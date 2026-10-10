@@ -399,15 +399,15 @@ function applyLanguage(){
  const h=$('#hud .sb small');if(h)h.textContent=L('score');
 }
 function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
- ov('<h2>Settings</h2><div class="settings-grid">'+
- '<label class="settings-row"><span>Language</span><select id="settingLang" aria-label="Language">'+options+'</select></label>'+
- '<label class="settings-row"><span>Master volume <b id="volumeVal">'+Math.round(S.volume??80)+'%</b></span><input id="settingVolume" type="range" min="0" max="100" step="5" value="'+(S.volume??80)+'" aria-label="Master volume"></label>'+
- '<label class="settings-row"><span>Sound effects</span><input id="settingMute" type="checkbox" '+(!S.mute?'checked':'')+' aria-label="Sound effects"></label>'+
- '<label class="settings-row"><span>Hover sounds</span><input id="settingHover" type="checkbox" '+(S.hoverSound?'checked':'')+' aria-label="Hover sounds"></label>'+
- '<label class="settings-row"><span>Reduced motion</span><input id="settingMotion" type="checkbox" '+(S.rm?'checked':'')+' aria-label="Reduced motion"></label>'+
- '<label class="settings-row"><span>Larger text</span><input id="settingText" type="checkbox" '+(S.largeText?'checked':'')+' aria-label="Larger text"></label>'+
- '<label class="settings-row"><span>High contrast</span><input id="settingContrast" type="checkbox" '+(S.hc?'checked':'')+' aria-label="High contrast"></label></div>'+
- '<p class="settings-note">Preferences save automatically. Language preference is saved; some game text remains English.</p><button class="b pri" data-a="settingsClose">Done</button>')}
+ ov('<h2>'+L('settings')+'</h2><div class="settings-grid">'+
+ '<label class="settings-row"><span>'+L('language')+'</span><select id="settingLang" aria-label="'+L('language')+'">'+options+'</select></label>'+
+ '<label class="settings-row"><span>'+L('volume')+' <b id="volumeVal">'+Math.round(S.volume??80)+'%</b></span><input id="settingVolume" type="range" min="0" max="100" step="5" value="'+(S.volume??80)+'" aria-label="'+L('volume')+'"></label>'+
+ '<label class="settings-row"><span>'+L('sound')+'</span><input id="settingMute" type="checkbox" '+(!S.mute?'checked':'')+' aria-label="'+L('sound')+'"></label>'+
+ '<label class="settings-row"><span>'+L('hoverSounds')+'</span><input id="settingHover" type="checkbox" '+(S.hoverSound?'checked':'')+' aria-label="'+L('hoverSounds')+'"></label>'+
+ '<label class="settings-row"><span>'+L('reducedMotion')+'</span><input id="settingMotion" type="checkbox" '+(S.rm?'checked':'')+' aria-label="'+L('reducedMotion')+'"></label>'+
+ '<label class="settings-row"><span>'+L('largeText')+'</span><input id="settingText" type="checkbox" '+(S.largeText?'checked':'')+' aria-label="'+L('largeText')+'"></label>'+
+ '<label class="settings-row"><span>'+L('highContrast')+'</span><input id="settingContrast" type="checkbox" '+(S.hc?'checked':'')+' aria-label="'+L('highContrast')+'"></label></div>'+
+ '<p class="settings-note">'+L('savedAuto')+'</p><button class="b pri" data-a="settingsClose">'+L('close')+'</button>')}
 
 function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]||{}).locale||'en-GB';
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')}</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
