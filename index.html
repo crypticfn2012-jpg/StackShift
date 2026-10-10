@@ -2,8 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Stack Shift</title>
-<link rel="icon" type="image/svg+xml" href="./favicon.png" sizes="any">
-<link rel="alternate icon" href="./favicon.ico">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <meta name="theme-color" content="#14213f">
 <style>
 :root{--bg:#26395f;--bg2:#1a2748;--navy:#14213f;--cream:#fbf0d4;--paper:#f4e3b8;--ink:#14213f;--or:#f5862a;--ok:#2f8a55;--bad:#c8382b;--gbg:#ead9b5;--gln:#cdb98d;--u:56px;--f:"Arial Rounded MT Bold","Avenir Next Rounded",Nunito,"Trebuchet MS",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -45,6 +44,7 @@ button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 .ib{width:46px;height:46px;flex:none;border:4px solid var(--navy);background:var(--cream);color:var(--ink);border-radius:50%;font:900 15px var(--f);cursor:pointer;box-shadow:0 4px 0 var(--navy)}
 #ord{display:flex;align-items:center;gap:10px;margin:12px 0 4px;padding:6px 10px;background:var(--paper);color:var(--ink);border:4px solid var(--navy);border-radius:12px;overflow:hidden}
 #ord .van{width:64px;flex:none}.van.go{animation:drive .5s}
+#contract{display:flex;align-items:center;gap:10px;margin:8px 0;padding:9px 12px;background:rgba(251,240,212,.09);border:1px solid rgba(251,240,212,.22);border-radius:12px;color:var(--cream)}#contract .mark{flex:none;width:34px;height:34px;display:grid;place-items:center;background:var(--or);color:var(--navy);border-radius:9px;font-size:20px}#contract .copy{flex:1;min-width:0}#contract b{display:block;font-size:13px}#contract small{display:block;color:#d6cbb0;font-size:12px;font-weight:700}#contract .progress{height:5px;margin-top:6px;background:rgba(251,240,212,.18);border-radius:9px;overflow:hidden}#contract .progress i{display:block;height:100%;background:var(--or);width:0;transition:width .2s}
 @keyframes drive{45%{transform:translateX(150%)}46%{transform:translateX(-150%)}}
 #rl{flex:1;font-size:15px}#on{font-size:12px;color:#5a5048;display:block;text-align:right}
 .lnk{background:none;border:0;color:var(--ink);font:800 13px var(--f);text-decoration:underline;cursor:pointer;padding:6px}
@@ -125,6 +125,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 <section id="game" class="scr hide">
  <div id="hud"><div class="sb"><small>Score</small><b id="sc">0</b></div><div class="tmw" role="timer"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
  <div id="ord"><div class="van" id="gvan"></div><div id="rl"></div><div><span id="on"></span><button class="lnk" data-a="nxt">Skip (−5s)</button></div></div>
+ <div id="contract" aria-live="polite"><div class="mark">★</div><div class="copy"><b id="contractTitle">Shift contract</b><small id="contractDesc">Complete an extra objective for bonus coins.</small><div class="progress"><i id="contractBar"></i></div></div><small id="contractCount">0/3</small></div>
  <p id="tut" class="hide">Drag parcels into the van. Tap one to rotate it, or press R. Space delivers. Fast deliveries add time. <button class="lnk" data-a="skip">Got it</button></p>
  <div id="stage"><div id="board"></div></div>
  <div id="acts"><button class="b" data-a="clr">Reset</button><button class="b" id="rt" data-a="rot">Rotate</button><button class="b pri" id="dl" data-a="dlv" disabled>Deliver</button></div>
@@ -314,7 +315,8 @@ function newOrder(){const o=G.o=gen(G.seed,G.i);G.c=o.c;G.r=o.r;build(o.c,o.r);i
  set('#rl',{none:'Pack every parcel into the van.',edge:'★ parcel must touch the '+o.edge+' wall.',lock:'🔒 parcel can’t be rotated.',fill:'Fill the van with no gaps.'}[o.rule]);set('#on','Order '+(G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
 function start(daily,endless){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
- G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,date:utc(),i:0,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false};
+ G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,date:utc(),i:0,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false};
+ G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
  $('#game').classList.toggle('endless',!!endless);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(endless?'Endless!':'Go!')}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
  set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const s=G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
@@ -324,15 +326,18 @@ function deliver(){if(!G||!G.run||G.paused||!G.ps.every(p=>p.pl))return;const o=
  const clean=G.om===0,area=G.ps.reduce((a,p)=>a+p.cells.length,0);G.streak=clean?G.streak+1:0;G.bs=Math.max(G.bs,G.streak);
  const sp=Math.floor(Math.max(0,20-Math.max(0,G.os-4))*4),mult=1+.1*Math.min(G.streak,10);
  const pts=Math.round((100+10*area+sp+(clean?50:0)+(o.rule==='fill'?50:0))*mult);
- const tb=bonusFor(G.os,area);if(!G.endless)G.t=Math.min(SHIFT+30,G.t+tb);G.score+=pts;G.done++;if(clean)G.perf++;S.orders++;if(clean)S.perfect++;S.streak=Math.max(S.streak,G.bs);S.seen=true;$('#tut').classList.add('hide');
+ const tb=bonusFor(G.os,area);if(!G.endless)G.t=Math.min(SHIFT+30,G.t+tb);G.score+=pts;G.done++;if(clean)G.perf++;updateContract();S.orders++;if(clean)S.perfect++;S.streak=Math.max(S.streak,G.bs);S.seen=true;$('#tut').classList.add('hide');
  cheer(clean,pts,tb);
  
- const v=$('#gvan');v.classList.remove('go');void v.offsetWidth;v.classList.add('go');pop($('#sc'));if(G.streak>1)pop($('#st'));
+ updateContract();const v=$('#gvan');v.classList.remove('go');void v.offsetWidth;v.classList.add('go');pop($('#sc'));if(G.streak>1)pop($('#st'));
  ach();save();
  if(G.daily&&G.done>=DN){G.win=true;end();return}flyOut();
  G.i++;newOrder();hud()}
-function skip(){if(!G||!G.run||G.paused)return;if(!G.endless){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();hud()}
+function skip(){if(!G||!G.run||G.paused)return;if(!G.endless){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
+const CONTRACTS=[{id:"clean",title:"Careful hands",desc:"Deliver 3 orders without mistakes",goal:3,reward:80,icon:"✓"},{id:"orders",title:"Busy shift",desc:"Complete 5 deliveries",goal:5,reward:80,icon:"▣"},{id:"streak",title:"On a roll",desc:"Build a 4-order clean streak",goal:4,reward:100,icon:"★"}];
+function contractProgress(){if(!G||!G.contract)return 0;return G.contract.id==="clean"?G.perf:G.contract.id==="orders"?G.done:G.bs}
+function updateContract(){if(!G||!G.contract)return;const c=G.contract,p=Math.min(c.goal,contractProgress());set("#contractTitle",c.title);set("#contractDesc",G.contractPaid?"Contract complete — bonus claimed":c.desc);set("#contractCount",p+"/"+c.goal);$("#contractBar").style.width=(p/c.goal*100)+"%";$(".mark")&&set(".mark",c.icon);if(p>=c.goal&&!G.contractPaid){G.contractPaid=true;S.coins+=c.reward;S.life+=c.reward;save();set("#contractDesc","Contract complete! +"+c.reward+" coins");toast("Contract complete: +"+c.reward+" coins");sfx("ach")}}
 const AL=[['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1],['s5','Hot streak','Reach a 5-order streak',s=>s.streak>=5],['k1','Four figures','Score 1000 in one shift',(s,g)=>g.score>=1000],['clean','Spotless shift','Deliver 3+ orders with no mistakes',(s,g)=>g.mist===0&&g.done>=3],['o25','Veteran','Deliver 25 orders in total',s=>s.orders>=25]];
 function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]&&f(S,G)){S.ach[id]=1;S.coins+=25;S.life+=25;toast('Achievement: '+n+' (+25 coins)');sfx('ach')}}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
