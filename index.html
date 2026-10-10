@@ -81,6 +81,10 @@ button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 #acts .b{margin:0;min-height:54px;font-size:17px;flex:1}#dl{flex:1.7!important}
 #ov{position:fixed;inset:0;background:rgba(10,16,32,.78);display:grid;place-items:center;padding:16px;z-index:20;overflow:auto}
 #ov .card{width:100%;max-width:390px;background:var(--paper);color:var(--ink);border:5px solid var(--navy);border-radius:18px;padding:18px;box-shadow:0 8px 0 #0a1022}
+#ov .card.cosmetics-card{width:min(760px,calc(100vw - 32px));max-width:760px;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;padding:22px}
+#ov .cosmetics-card .chips{gap:10px}
+#ov .cosmetics-card .chip{min-width:120px;flex:1 1 135px}
+@media(max-width:520px){#ov .card.cosmetics-card{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);padding:14px}#ov .cosmetics-card .chip{flex:1 1 calc(50% - 10px);min-width:0}}
 #ov .b{margin:10px 0}
 h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size:14px;margin:12px 0 6px}
 .sub{color:#5a5048;margin:4px 0 12px;font-weight:700}
@@ -421,7 +425,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  let h=`<h2>${L('cosmetics')}</h2><p class="sub">${S.coins} ${L('coins')} · ${L('earnedByPlaying')}</p><div class="van"></div><div class="sw" style="background:${g[0]};border-color:${g[1]}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`;
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
- ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');applyTheme(eq)}
+ ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
 const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
