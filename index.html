@@ -354,11 +354,13 @@ function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.rem
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
- ov(`<h2>${g.daily?(g.win?'Daily complete':'Daily attempt'):'Shift over'}</h2><div class="big">${g.score}</div>
- <p class="sub">${g.pb?'New personal best':d<0?(-d)+' short of your best ('+g.prev+')':'Matched your best'}${g.daily&&!g.win?` · ${g.done}/${DN} orders`:''}</p>
- <div class="st"><div><b>${g.done}</b><span>orders</span></div><div><b>${g.perf}</b><span>perfect</span></div><div><b>${g.bs}</b><span>best streak</span></div><div><b>${avg}s</b><span>per order · ${acc}% clean</span></div></div>
- <p class="sub">+${g.coins} coins${g.mist?` · ${g.mist} mistake${g.mist>1?'s':''} cost your streak`:' · no mistakes'}</p>
- <button class="b pri" data-a="again">Play again</button><div class="row"><button class="b" data-a="copy">Copy result</button><button class="b" data-a="menu">Menu</button></div>`)}
+ const title=L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
+ const subtitle=(g.pb?L('newBest'):d<0?L('shortBest').replace('{diff}',-d).replace('{best}',g.prev):L('matchedBest'))+(g.daily&&!g.win?' · '+g.done+'/'+DN+' '+L('ordersStat'):'');
+ const mistakeLine=g.mist?L('mistakesText').replace('{n}',g.mist):L('noMistakes');
+ ov('<h2>'+title+'</h2><div class="big">'+g.score+'</div><p class="sub">'+subtitle+'</p>'+
+ '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
+ '<p class="sub">+'+L('coinsEarned').replace('{n}',g.coins)+' · '+mistakeLine+'</p>'+
+ '<button class="b pri" data-a="again">'+L('playAgain')+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
