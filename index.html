@@ -121,7 +121,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 .settings-row span{font-size:14px}.settings-row select{max-width:58%;min-width:125px}.settings-row input[type=range]{width:46%;accent-color:#f5862a}.settings-row input[type=checkbox]{width:19px;height:19px;accent-color:#f5862a}
 .settings-note{font-size:12px;opacity:.78;margin:4px 0 12px}.card:has(#settingLang){max-height:88vh;overflow:auto}
 .settings-credits{border-top:2px solid #14213f30;margin:10px 0 4px;padding-top:9px;font-size:13px}.settings-credits b{display:block;margin-bottom:4px}.settings-credits p{margin:2px 0;font-weight:700;color:#5a5048}
-.ach-list{display:grid;gap:7px;max-height:56vh;overflow-y:auto;margin:10px 0 14px;padding:2px}.ach-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--cream);border:3px solid var(--navy);border-radius:10px}.ach-item.locked{opacity:.65}.ach-mark{width:30px;height:30px;flex:none;display:grid;place-items:center;background:var(--or);border-radius:7px;font-size:17px}.ach-item b{display:block;font-size:14px}.ach-item small{display:block;font-size:12px;line-height:1.25;color:#5a5048}.ach-item .ach-state{font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+.ach-list{display:grid;gap:7px;max-height:56vh;overflow-y:auto;margin:10px 0 14px;padding:2px}.ach-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--cream);border:3px solid var(--navy);border-radius:10px}.ach-item.locked{opacity:.65}.ach-mark{width:30px;height:30px;flex:none;display:grid;place-items:center;background:var(--or);border-radius:7px;font-size:17px}.ach-item b{display:block;font-size:14px}.ach-item small{display:block;font-size:12px;line-height:1.25;color:#5a5048}.ach-item .ach-state{font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}.ach-item.active{opacity:1;border-color:var(--or)}.menu-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px}.menu-links span{opacity:.55}
 @media(prefers-reduced-motion:reduce){.scr{animation:none!important}}
 
 </style></head>
@@ -141,7 +141,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <div class="dkt" id="dly"></div>
  <div class="row"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
  <p class="rec" id="rec"></p>
- <p id="achLink" class="rec"><button class="lnk" data-a="achievements" style="color:var(--or)">Achievements</button></p>
+ <p id="achLink" class="rec menu-links"><button class="lnk" data-a="campaign" style="color:var(--or)">Career campaign</button><span>·</span><button class="lnk" data-a="achievements">Achievements</button><span>·</span><button class="lnk" data-a="leaderboard">Daily leaderboard</button></p>
 </section>
 <section id="game" class="scr hide">
  <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
@@ -234,9 +234,23 @@ const SDK={on:false,c:null,mute:false,
   }catch(e){return false}
  },
  gs(){this.call(g=>g.gameplayStart())},gx(){this.call(g=>g.gameplayStop())},ht(){this.call(g=>g.happytime())},loaded(){this.call(g=>g.loadingStop())}};
+const CAMPAIGN=[
+ {id:'route',title:'First route',desc:'Complete 3 deliveries in a timed shift',reward:50,check:(s,g)=>!g.daily&&!g.endless&&g.done>=3},
+ {id:'clean',title:'Careful loading',desc:'Make 3 perfect deliveries in one shift',reward:75,check:(s,g)=>g.perf>=3},
+ {id:'five',title:'Full van',desc:'Complete 5 deliveries in a timed shift',reward:100,check:(s,g)=>!g.endless&&g.done>=5},
+ {id:'express',title:'Express service',desc:'Complete 3 orders in under 8 seconds each',reward:125,check:(s,g)=>(g.fast||0)>=3},
+ {id:'daily',title:'Daily regular',desc:'Complete a Daily Route',reward:125,check:(s,g)=>!!g.daily&&!!g.win},
+ {id:'rhythm',title:'Perfect rhythm',desc:'Reach a 5-order clean streak',reward:150,check:(s,g)=>(g.bs||0)>=5},
+ {id:'career25',title:'Growing route',desc:'Deliver 25 orders across your career',reward:175,check:s=>s.orders>=25},
+ {id:'noskip',title:'No shortcuts',desc:'Complete 5 deliveries without skipping in one shift',reward:175,check:(s,g)=>!g.endless&&g.done>=5&&g.skips===0},
+ {id:'bigshift',title:'Big earner',desc:'Score 1,200 points in one shift',reward:200,check:(s,g)=>g.score>=1200},
+ {id:'ten-shifts',title:'Experienced driver',desc:'Finish 10 shifts in total',reward:250,check:s=>s.shifts>=10},
+ {id:'career100',title:'Veteran driver',desc:'Deliver 100 orders across your career',reward:350,check:s=>s.orders>=100},
+ {id:'career250',title:'Delivery legend',desc:'Deliver 250 orders across your career',reward:500,check:s=>s.orders>=250}
+];
 /* ===== save (versioned, validated; SDK Data module on CrazyGames, localStorage elsewhere) ===== */
-const st={get(k){if(SDK.on)return SDK.c.data.getItem(k);try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on)return SDK.c.data.setItem(k,v);try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
-const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyStreak:{lastDate:'',current:0,best:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
+const st={get(k){if(SDK.on){try{const v=SDK.c.data.getItem(k);if(v!==null&&v!==undefined)return v}catch(e){}}try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on){try{SDK.c.data.setItem(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
+const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[]},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
 let S=DEF();
 function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK.on)raw=localStorage.getItem(KEY)}catch(e){}
  if(!raw)return d;let j;try{j=JSON.parse(raw)}catch(e){try{st.set(KEY+'.bak',raw)}catch(_){}return d}
@@ -248,6 +262,8 @@ function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK
  d.dailyStreak=Object.assign(DEF().dailyStreak,d.dailyStreak&&typeof d.dailyStreak==='object'?d.dailyStreak:{});
  if(typeof d.dailyStreak.lastDate!=='string')d.dailyStreak.lastDate='';
  for(const k of['current','best'])if(!(d.dailyStreak[k]>=0)||!isFinite(d.dailyStreak[k]))d.dailyStreak[k]=0;
+ d.campaign=Object.assign(DEF().campaign,d.campaign&&typeof d.campaign==='object'?d.campaign:{});
+ d.campaign.done=Array.isArray(d.campaign.done)?[...new Set(d.campaign.done.filter(id=>typeof id==='string'&&CAMPAIGN.some(m=>m.id===id)))]:[];
  d.playtime=Object.assign(DEF().playtime,d.playtime&&typeof d.playtime==='object'?d.playtime:{});
  if(!(d.playtime.seconds>=0)||!isFinite(d.playtime.seconds))d.playtime.seconds=0;
  d.playtime.claimed=Array.isArray(d.playtime.claimed)?[...new Set(d.playtime.claimed.filter(n=>Number.isFinite(n)&&n>0&&n<=d.playtime.seconds))]:[];
@@ -396,11 +412,14 @@ function updateContract(){if(!G||!G.contract)return;const c=G.contract,p=Math.mi
 const AL=[['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1],['s5','Hot streak','Reach a 5-order streak',s=>s.streak>=5],['k1','Four figures','Score 1000 in one shift',s=>s.best>=1000],['clean','Spotless shift','Deliver 3+ orders with no mistakes',(s,g)=>g.mist===0&&g.done>=3],['o25','Veteran','Deliver 25 orders in total',s=>s.orders>=25],['o100','Regular customer','Deliver 100 orders in total',s=>s.orders>=100],['daily1','Daily driver','Complete a daily route',s=>!!(s.daily&&s.daily.done)],['day3','Three-day streak','Complete daily routes 3 days in a row',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=3],['day7','Full week','Reach a 7-day daily streak',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=7],['stay5','Clocked in','Spend 5 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=300],['stay20','Long haul','Spend 20 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=1200],['coins1k','Big saver','Earn 1,000 coins in total',s=>s.life>=1000],['shifts10','Experienced driver','Finish 10 shifts',s=>s.shifts>=10]];
 function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]){let unlocked=false;try{unlocked=!!f(S,G||{})}catch(e){}if(unlocked){S.ach[id]=1;S.coins+=25;S.life+=25;toast('Achievement: '+n+' (+25 coins)');sfx('ach')}}}
 function achievements(){ach();save();const count=AL.filter(a=>!!S.ach[a[0]]).length;let h='<h2>Achievements</h2><p class="sub">'+count+' / '+AL.length+' unlocked · Each achievement earns 25 coins.</p><div class="ach-list">';for(const[id,name,desc]of AL){const done=!!S.ach[id];h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'•')+'</span><div><b>'+name+'</b><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked':'Locked')+'</small></div></div>'}h+='</div><button class="b pri" data-a="achClose">Close</button>';ov(h)}
+function advanceCampaign(){const c=S.campaign||(S.campaign={done:[]});if(!Array.isArray(c.done))c.done=[];const m=CAMPAIGN[c.done.length];if(!m)return 0;let complete=false;try{complete=!!m.check(S,G||{})}catch(e){}if(!complete)return 0;c.done.push(m.id);G.campaignTitle=m.title;G.campaignReward=m.reward;toast('Campaign complete: '+m.title+' (+'+m.reward+' coins)');return m.reward}
+function campaign(){const done=S.campaign&&Array.isArray(S.campaign.done)?S.campaign.done:[],pct=Math.round(done.length/CAMPAIGN.length*100);let h='<h2>Career campaign</h2><p class="sub">'+done.length+' / '+CAMPAIGN.length+' missions complete. Finish the next objective during a run to earn its coin reward.</p><div style="height:8px;background:#14213f24;border:2px solid #14213f;border-radius:9px;overflow:hidden;margin:10px 0 14px"><i style="display:block;width:'+pct+'%;height:100%;background:#f5862a"></i></div><div class="ach-list">';for(let i=0;i<CAMPAIGN.length;i++){const m=CAMPAIGN[i],complete=done.includes(m.id),active=!complete&&i===done.length;h+='<div class="ach-item '+(complete?'':'locked')+(active?' active':'')+'"><span class="ach-mark">'+(complete?'✓':i+1)+'</span><div><b>'+m.title+'</b><small>'+m.desc+'</small><small class="ach-state">'+(complete?'Complete':active?'Next mission':'Locked')+' · '+m.reward+' coins</small></div></div>'}h+='</div><p class="sub">Progress is saved automatically.</p><button class="b pri" data-a="campaignClose">Close</button>';ov(h)}
+function leaderboard(){const ready=!!(SDK.on&&LEADERBOARD_ENCRYPTION_KEY&&SDK.c&&SDK.c.user&&typeof SDK.c.user.submitScore==='function');const info=ready?'<p class="sub">Daily Route scores are submitted to CrazyGames. Rankings use its weekly seasons, so the built-in board does not reset every day.</p><p class="sub">Open the Stack Shift leaderboard on the CrazyGames game page to see the live standings.</p>':'<p class="sub">To enable score submissions, enable Leaderboards for Stack Shift in the CrazyGames Developer Portal and add its encryption key to index.html.</p><p class="sub">CrazyGames leaderboard seasons reset weekly, not daily. A true global leaderboard that resets every day needs a separate backend.</p>';ov('<h2>Daily leaderboard</h2>'+info+'<button class="b pri" data-a="leaderboardClose">Close</button>')}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
  if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
- S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;S.coins+=coins;S.life+=coins;ach();save();
- sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
+ S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=advanceCampaign();coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
+ sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.daily&&G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
  const title=L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
@@ -411,7 +430,7 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
  const streakLine=g.streakBonus?'<p class="sub">'+(S.dailyStreak&&S.dailyStreak.current||0)+'-day daily streak reward: +'+g.streakBonus+' coins</p>':'';
  ov('<h2>'+title+'</h2><div class="big">'+g.score+'</div><p class="sub">'+subtitle+'</p>'+
  '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
- '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p>'+streakLine+'<p class="sub">'+stayLine+'</p>'+
+ '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p>'+streakLine+(g.campaignReward?'<p class="sub">Campaign complete: '+g.campaignTitle+' · +'+g.campaignReward+' coins included above</p>':'')+'<p class="sub">'+stayLine+'</p>'+
  '<button class="b pri" data-a="again">'+L('playAgain')+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
@@ -442,7 +461,7 @@ function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" 
  '<p class="settings-note">'+L('savedAuto')+'</p><div class="settings-credits"><b>Credits</b><p>Main developer: Ron</p><p>Studio: PixelForge Studios</p></div><button class="b pri" data-a="settingsClose">'+L('close')+'</button>')}
 
 function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]||{}).locale||'en-GB',ds=S.dailyStreak||{best:0};
- $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')} · ${L('streak')} ${dailyStreakNow()} · ${L('best')} ${ds.best||0}</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
+ $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')} · Day streak ${dailyStreakNow()} · Best streak ${ds.best||0}</p><p class="sub">Streak reward: +50 coins at 3 days, +100 every 7 days.</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
  const played=Math.floor(S.playtime&&S.playtime.seconds||0),next=nextPlaytimeReward();
  set('#rec',`${L('best')} ${S.best} · ${S.orders} ${L('orders')} · ${S.perfect} ${L('perfect')} · ${L('streak')} ${S.streak} · ${S.shifts} ${L('shifts')} · ${S.coins} ${L('coins')} · ${formatDuration(played)} played · next +${next.coins} in ${formatDuration(Math.max(0,next.seconds-played))}`);set('#snd',L(muted()?'soundOff':'soundOn'));show('menu');applyLanguage()}
 function toMenu(){if(G&&G.run){G.run=false;SDK.gx()}cl();menu()}
@@ -451,7 +470,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
-const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},leaderboard:leaderboard,leaderboardClose:()=>{cl();menu()},shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
@@ -472,6 +491,6 @@ let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;tra
  if(G&&G.run&&!G.paused){if(!G.endless)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
-(async()=>{await SDK.init();S=load();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
+(async()=>{await SDK.init();S=load();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
 
 </script></body></html>
