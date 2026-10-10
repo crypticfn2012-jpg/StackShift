@@ -352,7 +352,41 @@ function sfx(k,n=0){if(muted()||!audioUnlocked)return;try{ac();if(!AC||!MG)retur
   pb:()=>{arp([0,4,7,12,16,19,24],440,'triangle',.13,.08,.3);arp([0,4,7,12,16,19,24],440,'square',.03,.08,.3);z(.4,.08,2500,.5)}})[k]()}catch(e){}}
 
 /* ===== UI plumbing ===== */
-let G=null,drag=null,sel=null,U=56,tt;const stage=$('#stage'),board=$('#board'),bc=[];
+let G=null,drag=null,sel=null,U=56,tt,lifeAdBusy=false,lifeAdNextAt=0;
+const LIFE_AD_KEY='stackshift_life_ad_next';
+function lifeAdCooldown(){let stored=0;try{stored=Number(localStorage.getItem(LIFE_AD_KEY))||0}catch(e){}return Math.max(lifeAdNextAt,stored)}
+function lifeAdOffer(context){
+ if(!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed)||!SDK.on||!SDK.c||!SDK.c.ad||typeof SDK.c.ad.requestAd!=='function')return'';
+ const left=lifeAdCooldown()-Date.now();
+ if(left>0)return'<p class="sub">Extra life ad available in '+Math.ceil(left/1000)+'s.</p>';
+ return '<button class="b" data-a="lifeAd" data-context="'+context+'">Watch an ad for +1 life</button>';
+}
+async function requestLifeAd(context){
+ if(lifeAdBusy||!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed))return;
+ if(!SDK.on||!SDK.c||!SDK.c.ad||typeof SDK.c.ad.requestAd!=='function'){toast('Rewarded ads are unavailable right now');return}
+ const wait=lifeAdCooldown()-Date.now();if(wait>0){toast('Try again in '+Math.ceil(wait/1000)+' seconds');return}
+ lifeAdBusy=true;lifeAdNextAt=Date.now()+180000;try{localStorage.setItem(LIFE_AD_KEY,String(lifeAdNextAt))}catch(e){}
+ const previousGain=MG?MG.gain.value:null;
+ const card=$('#ov .card');if(card){card.querySelectorAll('button').forEach(b=>b.disabled=true);const adButton=card.querySelector('[data-a=lifeAd]');if(adButton)adButton.textContent='Loading ad...'}
+ try{
+  if(MG)MG.gain.value=0;
+  await SDK.c.ad.requestAd('rewarded');
+  if(!G||!G.campaign)throw new Error('Campaign ended');
+  if(context==='pause'&&G.run){
+   G.lives=(G.lives||0)+1;G.paused=false;cl();hud();layout();if(G.sx){SDK.gs();G.sx=0}toast('Extra life added');sfx('ach');
+  }else if(context==='results'&&G.campaignFailed){
+   const retryLevel=G.campaignLevel;G.adBonusLives=(G.adBonusLives||0)+1;const bonus=G.adBonusLives;start(0,false,true,bonus);G.campaignLevel=retryLevel;G.i=retryLevel;toast('Extra life added — good luck');sfx('ach');
+  }
+ }catch(e){
+  toast('No ad available right now. Try again later.');
+  if(context==='pause'&&G&&G.run&&G.paused)pcard();
+  else if(context==='results'&&G&&!G.run)results();
+ }finally{
+  if(MG&&previousGain!==null)MG.gain.value=previousGain;
+  lifeAdBusy=false;
+ }
+}
+const stage=$('#stage'),board=$('#board'),bc=[];
 const RM=()=>S.rm||matchMedia('(prefers-reduced-motion:reduce)').matches;
 const show=id=>$$('.scr').forEach(e=>e.classList.toggle('hide',e.id!==id));
 const ov=h=>{const o=$('#ov');o.innerHTML='<div class="card">'+h+'</div>';o.classList.remove('hide');const b=o.querySelector('.pri,button');b&&b.focus()};
@@ -417,10 +451,10 @@ function newOrder(){const ramp=G.campaign?Math.floor(G.campaignLevel*GR.length/C
  G.os=0;G.om=0;sel=G.ps[0];board.dataset.e=o.edge||'';
  set('#rl',{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
-function start(daily,endless,campaignMode){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
- const savedCampaignLevel=Math.max(0,Math.floor(S.campaign.level||0));const campaignLevel=campaignMode?(savedCampaignLevel>=CAMPAIGN_LEVELS?0:savedCampaignLevel):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,lives:campaignMode?((campaignLevel+1)%15===0?1:3):0,campaignFailed:false,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
+function start(daily,endless,campaignMode,extraLives=0){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
+ const savedCampaignLevel=Math.max(0,Math.floor(S.campaign.level||0));const campaignLevel=campaignMode?(savedCampaignLevel>=CAMPAIGN_LEVELS?0:savedCampaignLevel):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,lives:campaignMode?((campaignLevel+1)%15===0?1:3)+Math.max(0,Math.floor(extraLives||0)):0,campaignFailed:false,adBonusLives:Math.max(0,Math.floor(extraLives||0)),date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
  G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
- $('#game').classList.toggle('endless',!!endless||!!campaignMode);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(campaignMode?'Campaign level '+(G.campaignLevel+1):endless?L('endlessGo'):L('go'))}
+ $('#game').classList.toggle('endless',!!endless||!!campaignMode);$('#ord [data-a=nxt]').classList.toggle('hide',!!campaignMode);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(campaignMode?'Campaign level '+(G.campaignLevel+1):endless?L('endlessGo'):L('go'))}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
  set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const lv=$('#lives');if(lv){lv.textContent=G.campaign?'♥ '.repeat(Math.max(0,G.lives||0)).trim()+(G.campaign&&G.lives===1?' !':''):'';lv.style.display=G.campaign?'inline':'none';lv.setAttribute('aria-label',G.campaign?(G.lives+' lives remaining'):'')}const s=G.campaign?(G.campaignLevel+1)+'/'+CAMPAIGN_LEVELS:G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
  TMW.classList.toggle('hide',!!G.endless||!!G.campaign);TMW.classList.toggle('low',!G.endless&&!G.campaign&&G.run&&G.t<=10);if(!G.endless&&!G.campaign&&s!==G.ls){G.ls=s;if(G.run&&!G.paused&&s<=5&&s>0)sfx('tick',s)}}
@@ -475,12 +509,12 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
  ov('<h2>'+title+'</h2><div class="big">'+g.score+'</div><p class="sub">'+subtitle+'</p>'+
  '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
  '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p>'+streakLine+(g.campaignReward?'<p class="sub">Campaign complete: '+g.campaignTitle+' · +'+g.campaignReward+' coins included above</p>':'')+'<p class="sub">'+stayLine+'</p>'+
- '<button class="b pri" data-a="again">'+(g.campaignFailed?'Retry level':L('playAgain'))+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
+ (g.campaignFailed&&lifeAdOffer('results')?'<button class="b" data-a="again">Retry level</button>'+lifeAdOffer('results'):'<button class="b pri" data-a="again">'+(g.campaignFailed?'Retry level':L('playAgain'))+'</button>')+'<div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
  if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
-const pcard=()=>ov(`<h2>${L('pause')}</h2><button class="b pri" data-a="resume">${L('resume')}</button><button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`);
+const pcard=()=>{const offer=lifeAdOffer('pause');ov(`<h2>${L('pause')}</h2>${offer?'<button class="b" data-a="resume">Continue without ad</button>':'<button class="b pri" data-a="resume">'+L('resume')+'</button>'}${offer}<button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`)};
 let settingsBack=false;
 const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
 function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
@@ -519,7 +553,7 @@ const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);set
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},
- rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
+ rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),lifeAd:b=>requestLifeAd(b.dataset.context),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
 let hoverButton=null,lastHoverSound=0;
