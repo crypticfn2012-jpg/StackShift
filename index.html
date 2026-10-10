@@ -377,6 +377,41 @@ body{background-color:var(--bg2);background-image:radial-gradient(ellipse at 50%
  #menu>#rec .stat-tile span{font-size:7px}
  #menu>#rec .stat-tile b{font-size:10px}
 }
+
+/* Readability and strict board fit corrections. */
+:root{--ui-muted:#d5deeb}
+#menu>.tag{color:#f0f3fa!important}
+#menu>.menu-utility .b{color:#f2f5fb}
+#menu>#rec .stat-tile span{color:#d1dced}
+#menu>#rec .stat-tile b{color:#fff7e8}
+#menu>#rec .stat-tile.reward span{color:#ffcf94}
+#menu>#rec .stat-tile.reward b{color:#ffebd1}
+#menu>#dly .bd>p{color:#403626;font-size:11px;line-height:1.4}
+#menu>#dly .bd>p:nth-of-type(2){color:#403626}
+#menu>#dly .bd>p.sub{color:#5f4a2e;font-size:10px}
+#contract b{color:#fff9ed;font-size:14px}
+#contract small{color:#e5eaf2;font-size:13px;line-height:1.4}
+#contractCount{color:#fff4db;font-weight:900}
+#tut{color:#f0f3fa;font-size:15px;line-height:1.5}
+#tut .lnk{color:#ffb363}
+#rl{font-size:15px;line-height:1.4;color:#14213f}
+#on{color:#403626;font-weight:800}
+#board{max-width:100%}
+.g{border-color:#b5a47c}
+@media(min-width:600px){
+ #menu>#rec .stat-tile span{font-size:10px;color:#d5deeb}
+ #menu>#rec .stat-tile b{font-size:14px}
+ #menu>#dly .bd>p{font-size:11px}
+}
+@media(max-width:599px){
+ #menu>#rec .stat-tile span{font-size:9px;color:#d5deeb}
+ #menu>#rec .stat-tile b{font-size:13px}
+ #menu>#dly .bd>p{font-size:10px}
+ #menu>#dly .bd>p.sub{font-size:9px}
+}
+@media(max-width:380px){
+ #menu>#rec .stat-tile span{font-size:8px}
+}
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
@@ -598,7 +633,16 @@ const pop=e=>{e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop'
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1900)}
 function burst(){if(RM())return;for(let i=0;i<14;i++){const d=document.createElement('i');d.className='cf';d.style.cssText=`left:50%;top:40%;--dx:${(Math.random()-.5)*320}px;--dy:${-60-Math.random()*170}px;background:${i%2?'#f5862a':'#fbf0d4'}`;document.body.appendChild(d);setTimeout(()=>d.remove(),750)}}
 /* cell size now fits each order's van to the screen, so small vans are drawn big */
-function size(){const SW=stage.clientWidth||innerWidth-20,VH=window.visualViewport?.height||innerHeight,c=G&&G.c||5,r=G&&G.r||4,land=matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches,room=Math.max(120,VH-(land?112:300));U=Math.max(land?22:28,Math.min(96,Math.floor(Math.min(SW/Math.max(c,5.2),room/(r+3.2)))));document.documentElement.style.setProperty('--u',U+'px');layout()}
+function size(){
+ const rawWidth=stage.clientWidth||innerWidth-20,SW=Math.max(48,rawWidth),VH=window.visualViewport?.height||innerHeight,c=G&&G.c||5,r=G&&G.r||4;
+ const land=matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches;
+ const widthBudget=Math.max(8,SW-16),heightBudget=Math.max(80,VH-(land?130:320));
+ // Never force cells to a minimum size that makes the board wider than its stage.
+ const byWidth=widthBudget/Math.max(c,5.2),byBoard=widthBudget/c,byHeight=heightBudget/(r+3.2);
+ U=Math.max(4,Math.min(96,Math.floor(Math.min(byWidth,byBoard,byHeight))));
+ document.documentElement.style.setProperty('--u',U+'px');
+ layout()
+}
 const TMW=$('.tmw'),buzz=p=>{try{!RM()&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const bonusFor=(os,area)=>{const r=os/(4+area*.5);return r<=.5?6:r<=.8?5:r<=1.1?4:r<=1.5?3:r<=2?2:1};
 function spark(x,y,n,cols,sp){if(RM())return;for(let i=0;i<n;i++){const d=document.createElement('i'),a=Math.random()*6.283,s=sp*(.5+Math.random());d.className='sp';d.style.cssText=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*s}px;--dy:${Math.sin(a)*s-20}px;background:${cols[i%cols.length]}`;stage.appendChild(d);setTimeout(()=>d.remove(),650)}}
