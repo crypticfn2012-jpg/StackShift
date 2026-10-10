@@ -194,6 +194,34 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #acts .b{min-height:36px}
 }
 
+
+/* Readable shift stats: important numbers get their own cards. */
+#rec{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:9px;margin:18px 0 10px;color:var(--cream);font-size:14px}
+.stat-tile{min-width:0;padding:12px 13px 11px;background:rgba(251,240,212,.08);border:2px solid rgba(251,240,212,.17);border-radius:13px;box-shadow:0 3px 0 rgba(8,15,31,.2)}
+.stat-tile span{display:block;color:#d6cbb0;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.stat-tile b{display:block;margin-top:3px;color:var(--cream);font-size:clamp(19px,2.1vw,27px);line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat-tile.coins{background:rgba(245,134,42,.15);border-color:rgba(245,134,42,.48)}.stat-tile.coins b{color:#ffb568}
+.stat-tile.reward{grid-column:span 2;background:var(--paper);border-color:var(--navy);color:var(--ink)}.stat-tile.reward span,.stat-tile.reward b{color:var(--ink)}
+.pc[data-special="fragile"] .c:first-child{outline:3px solid #fff0a6;outline-offset:-5px}
+#contract.special-cargo{background:rgba(245,134,42,.13);border-color:rgba(245,134,42,.65)}
+#contract.special-cargo .mark{background:#ffb568}
+@media(min-width:1100px) and (min-height:650px){
+ #app{width:100%;max-width:1540px;padding:18px 24px 14px}
+ #game{display:grid;grid-template-columns:minmax(210px,.78fr) minmax(460px,1.55fr) minmax(220px,.82fr);grid-template-areas:"hud hud hud" "ord stage contract" "tut stage contract" "tut stage acts";column-gap:clamp(14px,2vw,30px);row-gap:12px;align-items:start}
+ #hud{grid-area:hud;gap:16px;padding:0 0 8px;border-bottom:2px solid rgba(251,240,212,.13)}
+ .sb{min-width:110px}.sb small{font-size:14px}#sc{font-size:44px}
+ .tmw{max-width:420px;height:38px}#tm{font-size:18px}#st{font-size:19px;min-width:110px}#lives{font-size:18px}
+ #ord{grid-area:ord;align-self:start;margin:0;padding:12px;gap:10px;min-width:0}
+ #ord .van{width:54px}#rl{font-size:15px;line-height:1.4}#on{font-size:12px;margin-top:5px}
+ #contract{grid-area:contract;align-self:start;margin:0;padding:15px;gap:12px;min-width:0}
+ #contract .mark{width:42px;height:42px;font-size:23px}#contract b{font-size:16px}#contract small{font-size:14px;line-height:1.4}#contract .progress{height:8px}
+ #stage{grid-area:stage;min-width:0;margin:0 auto 8px;width:100%;max-width:760px;overflow:visible}
+ #tut{grid-area:tut;align-self:start;margin:0;padding:14px;background:rgba(251,240,212,.06);border:1px solid rgba(251,240,212,.14);border-radius:12px;font-size:14px;line-height:1.55}
+ #acts{grid-area:acts;position:relative;bottom:auto;display:flex;flex-direction:column;padding:0;background:none;gap:10px;align-self:start}
+ #acts .b{min-height:52px;font-size:17px}
+}
+@media(max-width:700px){#rec{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.stat-tile{padding:10px}.stat-tile b{font-size:22px}.stat-tile.reward{grid-column:span 2}}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
