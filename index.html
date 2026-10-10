@@ -108,64 +108,13 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(max-height:780px){#app{padding-top:5px;padding-bottom:3px}.ttl{font-size:clamp(48px,12vw,70px);margin:4px 0 14px}.tag{margin:7px 0}#road{height:112px}#mvan{width:190px;margin-left:-95px}.b{margin:7px 0;min-height:44px;padding:8px 10px}.b.big{min-height:48px;font-size:20px}.dkt{margin:8px 0 5px}.dkt .bd{padding:6px 9px}.dkt p{font-size:12px}.dkt .b{min-height:34px;margin:5px 0}.rec{margin:7px 0;font-size:11px}.mode-row .b{min-height:46px;font-size:17px}}
 @media(max-height:640px){.ttl{font-size:48px}.tag{font-size:13px}#road{height:86px}#mvan{width:160px;margin-left:-80px}#road::after{bottom:5px}.dkt .stub{width:60px}.dkt .stub b{font-size:25px}.rec{font-size:10px}.row .b{font-size:15px}}
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
+.mode-row{gap:8px}
+.mode-row .b{min-width:0;padding:10px 7px;font-size:clamp(14px,2.2vw,19px);white-space:normal;line-height:1.15}
+.menu-utility{margin-top:4px}
+@media(max-width:520px){.mode-row{gap:6px}.mode-row .b{font-size:14px;padding:9px 5px}.menu-utility .b{font-size:15px}}
 
 
-/* Keep the main menu fitting the viewport without making its contents feel tiny. */
-#menu .ttl{font-size:clamp(62px,16vw,86px);margin:7px 0 14px}
-#menu .tag{font-size:15px;line-height:1.3;margin:5px 0}
-#menu #road{height:142px}
-#menu #mvan{width:215px;margin-left:-107px}
-#menu .dkt{margin:12px 0 7px}
-#menu .dkt .bd{padding:8px 11px 9px}
-#menu .dkt .bd::after{height:7px;margin-top:6px}
-#menu .dkt p{font-size:14px;line-height:1.25}
-#menu .dkt .b{min-height:40px;margin:5px 0}
-#menu .row .b{min-height:42px;margin:5px 0;font-size:16px}
-#menu .rec{margin:7px 0;font-size:13px}
-#menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:9px 0 6px}
-#menu .menu-tile{min-height:100px;padding:9px 11px;gap:5px}
-#menu .menu-tile-top{display:flex}
-#menu .menu-tile-mark{width:25px;height:25px}
-#menu .menu-tile-count{font-size:10px}
-#menu .menu-tile b{font-size:15px}
-#menu .menu-tile small{font-size:11px;line-height:1.3}
-#menu .menu-tile-foot{padding-top:5px;font-size:11px}
-@media(max-height:780px){
- #menu .ttl{font-size:clamp(54px,12vw,72px);margin:4px 0 9px;-webkit-text-stroke:6px var(--navy);text-shadow:0 5px 0 var(--navy)}
- #menu .tag{font-size:13px;line-height:1.25;margin:4px 0}
- #menu #road{height:96px}
- #menu #mvan{width:175px;margin-left:-87px}
- #menu .dkt{margin:7px 0 4px}
- #menu .dkt .stub{width:62px}
- #menu .dkt .stub b{font-size:26px}
- #menu .dkt .bd{padding:6px 9px}
- #menu .dkt p{font-size:12px;line-height:1.2}
- #menu .dkt .b{min-height:34px;padding:6px 9px;margin:4px 0;font-size:14px}
- #menu .row .b{min-height:39px;padding:7px 9px;margin:4px 0;font-size:15px}
- #menu .rec{font-size:11px;margin:4px 0}
- #menu .menu-links{margin:6px 0 3px;gap:7px}
- #menu .menu-tile{min-height:82px;padding:7px 9px;gap:4px}
- #menu .menu-tile b{font-size:14px}
- #menu .menu-tile small{font-size:10px}
- #menu .menu-tile-foot{font-size:10px;padding-top:4px}
-}
-@media(max-height:640px){
- #menu .ttl{font-size:48px;margin:1px 0 6px}
- #menu .tag{font-size:12px}
- #menu #road{height:66px}
- #menu #mvan{width:135px;margin-left:-67px}
- #menu .dkt p{font-size:11px}
- #menu .menu-tile{min-height:65px;padding:6px 8px}
- #menu .menu-tile-top{display:none}
-}
-@media(max-width:520px){
- #menu .ttl{font-size:clamp(58px,17vw,78px)}
- #menu .tag{font-size:13px}
- #menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr))}
- #menu .menu-tile{min-height:88px}
- #menu .menu-tile b{font-size:14px}
- #menu .menu-tile small{font-size:10px}
-}
+
 
 </style></head>
 <body>
@@ -180,11 +129,11 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <h1 class="ttl">Stack<span>Shift</span></h1>
  <p class="tag">Fit every parcel into the van before the clock runs out.</p>
  <div id="road"><div class="van" id="mvan"></div></div>
- <div class="row mode-row"><button class="b pri big" data-a="play">Timed puzzle</button><button class="b big" data-a="endless">Endless mode</button></div>
+ <div class="row mode-row"><button class="b pri big" data-a="play">Timed puzzle</button><button class="b big" data-a="endless">Endless mode</button><button class="b big" data-a="campaignPlay">Career campaign</button></div>
  <div class="dkt" id="dly"></div>
- <div class="row"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
+ <div class="row menu-utility"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="achievements">Achievements</button></div><div class="row"><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
  <p class="rec" id="rec"></p>
- <div id="achLink" class="menu-links" aria-label="Progress"><button class="menu-tile" data-a="campaign"><span class="menu-tile-top"><span class="menu-tile-mark">01</span><span class="menu-tile-count" id="campaignCount">0 / 12</span></span><b>Career campaign</b><small>Work through your delivery career</small><span class="menu-tile-foot">View missions <span aria-hidden="true">→</span></span></button><button class="menu-tile" data-a="achievements"><span class="menu-tile-top"><span class="menu-tile-mark">02</span><span class="menu-tile-count" id="achievementCount">0 unlocked</span></span><b>Achievements</b><small>Collect rewards for milestones</small><span class="menu-tile-foot">View achievements <span aria-hidden="true">→</span></span></button></div>
+ 
 </section>
 <section id="game" class="scr hide">
  <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
@@ -212,16 +161,17 @@ const rotc=cs=>norm(cs.map(c=>[-c[1],c[0]]));
 const dims=cs=>[Math.max(...cs.map(c=>c[0]))+1,Math.max(...cs.map(c=>c[1]))+1];
 const edgeOK=(cs,gx,gy,e,c,r)=>cs.some(([x,y])=>e==='left'?x+gx===0:e==='right'?x+gx===c-1:e==='top'?y+gy===0:y+gy===r-1);
 /* The van (grid) grows with the order: bigger boxes and more of them get a bigger cargo bay. */
-const GR=[[4,3],[4,3],[5,3],[5,4],[5,4],[6,4],[6,4],[6,5],[7,5]];
+const GR=[[4,3],[4,3],[5,3],[5,4],[5,4],[6,4],[6,4],[6,5],[7,5],[7,6],[8,6]];
+const CAMPAIGN_LEVELS=40;
 /* Every order is carved out of a placed solution, then re-verified, so it always has an answer. */
 function verify(o){const seen=new Set();for(const p of o.ps)for(const[x,y]of p.sol){const X=x+p.sx,Y=y+p.sy;if(X<0||X>=o.c||Y<0||Y>=o.r||seen.has(Y*o.c+X))return false;seen.add(Y*o.c+X)}
  if(o.rule==='fill'&&seen.size!==o.c*o.r)return false;
  if(o.rule==='edge'){const p=o.ps[o.star];if(!edgeOK(p.sol,p.sx,p.sy,o.edge,o.c,o.r))return false}return true}
 function gen(seed,i){
  for(let a=0;a<400;a++){
-  const r=rng(seed+i*7919+a*104729),R=n=>Math.floor(r()*n),[c,rw]=GR[Math.min(i,8)],tot=c*rw;
+  const r=rng(seed+i*7919+a*104729),R=n=>Math.floor(r()*n),[c,rw]=GR[Math.min(i,GR.length-1)],tot=c*rw;
   const rule=i<2?'none':['edge','lock','fill','none'][(i-2)%4],full=rule==='fill';
-  const area=full?tot:Math.round(tot*(.62+r()*.2)),n=Math.max(3,Math.min(7,Math.round(area/4.5))),mn=area/n<4?2:3;
+  const area=full?tot:Math.round(tot*(.62+r()*.2)),n=Math.max(3,Math.min(i>=9?8:7,Math.round(area/4.5))),mn=area/n<4?2:3;
   const reg=new Set(full?[...Array(tot).keys()]:[R(tot)]);
   while(reg.size<area){const q=[...reg],o=NB(q[R(q.length)],c,rw);reg.add(o[R(o.length)])}
   const cells=[...reg],own=new Map();
@@ -277,7 +227,7 @@ const CAMPAIGN=[
 ];
 /* ===== save (versioned, validated; SDK Data module on CrazyGames, localStorage elsewhere) ===== */
 const st={get(k){if(SDK.on){try{const v=SDK.c.data.getItem(k);if(v!==null&&v!==undefined)return v}catch(e){}}try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on){try{SDK.c.data.setItem(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
-const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[]},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
+const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[],level:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
 let S=DEF();
 function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK.on)raw=localStorage.getItem(KEY)}catch(e){}
  if(!raw)return d;let j;try{j=JSON.parse(raw)}catch(e){try{st.set(KEY+'.bak',raw)}catch(_){}return d}
@@ -290,7 +240,7 @@ function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK
  if(typeof d.dailyStreak.lastDate!=='string')d.dailyStreak.lastDate='';
  for(const k of['current','best'])if(!(d.dailyStreak[k]>=0)||!isFinite(d.dailyStreak[k]))d.dailyStreak[k]=0;
  d.campaign=Object.assign(DEF().campaign,d.campaign&&typeof d.campaign==='object'?d.campaign:{});
- d.campaign.done=Array.isArray(d.campaign.done)?[...new Set(d.campaign.done.filter(id=>typeof id==='string'&&CAMPAIGN.some(m=>m.id===id)))]:[];
+ d.campaign.done=Array.isArray(d.campaign.done)?[...new Set(d.campaign.done.filter(id=>typeof id==='string'&&CAMPAIGN.some(m=>m.id===id)))]:[];d.campaign.level=Math.max(0,Math.min(CAMPAIGN_LEVELS,Math.floor(Number(d.campaign.level)||0)));
  d.playtime=Object.assign(DEF().playtime,d.playtime&&typeof d.playtime==='object'?d.playtime:{});
  if(!(d.playtime.seconds>=0)||!isFinite(d.playtime.seconds))d.playtime.seconds=0;
  d.playtime.claimed=Array.isArray(d.playtime.claimed)?[...new Set(d.playtime.claimed.filter(n=>Number.isFinite(n)&&n>0&&n<=d.playtime.seconds))]:[];
@@ -337,7 +287,7 @@ function sfx(k,n=0){if(muted()||!audioUnlocked)return;try{ac();if(!AC||!MG)retur
 let G=null,drag=null,sel=null,U=56,tt;const stage=$('#stage'),board=$('#board'),bc=[];
 const RM=()=>S.rm||matchMedia('(prefers-reduced-motion:reduce)').matches;
 const show=id=>$$('.scr').forEach(e=>e.classList.toggle('hide',e.id!==id));
-const ov=h=>{const o=$('#ov');const feature=/Career campaign|Achievements/.test(h);o.innerHTML='<div class="card'+(feature?' feature-card':'')+'">'+h+'</div>';o.classList.remove('hide');const b=o.querySelector('.pri,button');b&&b.focus()};
+const ov=h=>{const o=$('#ov');o.innerHTML='<div class="card">'+h+'</div>';o.classList.remove('hide');const b=o.querySelector('.pri,button');b&&b.focus()};
 const cl=()=>$('#ov').classList.add('hide');
 const set=(q,t)=>{const e=$(q);if(e.textContent!==String(t))e.textContent=t};
 const pop=e=>{e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')};
@@ -397,28 +347,28 @@ stage.addEventListener('contextmenu',e=>{e.preventDefault();rotSel()});
 function newOrder(){const o=G.o=gen(G.seed,G.i);G.c=o.c;G.r=o.r;build(o.c,o.r);if(G.ps)G.ps.forEach(p=>p.el.remove());
  G.ps=o.ps.map(p=>{const el=document.createElement('div');el.className='pc';stage.appendChild(el);const q={k:p.k,cells:p.cells,lock:p.k===o.lock,star:p.k===o.star,pl:null,el};el._p=q;paint(q);return q});
  G.os=0;G.om=0;sel=G.ps[0];board.dataset.e=o.edge||'';
- set('#rl',{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);set('#on',L('orderLabel').replace('{n}',G.i+1));
+ set('#rl',{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
-function start(daily,endless){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
- G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,date:utc(),i:0,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
+function start(daily,endless,campaignMode){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
+ const campaignLevel=campaignMode?Math.min(CAMPAIGN_LEVELS,Math.max(0,S.campaign.level||0)):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
  G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
- $('#game').classList.toggle('endless',!!endless);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(endless?L('endlessGo'):L('go'))}
+ $('#game').classList.toggle('endless',!!endless||!!campaignMode);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(campaignMode?'Campaign level '+(G.campaignLevel+1):endless?L('endlessGo'):L('go'))}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
- set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const s=G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
- TMW.classList.toggle('hide',!!G.endless);TMW.classList.toggle('low',!G.endless&&G.run&&G.t<=10);if(!G.endless&&s!==G.ls){G.ls=s;if(G.run&&!G.paused&&s<=5&&s>0)sfx('tick',s)}}
+ set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const s=G.campaign?(G.campaignLevel+1)+'/'+CAMPAIGN_LEVELS:G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
+ TMW.classList.toggle('hide',!!G.endless||!!G.campaign);TMW.classList.toggle('low',!G.endless&&!G.campaign&&G.run&&G.t<=10);if(!G.endless&&!G.campaign&&s!==G.ls){G.ls=s;if(G.run&&!G.paused&&s<=5&&s>0)sfx('tick',s)}}
 function deliver(){if(!G||!G.run||G.paused||!Array.isArray(G.ps)||!G.ps.length||!G.ps.every(p=>p&&p.pl))return;const o=G.o;
  if(o.rule==='edge'){const p=G.ps[o.star];if(!edgeOK(p.cells,p.pl[0],p.pl[1],o.edge,o.c,o.r)){G.score=Math.max(0,G.score-30);mist('★ parcel must touch the '+o.edge+' wall (−30)');hud();return}}
  const clean=G.om===0,area=G.ps.reduce((a,p)=>a+p.cells.length,0);if(G.os<=8)G.fast=(G.fast||0)+1;G.streak=clean?G.streak+1:0;G.bs=Math.max(G.bs,G.streak);
  const sp=Math.floor(Math.max(0,20-Math.max(0,G.os-4))*4),mult=1+.1*Math.min(G.streak,10);
  const pts=Math.round((100+10*area+sp+(clean?50:0)+(o.rule==='fill'?50:0))*mult);
- const tb=bonusFor(G.os,area);if(!G.endless)G.t=Math.min(SHIFT+30,G.t+tb);G.score+=pts;G.done++;if(clean)G.perf++;updateContract();S.orders++;if(clean)S.perfect++;S.streak=Math.max(S.streak,G.bs);S.seen=true;$('#tut').classList.add('hide');
+ const tb=bonusFor(G.os,area);if(!G.endless&&!G.campaign)G.t=Math.min(SHIFT+30,G.t+tb);G.score+=pts;G.done++;if(clean)G.perf++;updateContract();S.orders++;if(clean)S.perfect++;S.streak=Math.max(S.streak,G.bs);S.seen=true;$('#tut').classList.add('hide');
  cheer(clean,pts,tb);
  
  updateContract();const v=$('#gvan');v.classList.remove('go');void v.offsetWidth;v.classList.add('go');pop($('#sc'));if(G.streak>1)pop($('#st'));
  ach();save();
- if(G.daily&&G.done>=DN){G.win=true;end();return}flyOut();
+ if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
  G.i++;newOrder();hud()}
-function skip(){if(!G||!G.run||G.paused)return;G.skips=(G.skips||0)+1;if(!G.endless){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
+function skip(){if(!G||!G.run||G.paused)return;G.skips=(G.skips||0)+1;if(!G.endless&&!G.campaign){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
 const CONTRACTS=[
 {id:"clean",title:"Careful hands",titleKey:"careful",desc:"Deliver 3 orders without mistakes",descKey:"carefulDesc",goal:3,reward:80,icon:"✓",kind:"clean"},
@@ -440,16 +390,16 @@ const AL=[['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1],['s5'
 function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]){let unlocked=false;try{unlocked=!!f(S,G||{})}catch(e){}if(unlocked){S.ach[id]=1;S.coins+=25;S.life+=25;toast('Achievement: '+n+' (+25 coins)');sfx('ach')}}}
 function achievements(){ach();save();const count=AL.filter(a=>!!S.ach[a[0]]).length;let h='<div class="feature-intro"><div><h2>Achievements</h2><p class="sub">Milestones earned by playing your way.</p></div><span class="feature-stat">'+count+' / '+AL.length+' UNLOCKED</span></div><p class="sub">Every achievement earns 25 coins.</p><div class="ach-list">';for(const[id,name,desc]of AL){const done=!!S.ach[id];h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'•')+'</span><div><b>'+name+'</b><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked':'Locked')+'</small></div></div>'}h+='</div><button class="b pri" data-a="achClose">Back to menu</button>';ov(h)}
 function advanceCampaign(){const c=S.campaign||(S.campaign={done:[]});if(!Array.isArray(c.done))c.done=[];const m=CAMPAIGN[c.done.length];if(!m)return 0;let complete=false;try{complete=!!m.check(S,G||{})}catch(e){}if(!complete)return 0;c.done.push(m.id);G.campaignTitle=m.title;G.campaignReward=m.reward;toast('Campaign complete: '+m.title+' (+'+m.reward+' coins)');return m.reward}
-function campaign(){const done=S.campaign&&Array.isArray(S.campaign.done)?S.campaign.done:[],pct=Math.round(done.length/CAMPAIGN.length*100);let h='<div class="feature-intro"><div><h2>Career campaign</h2><p class="sub">Long-term goals to work towards across your shifts.</p></div><span class="feature-stat">'+done.length+' / '+CAMPAIGN.length+' COMPLETE</span></div><div class="campaign-progress" role="progressbar" aria-valuenow="'+done.length+'" aria-valuemin="0" aria-valuemax="'+CAMPAIGN.length+'"><i style="width:'+pct+'%"></i></div><div class="ach-list">';for(let i=0;i<CAMPAIGN.length;i++){const m=CAMPAIGN[i],complete=done.includes(m.id),active=!complete&&i===done.length;h+='<div class="ach-item '+(complete?'':'locked')+(active?' active':'')+'"><span class="ach-mark">'+(complete?'✓':i+1)+'</span><div><b>'+m.title+'</b><small>'+m.desc+'</small><small class="ach-state">'+(complete?'Complete':active?'Next mission':'Locked')+' · '+m.reward+' coins</small></div></div>'}h+='</div><p class="sub">Progress is saved automatically.</p><button class="b pri" data-a="campaignClose">Back to menu</button>';ov(h)}
+function campaign(){start(0,false,true)}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
  if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
- S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=advanceCampaign();coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
+ S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=G.campaign?0:advanceCampaign();coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
- const title=L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
- const subtitle=(g.pb?L('newBest'):d<0?L('shortBest').replace('{diff}',-d).replace('{best}',g.prev):L('matchedBest'))+(g.daily&&!g.win?' · '+g.done+'/'+DN+' '+L('ordersStat'):'');
+ const title=g.campaign?(g.win?'Campaign complete!':'Campaign ended'):L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
+ const subtitle=g.campaign?(g.win?'You cleared all '+CAMPAIGN_LEVELS+' levels. Incredible work.':'You reached level '+(g.campaignLevel+1)+' of '+CAMPAIGN_LEVELS+'.'):(g.pb?L('newBest'):d<0?L('shortBest').replace('{diff}',-d).replace('{best}',g.prev):L('matchedBest'))+(g.daily&&!g.win?' · '+g.done+'/'+DN+' '+L('ordersStat'):'');
  const mistakeLine=g.mist?L('mistakesText').replace('{n}',g.mist):L('noMistakes');
  const played=Math.floor(S.playtime&&S.playtime.seconds||0),next=nextPlaytimeReward();
  const stayLine='Run time '+formatDuration(g.el)+' · Total playtime '+formatDuration(played)+' · Next stay reward in '+formatDuration(Math.max(0,next.seconds-played))+' (+'+next.coins+' coins)';
@@ -489,7 +439,7 @@ function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" 
 function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]||{}).locale||'en-GB',ds=S.dailyStreak||{best:0};
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')} · Day streak ${dailyStreakNow()} · Best streak ${ds.best||0}</p><p class="sub">Streak reward: +50 coins at 3 days, +100 every 7 days.</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
  const played=Math.floor(S.playtime&&S.playtime.seconds||0),next=nextPlaytimeReward();
- const cd=S.campaign&&Array.isArray(S.campaign.done)?S.campaign.done.length:0;set('#campaignCount',cd+' / '+CAMPAIGN.length);set('#achievementCount',AL.filter(a=>!!S.ach[a[0]]).length+' unlocked');
+ const cd=S.campaign&&Array.isArray(S.campaign.done)?S.campaign.done.length:0;
  set('#rec',`${L('best')} ${S.best} · ${S.orders} ${L('orders')} · ${S.perfect} ${L('perfect')} · ${L('streak')} ${S.streak} · ${S.shifts} ${L('shifts')} · ${S.coins} ${L('coins')} · ${formatDuration(played)} played · next +${next.coins} in ${formatDuration(Math.max(0,next.seconds-played))}`);set('#snd',L(muted()?'soundOff':'soundOn'));show('menu');applyLanguage()}
 function toMenu(){if(G&&G.run){G.run=false;SDK.gx()}cl();menu()}
 function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]=pv;const g=cat(eq.grd)[4],p=cat(eq.pal)[4];
@@ -497,7 +447,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
-const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
@@ -515,7 +465,7 @@ addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause()
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
 addEventListener('resize',size);
 let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;trackPlaytime(dt);
- if(G&&G.run&&!G.paused){if(!G.endless)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
+ if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
 (async()=>{await SDK.init();S=load();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
