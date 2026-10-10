@@ -207,7 +207,7 @@ const LEADERBOARD_ENCRYPTION_KEY='';
 const SDK={on:false,c:null,mute:false,
  async init(){try{
   await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);setTimeout(no,2500)});
-  const c=window.CrazyGames&&window.CrazyGames.SDK;if(!c)return;await c.init();if(c.environment==='disabled')return;
+  const c=window.CrazyGames&&window.CrazyGames.SDK;if(!c)return;let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('SDK init timeout')),1800)})]).finally(()=>clearTimeout(initTimer));if(c.environment==='disabled')return;
   this.c=c;this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
   if(c.game&&c.game.addSettingsChangeListener)c.game.addSettingsChangeListener(s=>{this.mute=!!s.muteAudio});
   if(c.game&&c.game.loadingStart)c.game.loadingStart()
