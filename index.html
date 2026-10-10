@@ -220,10 +220,10 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #acts{grid-area:acts;position:relative;bottom:auto;display:flex;flex-direction:column;padding:0;background:none;gap:10px;align-self:start}
  #acts .b{min-height:52px;font-size:17px}
 }
-/* Desktop menu: use both side gutters for stats, keep the actual game menu centred. */
-@media(min-width:1180px) and (min-height:680px){
- #app{width:100%;max-width:1660px;padding:18px clamp(24px,3vw,52px) 16px}
- #menu{display:grid;grid-template-columns:minmax(190px,.78fr) minmax(500px,1.65fr) minmax(190px,.78fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(20px,3vw,54px);row-gap:5px;align-items:center;max-width:none;width:100%;margin:0 auto}
+/* Desktop menu: stats sit beside the menu, not underneath it. */
+@media(min-width:900px){
+ #app{width:100%;max-width:1660px;padding:14px clamp(12px,2vw,32px) 16px}
+ #menu{display:grid;grid-template-columns:minmax(135px,.72fr) minmax(420px,1.8fr) minmax(135px,.72fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(12px,2vw,30px);row-gap:5px;align-items:center;max-width:none;width:100%;margin:0 auto}
  #menu>.ttl{grid-area:title;justify-self:center;font-size:clamp(68px,7vw,100px);margin:5px 0 12px}
  #menu>.tag{grid-area:tag;justify-self:center;text-align:center;max-width:34em;margin:0 auto 8px;font-size:16px}
  #menu>#road{grid-area:road;width:100%;height:clamp(120px,17vh,170px);margin:0;border-radius:16px;overflow:hidden}
