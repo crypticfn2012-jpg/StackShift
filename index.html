@@ -14,9 +14,9 @@ body{margin:0;min-height:100%;color:var(--cream);background:var(--bg2) radial-gr
 #app{max-width:620px;margin:0 auto;padding:12px 10px 6px}
 .hide{display:none!important}
 .scr{animation:in .25s ease}@keyframes in{from{opacity:0;transform:translateY(8px)}}
-.ttl{font:900 clamp(56px,19vw,92px)/.84 var(--f);margin:10px 0 8px;color:var(--cream);-webkit-text-stroke:8px var(--navy);paint-order:stroke fill;text-shadow:0 7px 0 var(--navy);transform:rotate(-3deg);letter-spacing:-1px}
+.ttl{font:900 clamp(56px,19vw,92px)/.9 var(--f);margin:10px 0 20px;color:var(--cream);-webkit-text-stroke:8px var(--navy);paint-order:stroke fill;text-shadow:0 7px 0 var(--navy);transform:rotate(-3deg);letter-spacing:-1px}
 .ttl span{display:block;color:var(--or);margin-left:.4em}
-.tag{margin:16px 0 0;max-width:18em;color:#e9dcc0;font-weight:700}
+.tag{margin:8px 0 0;max-width:18em;color:#e9dcc0;font-weight:700}
 #road{position:relative;height:178px;margin:0 -10px;background:linear-gradient(transparent 150px,#171a28 150px)}
 #road::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:4px;background:repeating-linear-gradient(90deg,#e9dcc0 0 26px,transparent 26px 52px)}
 #mvan{position:absolute;left:50%;bottom:14px;width:240px;margin-left:-120px;animation:bob 1.1s ease-in-out infinite alternate}
@@ -94,7 +94,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* Compact responsive menu and branded startup splash */
 #menu .mode-row{margin:5px 0 8px;gap:10px}#menu .mode-row .b{margin:5px 0;min-height:54px;padding:8px;font-size:19px}
-#boot{position:fixed;inset:0;z-index:100;background:#070b17;display:grid;place-items:center;padding:24px;transition:opacity .4s,visibility .4s}
+#boot{position:fixed;inset:0;z-index:100;background:#000;display:grid;place-items:center;padding:24px;transition:opacity .4s,visibility .4s}
 #boot.done{opacity:0;visibility:hidden;pointer-events:none}
 .boot-inner{width:min(390px,88vw);text-align:center}
 .boot-logo{display:block;width:min(330px,78vw);margin:0 auto 28px}
@@ -108,7 +108,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
 <svg class="boot-logo" viewBox="0 0 500 330" role="img" aria-label="PixelForge Studios">
-<rect width="500" height="330" rx="10" fill="#070b17"/>
+<rect width="500" height="330" rx="10" fill="#000"/>
 <g transform="translate(95 22)"><path d="M8 112 35 8h125c29 0 43 24 32 48-4 9-14 16-27 20L68 112l-9 34-51 31 16-65Zm40-27 92-31c12-4 16-19 4-19H62Z" fill="#f7f9ff"/><path d="M102 111 242 59h95l-35 34H189l-7 25h104l-31 32H177l-10 34-51 31 23-104Z" fill="#0789ff"/></g>
 <text x="250" y="252" text-anchor="middle" font-family="Arial,sans-serif" font-size="43" font-weight="900" fill="#f7f9ff">PIXEL<tspan fill="#0789ff">FORGE</tspan></text><path d="M48 279h57m290 0h57" stroke="#0789ff" stroke-width="4"/><text x="250" y="286" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="13" fill="#f7f9ff">STUDIOS</text></svg>
 <div class="boot-track"><div id="bootBar"></div></div><div class="boot-caption" id="bootCaption">Preparing your shift</div></div></div>
@@ -183,12 +183,32 @@ function applyTheme(eq){const r=document.documentElement.style,g=cat(eq.grd)[4];
  const h=vanHTML(cat(eq.van)[4],cat(eq.dec)[4]);$$('.van').forEach(e=>e.innerHTML=h)}
 
 /* ===== platform: CrazyGames SDK v3 (optional; game runs without it) ===== */
+/* Add the Encryption Key from CrazyGames Developer Portal > Leaderboards.
+   Keep this blank until the game's leaderboard is enabled and a key is configured. */
+const LEADERBOARD_ENCRYPTION_KEY='';
 const SDK={on:false,c:null,mute:false,
  async init(){try{
   await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);setTimeout(no,2500)});
   const c=window.CrazyGames&&window.CrazyGames.SDK;if(!c)return;await c.init();if(c.environment==='disabled')return;
-  this.c=c;this.on=true;this.mute=!!c.game.settings.muteAudio;c.game.addSettingsChangeListener(s=>{this.mute=!!s.muteAudio});c.game.loadingStart()}catch(e){this.on=false}},
+  this.c=c;this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
+  if(c.game&&c.game.addSettingsChangeListener)c.game.addSettingsChangeListener(s=>{this.mute=!!s.muteAudio});
+  if(c.game&&c.game.loadingStart)c.game.loadingStart()
+ }catch(e){this.on=false}},
  call(f){try{this.on&&f(this.c.game)}catch(e){}},
+ async submitScore(score){
+  if(!this.on||!this.c||!this.c.user||typeof this.c.user.submitScore!=='function'||!LEADERBOARD_ENCRYPTION_KEY)return false;
+  try{
+   const iv=crypto.getRandomValues(new Uint8Array(12));
+   const keyBytes=Uint8Array.from(atob(LEADERBOARD_ENCRYPTION_KEY),ch=>ch.charCodeAt(0));
+   const key=await crypto.subtle.importKey('raw',keyBytes,{name:'AES-GCM'},false,['encrypt']);
+   const data=new TextEncoder().encode(String(score));
+   const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
+   const out=new Uint8Array(iv.length+encrypted.byteLength);out.set(iv);out.set(new Uint8Array(encrypted),iv.length);
+   const encryptedScore=btoa(String.fromCharCode(...out));
+   this.c.user.submitScore({encryptedScore,score});
+   return true
+  }catch(e){return false}
+ },
  gs(){this.call(g=>g.gameplayStart())},gx(){this.call(g=>g.gameplayStop())},ht(){this.call(g=>g.happytime())},loaded(){this.call(g=>g.loadingStop())}};
 /* ===== save (versioned, validated; SDK Data module on CrazyGames, localStorage elsewhere) ===== */
 const st={get(k){if(SDK.on)return SDK.c.data.getItem(k);try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on)return SDK.c.data.setItem(k,v);try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
@@ -319,7 +339,7 @@ function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.rem
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
  if(G.daily){const same=S.daily.d===G.date;if(G.win&&!(same&&S.daily.done))coins+=30;S.daily={d:G.date,done:(same&&S.daily.done)||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;S.coins+=coins;S.life+=coins;ach();save();
- sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
+ sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
  ov(`<h2>${g.daily?(g.win?'Daily complete':'Daily attempt'):'Shift over'}</h2><div class="big">${g.score}</div>
