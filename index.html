@@ -313,8 +313,8 @@ function mv(){const r=stage.getBoundingClientRect(),p=drag.p,[w,h]=dims(p.cells)
  const gx=Math.round((lx-bx())/U),gy=Math.round(ly/U);drag.g=[gx,gy];drag.f=fit(p,gx,gy);clr();drag.on=false;
  for(const[x,y]of p.cells){const X=x+gx,Y=y+gy;if(X>=0&&X<G.c&&Y>=0&&Y<G.r){bc[Y*G.c+X].classList.add(drag.f===1?'ok':'bad');drag.on=true}}}
 function mist(m){G.om++;G.mist++;sfx('bad');toast(m);board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake')}
-function rot(p){if(!p)return;if(p.lock){toast("This parcel can't be rotated");return}p.cells=rotc(p.cells);paint(p);sfx('rot');if(drag&&drag.moved&&drag.p===p)mv();layout()}
-const rotSel=()=>{if(!G||!G.run||G.paused)return;G.rotations=(G.rotations||0)+1;rot(drag&&drag.moved?drag.p:sel&&!sel.pl&&!sel.lock?sel:G.ps.find(q=>!q.pl&&!q.lock))};
+function rot(p){if(!p)return;if(p.lock){toast("This parcel can't be rotated");return}if(G&&G.run){G.rotations=(G.rotations||0)+1;updateContract()}p.cells=rotc(p.cells);paint(p);sfx('rot');if(drag&&drag.moved&&drag.p===p)mv();layout()}
+const rotSel=()=>{if(!G||!G.run||G.paused)return;rot(drag&&drag.moved?drag.p:sel&&!sel.pl&&!sel.lock?sel:G.ps.find(q=>!q.pl&&!q.lock))};
 stage.addEventListener('pointerdown',e=>{if(!G||!G.run||G.paused||e.button>0)return;const el=e.target.closest('.pc');if(!el)return;const p=el._p;
  drag={p,id:e.pointerId,sx:e.clientX,sy:e.clientY,cx:e.clientX,cy:e.clientY,t:e.pointerType==='touch',moved:false,was:!!p.pl,f:0,on:false};p.pl=null;sel=p;stage.setPointerCapture(e.pointerId);e.preventDefault()});
 stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;drag.cx=e.clientX;drag.cy=e.clientY;
@@ -414,10 +414,10 @@ function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>
  set('#rec',`${L('best')} ${S.best} · ${S.orders} ${L('orders')} · ${S.perfect} ${L('perfect')} · ${L('streak')} ${S.streak} · ${S.shifts} ${L('shifts')} · ${S.coins} ${L('coins')}`);set('#snd',L(muted()?'soundOff':'soundOn'));show('menu');applyLanguage()}
 function toMenu(){if(G&&G.run){G.run=false;SDK.gx()}cl();menu()}
 function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]=pv;const g=cat(eq.grd)[4],p=cat(eq.pal)[4];
- let h=`<h2>Cosmetics</h2><p class="sub">${S.coins} coins · earned by playing, never bought</p><div class="van"></div><div class="sw" style="background:${g[0]};border-color:${g[1]}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`;
- for(const[k,n]of[['van','Van paint'],['pal','Parcel colours'],['grd','Cargo floor'],['dec','Decal']])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?'equipped':'owned'):c[3]+' coins'}</small></button>`).join('')+'</div>';
- if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?'Equipped':'Equip '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>Buy ${it[2]} · ${it[3]} coins</button>`}
- ov(h+'<button class="b" data-a="done">Done</button>');applyTheme(eq)}
+ let h=`<h2>${L('cosmetics')}</h2><p class="sub">${S.coins} ${L('coins')} · ${L('earnedByPlaying')}</p><div class="van"></div><div class="sw" style="background:${g[0]};border-color:${g[1]}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`;
+ for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
+ if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
+ ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');applyTheme(eq)}
 const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
