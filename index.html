@@ -94,13 +94,13 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* Compact responsive menu and branded startup splash */
 #menu .mode-row{margin:5px 0 8px;gap:10px}#menu .mode-row .b{margin:5px 0;min-height:54px;padding:8px;font-size:19px}
-#boot{position:fixed;inset:0;z-index:100;background:#000;display:grid;place-items:center;padding:24px;transition:opacity .4s,visibility .4s}
+#boot{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 35%,#26395f,#101a33 78%);display:grid;place-items:center;padding:24px;transition:opacity .4s,visibility .4s}
 #boot.done{opacity:0;visibility:hidden;pointer-events:none}
 .boot-inner{width:min(390px,88vw);text-align:center}
 .boot-logo{display:block;width:min(330px,78vw);margin:0 auto 28px}
-.boot-track{height:5px;border-radius:8px;background:#1c2941;overflow:hidden}
-#bootBar{height:100%;width:4%;background:linear-gradient(90deg,#0789ff,#16b7ff);border-radius:8px;transition:width .18s}
-.boot-caption{font:800 10px/1.3 system-ui,sans-serif;letter-spacing:.17em;color:#91a2bf;margin-top:12px;text-transform:uppercase}
+.boot-track{height:5px;border-radius:8px;background:#26395f;border:1px solid #31466f;overflow:hidden}
+#bootBar{height:100%;width:4%;background:linear-gradient(90deg,#f5862a,#fbf0d4);border-radius:8px;transition:width .18s}
+.boot-caption{font:800 10px/1.3 system-ui,sans-serif;letter-spacing:.17em;color:#d6cbb0;margin-top:12px;text-transform:uppercase}
 @media(max-height:780px){#app{padding-top:5px;padding-bottom:3px}.ttl{font-size:clamp(48px,12vw,70px);margin:4px 0 14px}.tag{margin:7px 0}#road{height:112px}#mvan{width:190px;margin-left:-95px}.b{margin:7px 0;min-height:44px;padding:8px 10px}.b.big{min-height:48px;font-size:20px}.dkt{margin:8px 0 5px}.dkt .bd{padding:6px 9px}.dkt p{font-size:12px}.dkt .b{min-height:34px;margin:5px 0}.rec{margin:7px 0;font-size:11px}.mode-row .b{min-height:46px;font-size:17px}}
 @media(max-height:640px){.ttl{font-size:48px}.tag{font-size:13px}#road{height:86px}#mvan{width:160px;margin-left:-80px}#road::after{bottom:5px}.dkt .stub{width:60px}.dkt .stub b{font-size:25px}.rec{font-size:10px}.row .b{font-size:15px}}
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
@@ -121,10 +121,11 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
-<svg class="boot-logo" viewBox="0 0 500 330" role="img" aria-label="PixelForge Studios">
-<rect width="500" height="330" rx="10" fill="#000"/>
-<g transform="translate(95 22)"><path d="M8 112 35 8h125c29 0 43 24 32 48-4 9-14 16-27 20L68 112l-9 34-51 31 16-65Zm40-27 92-31c12-4 16-19 4-19H62Z" fill="#f7f9ff"/><path d="M102 111 242 59h95l-35 34H189l-7 25h104l-31 32H177l-10 34-51 31 23-104Z" fill="#0789ff"/></g>
-<text x="250" y="252" text-anchor="middle" font-family="Arial,sans-serif" font-size="43" font-weight="900" fill="#f7f9ff">PIXEL<tspan fill="#0789ff">FORGE</tspan></text><path d="M48 279h57m290 0h57" stroke="#0789ff" stroke-width="4"/><text x="250" y="286" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="13" fill="#f7f9ff">STUDIOS</text></svg>
+<svg class="boot-logo" viewBox="0 0 500 250" role="img" aria-label="Stack Shift">
+<rect width="500" height="250" rx="18" fill="#14213f"/>
+<g transform="translate(176 18)" stroke="#fbf0d4" stroke-width="8" stroke-linejoin="round"><path d="M0 25 50 0 100 25 50 50Z" fill="#f5862a"/><path d="M0 25v54l50 27 50-27V25M50 50v56" fill="none"/><path d="M18 36v33l32 17 32-17V36" fill="none" opacity=".45"/></g>
+<text x="250" y="165" text-anchor="middle" font-family="Arial Rounded MT Bold,Arial,sans-serif" font-size="63" font-weight="900" fill="#fbf0d4" letter-spacing="-2">STACK</text>
+<text x="250" y="220" text-anchor="middle" font-family="Arial Rounded MT Bold,Arial,sans-serif" font-size="63" font-weight="900" fill="#f5862a" letter-spacing="-2">SHIFT</text></svg>
 <div class="boot-track"><div id="bootBar"></div></div><div class="boot-caption" id="bootCaption">Preparing your shift</div></div></div>
 <main id="app">
 <section id="menu" class="scr">
@@ -137,7 +138,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <p class="rec" id="rec"></p>
 </section>
 <section id="game" class="scr hide">
- <div id="hud"><div class="sb"><small>Score</small><b id="sc">0</b></div><div class="tmw" role="timer"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
+ <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
  <div id="ord"><div class="van" id="gvan"></div><div id="rl"></div><div><span id="on"></span><button class="lnk" data-a="nxt">Skip (−5s)</button></div></div>
  <div id="contract" aria-live="polite"><div class="mark">★</div><div class="copy"><b id="contractTitle">Shift contract</b><small id="contractDesc">Complete an extra objective for bonus coins.</small><div class="progress"><i id="contractBar"></i></div></div><small id="contractCount">0/3</small></div>
  <p id="tut" class="hide">Drag parcels into the van. Tap one to rotate it, or press R. Space delivers. Fast deliveries add time. <button class="lnk" data-a="skip">Got it</button></p>
