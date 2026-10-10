@@ -248,6 +248,11 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #rec .stat-tile:nth-child(6){grid-area:right2}
  #rec .stat-tile:nth-child(7){grid-area:right3}
  #rec .stat-tile:nth-child(8){grid-area:right4;grid-column:auto}
+ /* Side stats should read as compact info cards, not giant buttons. */
+ #rec .stat-tile{min-height:0;padding:8px 10px;border-width:1px;border-radius:10px;box-shadow:0 2px 0 rgba(8,15,31,.16)}
+ #rec .stat-tile span{font-size:10px;letter-spacing:.025em}
+ #rec .stat-tile b{font-size:clamp(16px,1.25vw,20px);margin-top:3px;line-height:1.1}
+ #rec .stat-tile.reward b{font-size:clamp(12px,.95vw,15px);line-height:1.2}
 }
 @media(min-width:1000px) and (max-height:700px){
  #menu>.ttl{font-size:clamp(44px,5vw,60px);margin:0}
