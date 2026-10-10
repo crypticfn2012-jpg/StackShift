@@ -342,9 +342,9 @@ function deliver(){if(!G||!G.run||G.paused||!G.ps.every(p=>p.pl))return;const o=
  G.i++;newOrder();hud()}
 function skip(){if(!G||!G.run||G.paused)return;if(!G.endless){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
-const CONTRACTS=[{id:"clean",title:"Careful hands",desc:"Deliver 3 orders without mistakes",goal:3,reward:80,icon:"✓"},{id:"orders",title:"Busy shift",desc:"Complete 5 deliveries",goal:5,reward:80,icon:"▣"},{id:"streak",title:"On a roll",desc:"Build a 4-order clean streak",goal:4,reward:100,icon:"★"}];
-function contractProgress(){if(!G||!G.contract)return 0;return G.contract.id==="clean"?G.perf:G.contract.id==="orders"?G.done:G.bs}
-function updateContract(){if(!G||!G.contract)return;const c=G.contract,p=Math.min(c.goal,contractProgress());set("#contractTitle",c.title);set("#contractDesc",G.contractPaid?"Contract complete — bonus claimed":c.desc);set("#contractCount",p+"/"+c.goal);$("#contractBar").style.width=(p/c.goal*100)+"%";$(".mark")&&set(".mark",c.icon);if(p>=c.goal&&!G.contractPaid){G.contractPaid=true;S.coins+=c.reward;S.life+=c.reward;save();set("#contractDesc","Contract complete! +"+c.reward+" coins");toast("Contract complete: +"+c.reward+" coins");sfx("ach")}}
+const CONTRACTS=[{id:'clean',titleKey:'careful',descKey:'carefulDesc',goal:3,reward:80,icon:'✓'},{id:'orders',titleKey:'busy',descKey:'busyDesc',goal:5,reward:80,icon:'▣'},{id:'streak',titleKey:'roll',descKey:'rollDesc',goal:4,reward:100,icon:'★'}];
+function contractProgress(){if(!G||!G.contract)return 0;return G.contract.id==='clean'?G.perf:G.contract.id==='orders'?G.done:G.bs}
+function updateContract(){if(!G||!G.contract)return;const c=G.contract,p=Math.min(c.goal,contractProgress());set('#contractTitle',L(c.titleKey));set('#contractDesc',G.contractPaid?L('bonusClaimed'):L(c.descKey));set('#contractCount',p+'/'+c.goal);$('#contractBar').style.width=(p/c.goal*100)+'%';$('.mark')&&set('.mark',c.icon);if(p>=c.goal&&!G.contractPaid){G.contractPaid=true;S.coins+=c.reward;S.life+=c.reward;save();set('#contractDesc',L('contractComplete')+'! +'+c.reward+' '+L('coins'));toast(L('contractComplete')+': +'+c.reward+' '+L('coins'));sfx('ach')}}
 const AL=[['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1],['s5','Hot streak','Reach a 5-order streak',s=>s.streak>=5],['k1','Four figures','Score 1000 in one shift',(s,g)=>g.score>=1000],['clean','Spotless shift','Deliver 3+ orders with no mistakes',(s,g)=>g.mist===0&&g.done>=3],['o25','Veteran','Deliver 25 orders in total',s=>s.orders>=25]];
 function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]&&f(S,G)){S.ach[id]=1;S.coins+=25;S.life+=25;toast('Achievement: '+n+' (+25 coins)');sfx('ach')}}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
@@ -363,7 +363,26 @@ function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
  if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
-const pcard=()=>ov(`<h2>Paused</h2><button class="b pri" data-a="resume">Resume</button><button class="b" data-a="snd">Sound: ${muted()?'off':'on'}</button><button class="b" data-a="rmt">Reduced motion: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">Restart shift</button><button class="b" data-a="menu">Quit to menu</button>`);
+let SETTINGS_BACK=false;
+function pcard(){ov('<h2>'+L('pause')+'</h2><button class="b pri" data-a="resume">'+L('resume')+'</button><button class="b" data-a="settings">'+L('settings')+'</button><button class="b" data-a="snd">'+(muted()?L('soundOff'):L('soundOn'))+'</button><button class="b" data-a="rmt">'+L('reducedMotion')+': '+(S.rm?'on':'off')+'</button><button class="b" data-a="again0">'+L('restart')+'</button><button class="b" data-a="menu">'+L('quitMenu')+'</button>')}
+function openSettings(fromPause){SETTINGS_BACK=!!fromPause;settings()}
+function settings(){
+ const opts=LANGS.map(l=>'<option value="'+l.id+'" '+(l.id===S.lang?'selected':'')+'>'+l.name+'</option>').join('');
+ ov('<h2>'+L('settings')+'</h2><div class="setting-list">'+
+ '<label class="setting-row" for="prefLang"><span class="setting-copy"><b>'+L('language')+'</b></span><select id="prefLang" aria-label="'+L('language')+'">'+opts+'</select></label>'+
+ '<label class="setting-row" for="prefVolume"><span class="setting-copy"><b>'+L('volume')+' <output id="prefVolLabel">'+S.volume+'%</output></b></span><input id="prefVolume" type="range" min="0" max="100" step="5" value="'+S.volume+'" aria-label="'+L('volume')+'"></label>'+
+ '<label class="setting-row" for="prefMute"><span class="setting-copy"><b>'+L('sound')+'</b></span><input id="prefMute" type="checkbox" '+(!S.mute?'checked':'')+'></label>'+
+ '<label class="setting-row" for="prefHover"><span class="setting-copy"><b>'+L('hoverSounds')+'</b></span><input id="prefHover" type="checkbox" '+(S.hoverSound?'checked':'')+'></label>'+
+ '<h3>'+L('accessibility')+'</h3>'+
+ '<label class="setting-row" for="prefMotion"><span class="setting-copy"><b>'+L('reducedMotion')+'</b></span><input id="prefMotion" type="checkbox" '+(S.rm?'checked':'')+'></label>'+
+ '<label class="setting-row" for="prefText"><span class="setting-copy"><b>'+L('largeText')+'</b></span><input id="prefText" type="checkbox" '+(S.largeText?'checked':'')+'></label>'+
+ '<label class="setting-row" for="prefContrast"><span class="setting-copy"><b>'+L('highContrast')+'</b></span><input id="prefContrast" type="checkbox" '+(S.hc?'checked':'')+'></label></div>'+
+ '<h3>'+L('controls')+'</h3><p class="controls-note">'+L('controlsText')+'</p><p class="settings-note">'+L('savedAuto')+'</p><button class="b pri" data-a="settingsClose">'+L('close')+'</button>')}
+function applyPrefs(){document.documentElement.classList.toggle('rm',RM());document.documentElement.classList.toggle('hc',!!S.hc);document.documentElement.classList.toggle('large-text',!!S.largeText);const lang=LANGS.find(l=>l.id===S.lang)||LANGS[0];document.documentElement.lang=lang.locale;document.documentElement.dir='ltr';updateAudioVolume()}
+function applyLanguage(){const put=(selector,key)=>{const e=$(selector);if(e)e.textContent=L(key)};
+ put('#menu .tag','tagline');put('#menu [data-a=play]','timed');put('#menu [data-a=endless]','endless');put('#menu [data-a=shop]','cosmetics');put('#menu [data-a=settings]','settings');put('#acts [data-a=clr]','reset');put('#acts [data-a=rot]','rotate');put('#acts [data-a=dlv]','deliver');put('#ord [data-a=nxt]','skip');put('.sb small','score');
+ const tut=$('#tut');if(tut){if(tut.firstChild&&tut.firstChild.nodeType===3)tut.firstChild.textContent=L('tutorial')+' ';const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}}
+
 function menu(){const dly=S.daily.d===utc(),dt=new Date();
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString('en',{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>route</div><div class="bd"><b style="font-size:18px">Daily route</b><p>Deliver ${DN} orders before the clock runs out. Same orders for everyone today (UTC).</p><p>${dly&&S.daily.done?'Completed ✓ · best '+S.daily.best:dly?'Attempted · best '+S.daily.best:'Not attempted yet'}</p><button class="b pri" data-a="daily">Play daily</button></div>`;
  set('#rec',`Best ${S.best} · ${S.orders} orders · ${S.perfect} perfect · best streak ${S.streak} · ${S.shifts} shifts · ${S.coins} coins`);set('#snd','Sound: '+(muted()?'off':'on'));show('menu')}
