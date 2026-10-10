@@ -110,7 +110,9 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
 .mode-row{gap:8px}
 .mode-row .b{min-width:0;padding:10px 7px;font-size:clamp(14px,2.2vw,19px);white-space:normal;line-height:1.15}
-.menu-utility{margin-top:4px}
+.menu-utility{margin-top:4px;gap:10px}
+.menu-utility .b{min-width:0;padding:10px 8px;white-space:nowrap}
+@media(max-width:520px){.menu-utility{gap:6px}.menu-utility .b{font-size:13px;padding:9px 4px}}
 @media(max-width:520px){.mode-row{gap:6px}.mode-row .b{font-size:14px;padding:9px 5px}.menu-utility .b{font-size:15px}}
 
 
@@ -131,7 +133,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <div id="road"><div class="van" id="mvan"></div></div>
  <div class="row mode-row"><button class="b pri big" data-a="play">Timed puzzle</button><button class="b big" data-a="endless">Endless mode</button><button class="b big" data-a="campaignPlay">Career campaign</button></div>
  <div class="dkt" id="dly"></div>
- <div class="row menu-utility"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="achievements">Achievements</button></div><div class="row"><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
+ <div class="row menu-utility"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="achievements">Achievements</button><button class="b" data-a="settings">Settings</button></div>
  <p class="rec" id="rec"></p>
  
 </section>
@@ -413,13 +415,13 @@ function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
  if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
-const pcard=()=>ov(`<h2>${L('pause')}</h2><button class="b pri" data-a="resume">${L('resume')}</button><button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="snd">${L(muted()?'soundOff':'soundOn')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`);
+const pcard=()=>ov(`<h2>${L('pause')}</h2><button class="b pri" data-a="resume">${L('resume')}</button><button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`);
 let settingsBack=false;
 const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
 function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
 function applyLanguage(){
  const put=(sel,key)=>{const e=$(sel);if(e)e.textContent=L(key)};
- put('#menu .tag','tagline');put('#menu [data-a=play]','timed');put('#menu [data-a=endless]','endless');put('#menu [data-a=shop]','cosmetics');put('#menu [data-a=settings]','settings');put('#menu [data-a=snd]',muted()?'soundOff':'soundOn');
+ put('#menu .tag','tagline');put('#menu [data-a=play]','timed');put('#menu [data-a=endless]','endless');put('#menu [data-a=shop]','cosmetics');put('#menu [data-a=achievements]','achievements');put('#menu [data-a=settings]','settings');
  put('#acts [data-a=clr]','reset');put('#acts [data-a=rot]','rotate');put('#acts [data-a=dlv]','deliver');put('#ord [data-a=nxt]','skip');
  put('#contractTitle',G&&G.contract?G.contract.titleKey?L(G.contract.titleKey):G.contract.title:'shiftContract');
  if($('#contractDesc')&&G&&G.contract&&!G.contractPaid)$('#contractDesc').textContent=G.contract.descKey?L(G.contract.descKey):G.contract.desc;
@@ -451,7 +453,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
 const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
- done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
+ done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
