@@ -350,7 +350,7 @@ function newOrder(){const o=G.o=gen(G.seed,G.i);G.c=o.c;G.r=o.r;build(o.c,o.r);i
  set('#rl',{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
 function start(daily,endless,campaignMode){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
- const campaignLevel=campaignMode?Math.min(CAMPAIGN_LEVELS,Math.max(0,S.campaign.level||0)):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
+ const savedCampaignLevel=Math.max(0,Math.floor(S.campaign.level||0));const campaignLevel=campaignMode?(savedCampaignLevel>=CAMPAIGN_LEVELS?0:savedCampaignLevel):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
  G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
  $('#game').classList.toggle('endless',!!endless||!!campaignMode);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(campaignMode?'Campaign level '+(G.campaignLevel+1):endless?L('endlessGo'):L('go'))}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
@@ -368,7 +368,7 @@ function deliver(){if(!G||!G.run||G.paused||!Array.isArray(G.ps)||!G.ps.length||
  ach();save();
  if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
  G.i++;newOrder();hud()}
-function skip(){if(!G||!G.run||G.paused)return;G.skips=(G.skips||0)+1;if(!G.endless&&!G.campaign){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
+function skip(){if(!G||!G.run||G.paused)return;if(G.campaign){toast('Complete the level to progress');return}G.skips=(G.skips||0)+1;if(!G.endless&&!G.campaign){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
 const CONTRACTS=[
 {id:"clean",title:"Careful hands",titleKey:"careful",desc:"Deliver 3 orders without mistakes",descKey:"carefulDesc",goal:3,reward:80,icon:"✓",kind:"clean"},
