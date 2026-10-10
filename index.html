@@ -109,89 +109,63 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(max-height:640px){.ttl{font-size:48px}.tag{font-size:13px}#road{height:86px}#mvan{width:160px;margin-left:-80px}#road::after{bottom:5px}.dkt .stub{width:60px}.dkt .stub b{font-size:25px}.rec{font-size:10px}.row .b{font-size:15px}}
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
 
-/* Keep the complete main menu visible without changing puzzle/game screens. */
-#menu .ttl{margin-top:4px;margin-bottom:12px}
-#menu .tag{margin-top:4px}
-#menu #road{height:126px}
-#menu .dkt{margin:10px 0 6px}
-#menu .dkt .bd{padding:7px 10px 8px}
-#menu .dkt .bd::after{height:5px;margin-top:5px}
-#menu .dkt p{font-size:13px;line-height:1.22}
-#menu .dkt .b{min-height:36px;margin:5px 0}
-#menu .row .b{margin:5px 0}
-#menu .rec{margin:6px 0;font-size:12px}
-#menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 5px}
-#menu .menu-tile{min-height:92px;padding:8px 10px;gap:4px}
-#menu .menu-tile b{font-size:14px}
-#menu .menu-tile small{font-size:10px}
-#menu .menu-tile-foot{padding-top:4px;font-size:10px}
+
+/* Keep the main menu fitting the viewport without making its contents feel tiny. */
+#menu .ttl{font-size:clamp(62px,16vw,86px);margin:7px 0 14px}
+#menu .tag{font-size:15px;line-height:1.3;margin:5px 0}
+#menu #road{height:142px}
+#menu #mvan{width:215px;margin-left:-107px}
+#menu .dkt{margin:12px 0 7px}
+#menu .dkt .bd{padding:8px 11px 9px}
+#menu .dkt .bd::after{height:7px;margin-top:6px}
+#menu .dkt p{font-size:14px;line-height:1.25}
+#menu .dkt .b{min-height:40px;margin:5px 0}
+#menu .row .b{min-height:42px;margin:5px 0;font-size:16px}
+#menu .rec{margin:7px 0;font-size:13px}
+#menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:9px 0 6px}
+#menu .menu-tile{min-height:100px;padding:9px 11px;gap:5px}
+#menu .menu-tile-top{display:flex}
+#menu .menu-tile-mark{width:25px;height:25px}
+#menu .menu-tile-count{font-size:10px}
+#menu .menu-tile b{font-size:15px}
+#menu .menu-tile small{font-size:11px;line-height:1.3}
+#menu .menu-tile-foot{padding-top:5px;font-size:11px}
 @media(max-height:780px){
- #menu .ttl{font-size:clamp(44px,10vw,62px);margin:2px 0 8px;-webkit-text-stroke:5px var(--navy);text-shadow:0 4px 0 var(--navy)}
- #menu .tag{font-size:12px;line-height:1.2;margin:3px 0}
- #menu #road{height:78px}
- #menu #mvan{width:150px;margin-left:-75px}
- #menu .dkt{margin:5px 0 3px;border-width:3px;box-shadow:0 3px 0 var(--navy)}
- #menu .dkt .stub{width:53px}
- #menu .dkt .stub b{font-size:23px}
- #menu .dkt .bd{padding:5px 8px}
- #menu .dkt p{font-size:11px;line-height:1.15}
- #menu .dkt .b{min-height:30px;padding:5px 8px;margin:3px 0;font-size:13px}
- #menu .row .b{min-height:36px;padding:6px 8px;margin:3px 0;font-size:14px}
- #menu .rec{font-size:10px;margin:3px 0}
- #menu .menu-links{margin:4px 0 2px;gap:6px}
- #menu .menu-tile{min-height:68px;padding:6px 8px;border-width:2px;box-shadow:0 2px 0 var(--navy);gap:3px}
- #menu .menu-tile-top{display:none}
- #menu .menu-tile b{font-size:13px}
+ #menu .ttl{font-size:clamp(54px,12vw,72px);margin:4px 0 9px;-webkit-text-stroke:6px var(--navy);text-shadow:0 5px 0 var(--navy)}
+ #menu .tag{font-size:13px;line-height:1.25;margin:4px 0}
+ #menu #road{height:96px}
+ #menu #mvan{width:175px;margin-left:-87px}
+ #menu .dkt{margin:7px 0 4px}
+ #menu .dkt .stub{width:62px}
+ #menu .dkt .stub b{font-size:26px}
+ #menu .dkt .bd{padding:6px 9px}
+ #menu .dkt p{font-size:12px;line-height:1.2}
+ #menu .dkt .b{min-height:34px;padding:6px 9px;margin:4px 0;font-size:14px}
+ #menu .row .b{min-height:39px;padding:7px 9px;margin:4px 0;font-size:15px}
+ #menu .rec{font-size:11px;margin:4px 0}
+ #menu .menu-links{margin:6px 0 3px;gap:7px}
+ #menu .menu-tile{min-height:82px;padding:7px 9px;gap:4px}
+ #menu .menu-tile b{font-size:14px}
  #menu .menu-tile small{font-size:10px}
- #menu .menu-tile-foot{padding-top:3px;font-size:10px}
+ #menu .menu-tile-foot{font-size:10px;padding-top:4px}
 }
 @media(max-height:640px){
- #menu .ttl{font-size:42px;margin:0 0 5px}
- #menu #road{height:54px}
- #menu #mvan{width:115px;margin-left:-57px}
- #menu .dkt p{font-size:10px}
- #menu .menu-tile{min-height:56px}
+ #menu .ttl{font-size:48px;margin:1px 0 6px}
+ #menu .tag{font-size:12px}
+ #menu #road{height:66px}
+ #menu #mvan{width:135px;margin-left:-67px}
+ #menu .dkt p{font-size:11px}
+ #menu .menu-tile{min-height:65px;padding:6px 8px}
+ #menu .menu-tile-top{display:none}
 }
 @media(max-width:520px){
+ #menu .ttl{font-size:clamp(58px,17vw,78px)}
+ #menu .tag{font-size:13px}
  #menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr))}
- #menu .menu-tile{min-height:78px}
- #menu .menu-tile b{font-size:13px}
+ #menu .menu-tile{min-height:88px}
+ #menu .menu-tile b{font-size:14px}
  #menu .menu-tile small{font-size:10px}
 }
-
-
-/* Minimal polish layered onto the original UI. */
-.b,.ib,.chip,.lnk{transition:transform .13s ease,filter .13s ease}
-.b:hover:not(:disabled),.ib:hover:not(:disabled),.chip:hover:not(:disabled),.lnk:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06)}
-.b:active:not(:disabled),.ib:active:not(:disabled),.chip:active:not(:disabled),.lnk:active:not(:disabled){transform:translateY(1px) scale(.985)}
-.b:focus-visible,.ib:focus-visible,.chip:focus-visible,.lnk:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f5862a;outline-offset:3px}
-
-.large-text{font-size:18px}.high-contrast{--bg:#07101f;--bg2:#000;--cream:#fff;--paper:#fff;--ink:#000;--or:#ffbd24;--gbg:#fff;--gln:#555;--ok:#00652c;--bad:#a00020}
-.settings-grid{display:grid;gap:8px;text-align:left;margin:10px 0 14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #ffffff20}
-.settings-row span{font-size:14px}.settings-row select{max-width:58%;min-width:125px}.settings-row input[type=range]{width:46%;accent-color:#f5862a}.settings-row input[type=checkbox]{width:19px;height:19px;accent-color:#f5862a}
-.settings-note{font-size:12px;opacity:.78;margin:4px 0 12px}.card:has(#settingLang){max-height:88vh;overflow:auto}
-.settings-credits{border-top:2px solid #14213f30;margin:10px 0 4px;padding-top:9px;font-size:13px}.settings-credits b{display:block;margin-bottom:4px}.settings-credits p{margin:2px 0;font-weight:700;color:#5a5048}
-.ach-list{display:grid;gap:7px;max-height:56vh;overflow-y:auto;margin:10px 0 14px;padding:2px}.ach-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--cream);border:3px solid var(--navy);border-radius:10px}.ach-item.locked{opacity:.65}.ach-mark{width:30px;height:30px;flex:none;display:grid;place-items:center;background:var(--or);border-radius:7px;font-size:17px}.ach-item b{display:block;font-size:14px}.ach-item small{display:block;font-size:12px;line-height:1.25;color:#5a5048}.ach-item .ach-state{font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}.ach-item.active{opacity:1;border-color:var(--or)}
-.menu-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0 12px}
-.menu-tile{min-width:0;min-height:140px;padding:11px 10px 10px;display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:6px;color:var(--ink);background:var(--paper);border:3px solid var(--navy);border-radius:13px;box-shadow:0 4px 0 var(--navy);font:800 12px/1.25 var(--f);cursor:pointer;transition:transform .12s,background .12s}
-.menu-tile:hover{transform:translateY(-2px);background:var(--cream)}.menu-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--navy)}
-.menu-tile-top{display:flex;align-items:center;justify-content:space-between;gap:3px}.menu-tile-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:7px;background:var(--or);font-size:12px;font-weight:900}.menu-tile-count{font-size:10px;font-weight:900;letter-spacing:.02em;color:#5a5048;text-align:right}.menu-tile b{font-size:15px;line-height:1.1}.menu-tile small{font-size:11px;line-height:1.25;color:#5a5048;font-weight:700}.menu-tile-foot{margin-top:auto;padding-top:7px;border-top:1px solid #14213f26;font-size:11px;font-weight:900;color:var(--ink);display:flex;justify-content:space-between;gap:4px}
-#ov .card.feature-card{width:min(620px,calc(100vw - 28px));max-width:620px;max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain;padding:22px}
-#ov .feature-card h2{font-size:clamp(27px,4vw,34px);margin-bottom:8px}
-#ov .feature-card .sub{font-size:14px;line-height:1.45}
-#ov .feature-card .ach-list{max-height:none;overflow:visible;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:15px 0}
-#ov .feature-card .ach-item{min-width:0;align-items:flex-start;gap:10px;padding:12px;border-width:2px;border-radius:12px}
-#ov .feature-card .ach-mark{width:34px;height:34px;border-radius:9px;font-size:16px}
-#ov .feature-card .ach-item b{font-size:14px;line-height:1.25;margin:1px 0 4px}
-#ov .feature-card .ach-item small{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
-#ov .feature-card .campaign-progress{height:12px;background:#14213f20;border:2px solid var(--navy);border-radius:99px;overflow:hidden;margin:14px 0 16px}
-#ov .feature-card .campaign-progress i{display:block;height:100%;background:var(--or);border-radius:99px}
-#ov .feature-card .feature-intro{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-#ov .feature-card .feature-stat{flex:none;padding:7px 11px;border:2px solid var(--navy);border-radius:9px;background:var(--cream);font-size:12px;font-weight:900}
-#ov .feature-card .b{max-width:300px;margin:14px auto 0}
-@media(max-width:520px){.menu-links{grid-template-columns:1fr;gap:7px;margin-top:12px}.menu-tile{min-height:0;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;column-gap:9px;padding:9px 10px}.menu-tile-top{display:contents}.menu-tile-mark{grid-row:1 / span 2;width:31px;height:31px}.menu-tile-count{grid-column:3;grid-row:1;font-size:10px}.menu-tile b{grid-column:2;grid-row:1;font-size:14px}.menu-tile small{grid-column:2;grid-row:2;font-size:11px}.menu-tile-foot{grid-column:3;grid-row:2;border:0;padding:0;margin:0;font-size:10px}.menu-tile-foot span{display:none}#ov .card.feature-card{width:calc(100vw - 18px);max-height:calc(100dvh - 18px);padding:14px}#ov .feature-card .ach-list{grid-template-columns:1fr;gap:7px}#ov .feature-card .ach-item{padding:10px}#ov .feature-card .b{max-width:none}}
-@media(prefers-reduced-motion:reduce){.scr{animation:none!important}}
 
 </style></head>
 <body>
