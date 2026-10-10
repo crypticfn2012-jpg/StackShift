@@ -404,6 +404,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&
 let lastHoverBtn=null,lastHoverAt=0;
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('button:not(:disabled)');if(!b||!b.matches('.b,.ib,.chip,.lnk')||b===lastHoverBtn||(e.relatedTarget&&b.contains(e.relatedTarget)))return;lastHoverBtn=b;if(S&&S.hoverSound&&!muted()&&Date.now()-lastHoverAt>100){lastHoverAt=Date.now();sfx('hover')}},true);
 document.addEventListener('pointerout',e=>{const b=e.target.closest('button');if(b&&b===lastHoverBtn&&(!e.relatedTarget||!b.contains(e.relatedTarget)))lastHoverBtn=null},true);
+document.addEventListener('input',e=>{if(e.target.id==='prefVolume'){S.volume=Math.max(0,Math.min(100,Number(e.target.value)||0));const o=$('#prefVolLabel');if(o)o.textContent=S.volume+'%';updateAudioVolume();save()}});
+document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='prefLang'){S.lang=t.value;save();applyPrefs();applyLanguage();if(G&&G.contract)updateContract();settings();return}if(t.id==='prefMute')S.mute=!t.checked;else if(t.id==='prefHover')S.hoverSound=t.checked;else if(t.id==='prefMotion')S.rm=t.checked;else if(t.id==='prefText')S.largeText=t.checked;else if(t.id==='prefContrast')S.hc=t.checked;else return;save();applyPrefs();if(G&&G.contract)updateContract()});
 addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause();return}if(G.paused)return;
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
