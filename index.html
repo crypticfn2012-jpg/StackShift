@@ -13,6 +13,9 @@ body{margin:0;min-height:100%;color:var(--cream);background:var(--bg2) radial-gr
 #app{max-width:620px;margin:0 auto;padding:12px 10px 6px}
 .hide{display:none!important}
 .scr{animation:in .25s ease}@keyframes in{from{opacity:0;transform:translateY(8px)}}
+/* Tiny tactile response for the main game mode buttons. */
+@keyframes menuNudge{0%{transform:translateY(0)}35%{transform:translateY(-2px)}100%{transform:translateY(0)}}
+#menu .mode-row .b:active:not(:disabled){animation:menuNudge .16s ease-out}
 .ttl{font:900 clamp(56px,19vw,92px)/.9 var(--f);margin:10px 0 20px;color:var(--cream);-webkit-text-stroke:8px var(--navy);paint-order:stroke fill;text-shadow:0 7px 0 var(--navy);transform:rotate(-3deg);letter-spacing:-1px}
 .ttl span{display:block;color:var(--or);margin-left:.4em}
 .tag{margin:8px 0 0;max-width:18em;color:#e9dcc0;font-weight:700}
@@ -25,6 +28,17 @@ body{margin:0;min-height:100%;color:var(--cream);background:var(--bg2) radial-gr
 .b{display:block;width:100%;min-height:50px;margin:12px 0;padding:10px 14px;font:900 18px var(--f);color:var(--ink);background:var(--cream);border:4px solid var(--navy);border-radius:14px;box-shadow:0 6px 0 var(--navy);cursor:pointer;touch-action:manipulation;transition:transform .08s,box-shadow .08s}
 .b.pri{background:var(--or)}.b.big{min-height:64px;font-size:25px}
 .b:active:not(:disabled){transform:translateY(5px);box-shadow:0 1px 0 var(--navy)}
+/* Tactile button feedback: chunky lift, quick settle and a tiny playful tilt */
+@media(hover:hover) and (pointer:fine){
+ .b:not(:disabled),.ib,.chip,.lnk{transition:transform .14s cubic-bezier(.2,.8,.2,1),box-shadow .14s,filter .14s,color .14s}
+ .b:not(:disabled):hover{transform:translateY(-3px) rotate(-.35deg);box-shadow:0 9px 0 var(--navy);filter:saturate(1.12) brightness(1.035)}
+ .b.pri:not(:disabled):hover{background:#ff9a3d}
+ .ib:hover{transform:translateY(-2px) rotate(-7deg);box-shadow:0 6px 0 var(--navy);filter:brightness(1.06)}
+ .chip:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 5px 0 var(--navy);filter:saturate(1.12)}
+ .lnk:hover{transform:translateY(-1px);filter:brightness(1.25)}
+}
+.b:focus-visible,.ib:focus-visible,.chip:focus-visible{transform:translateY(-2px);box-shadow:0 8px 0 var(--navy)}
+.b:active:not(:disabled),.ib:active,.chip:active{filter:brightness(.96)}
 .b:disabled{opacity:.45;cursor:not-allowed}
 button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 .row{display:flex;gap:12px}.row .b{flex:1}
