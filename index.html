@@ -147,6 +147,41 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 
 
 
+
+/* Landscape phones: keep the board, parcel tray and controls usable together. */
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+ html,body{min-height:100%;height:auto}
+ body{overflow-x:hidden;overflow-y:auto}
+ #app{width:100%;max-width:none;padding:6px 10px 8px}
+ #menu{max-width:620px;margin:0 auto}
+ #game{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.45fr);grid-template-areas:"hud hud" "ord stage" "contract stage" "tut tut" "acts acts";column-gap:12px;row-gap:3px;align-items:start}
+ #hud{grid-area:hud;gap:7px}
+ .sb{min-width:52px}.sb small{font-size:10px}#sc{font-size:27px}
+ #st{min-width:0;font-size:12px}#lives{font-size:12px;letter-spacing:0}
+ .ib{width:38px;height:38px;font-size:13px}
+ #ord{grid-area:ord;align-self:start;margin:4px 0;padding:5px 7px;gap:6px}
+ #ord .van{width:44px}
+ #rl{font-size:12px}#on{font-size:10px}.lnk{font-size:11px;padding:4px}
+ #contract{grid-area:contract;align-self:start;margin:3px 0;padding:6px;gap:6px}
+ #contract .mark{width:26px;height:26px;font-size:15px}
+ #contract b{font-size:11px}#contract small{font-size:10px}
+ #stage{grid-area:stage;min-width:0;margin:4px 0 3px;overflow:visible}
+ #acts{grid-area:acts;position:relative;bottom:auto;padding:5px 0 2px;gap:8px;background:none}
+ #acts .b{min-height:42px;font-size:14px;padding:6px}
+ #tut{grid-area:tut}
+ #ov{padding:8px}
+ #ov .card.settings-card,#ov .card.cosmetics-card{max-height:calc(100dvh - 16px);padding:12px}
+}
+@media (orientation:landscape) and (max-height:380px) and (pointer:coarse){
+ #app{padding-top:3px}
+ #hud{gap:5px}
+ #ord{margin:1px 0;padding:3px 5px}
+ #contract{margin:1px 0;padding:4px}
+ #contract .progress{margin-top:3px}
+ #acts{padding-top:2px}
+ #acts .b{min-height:36px}
+}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
@@ -327,7 +362,7 @@ const pop=e=>{e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop'
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1900)}
 function burst(){if(RM())return;for(let i=0;i<14;i++){const d=document.createElement('i');d.className='cf';d.style.cssText=`left:50%;top:40%;--dx:${(Math.random()-.5)*320}px;--dy:${-60-Math.random()*170}px;background:${i%2?'#f5862a':'#fbf0d4'}`;document.body.appendChild(d);setTimeout(()=>d.remove(),750)}}
 /* cell size now fits each order's van to the screen, so small vans are drawn big */
-function size(){const SW=stage.clientWidth||innerWidth-20,c=G&&G.c||5,r=G&&G.r||4;U=Math.max(28,Math.min(96,Math.floor(Math.min(SW/Math.max(c,5.2),(innerHeight-300)/(r+3.2)))));document.documentElement.style.setProperty('--u',U+'px');layout()}
+function size(){const SW=stage.clientWidth||innerWidth-20,VH=window.visualViewport?.height||innerHeight,c=G&&G.c||5,r=G&&G.r||4,land=matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches,room=Math.max(120,VH-(land?112:300));U=Math.max(land?22:28,Math.min(96,Math.floor(Math.min(SW/Math.max(c,5.2),room/(r+3.2)))));document.documentElement.style.setProperty('--u',U+'px');layout()}
 const TMW=$('.tmw'),buzz=p=>{try{!RM()&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const bonusFor=(os,area)=>{const r=os/(4+area*.5);return r<=.5?6:r<=.8?5:r<=1.1?4:r<=1.5?3:r<=2?2:1};
 function spark(x,y,n,cols,sp){if(RM())return;for(let i=0;i<n;i++){const d=document.createElement('i'),a=Math.random()*6.283,s=sp*(.5+Math.random());d.className='sp';d.style.cssText=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*s}px;--dy:${Math.sin(a)*s-20}px;background:${cols[i%cols.length]}`;stage.appendChild(d);setTimeout(()=>d.remove(),650)}}
@@ -496,7 +531,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='
 addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause();return}if(G.paused)return;
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
-addEventListener('resize',size);
+addEventListener('resize',size,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',size,{passive:true});
 let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;trackPlaytime(dt);
  if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
