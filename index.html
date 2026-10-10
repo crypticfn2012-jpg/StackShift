@@ -202,7 +202,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 .stat-tile b{display:block;margin-top:3px;color:var(--cream);font-size:clamp(19px,2.1vw,27px);line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .stat-tile.coins{background:rgba(245,134,42,.15);border-color:rgba(245,134,42,.48)}.stat-tile.coins b{color:#ffb568}
 .stat-tile.reward{grid-column:span 2;background:var(--paper);border-color:var(--navy);color:var(--ink)}.stat-tile.reward span,.stat-tile.reward b{color:var(--ink)}
-.pc[data-special="fragile"] .c:first-child{outline:3px solid #fff0a6;outline-offset:-5px}
+.pc[data-special="fragile"] .c:first-child{outline:3px solid #fff0a6;outline-offset:-5px}.pc[data-special="priority"] .c:first-child{outline:3px solid var(--or);outline-offset:-5px}
 #contract.special-cargo{background:rgba(245,134,42,.13);border-color:rgba(245,134,42,.65)}
 #contract.special-cargo .mark{background:#ffb568}
 @media(min-width:1100px) and (min-height:650px){
@@ -293,7 +293,7 @@ function gen(seed,i,difficulty){
   if(rule==='edge'){const cd=[];ps.forEach(p=>{const[w,h]=dims(p.sol);if(p.sx===0)cd.push([p.k,'left']);if(p.sx+w===c)cd.push([p.k,'right']);if(p.sy===0)cd.push([p.k,'top']);if(p.sy+h===rw)cd.push([p.k,'bottom'])});if(!cd.length)continue;const q=cd[R(cd.length)];o.star=q[0];o.edge=q[1]}
   if(rule==='lock')o.lock=R(n);
   ps.forEach(p=>{let q=p.sol;if(p.k!==o.lock)for(let t=R(4);t--;)q=rotc(q);p.cells=q});
-  if(i>=2&&i%3===2){const candidates=ps.filter(p=>p.k!==o.lock);if(candidates.length){const target=candidates[R(candidates.length)];target.special="fragile";o.special={kind:"fragile",k:target.k}}}
+  if(i>=2&&i%3===2){const kind=Math.floor(i/3)%2===0?'fragile':'priority';if(kind==='fragile'){const candidates=ps.filter(p=>p.k!==o.lock);if(candidates.length){const target=candidates[R(candidates.length)];target.special='fragile';o.special={kind:'fragile',k:target.k}}}else{const edges=[];ps.forEach(p=>{const[w,h]=dims(p.sol);if(p.sx===0)edges.push({p,edge:'left'});if(p.sx+w===c)edges.push({p,edge:'right'});if(p.sy===0)edges.push({p,edge:'top'});if(p.sy+h===rw)edges.push({p,edge:'bottom'})});if(edges.length){const q=edges[R(edges.length)];o.rule='edge';o.lock=-1;o.star=q.p.k;o.edge=q.edge;q.p.special='priority';o.special={kind:'priority',k:q.p.k,edge:q.edge}}}}
   if(verify(o))return o}
  /* Bounded safety net: avoid recursive retries if random generation cannot find a layout. */
  const [fc,fr]=GR[Math.min(diff,GR.length-1)];
@@ -469,7 +469,7 @@ function layout(){if(!G||!G.ps)return;const B=bx(),sw=stage.clientWidth||7*U;let
 function build(c,r){board.textContent='';bc.length=0;board.style.width=`calc(var(--u)*${c})`;board.style.height=`calc(var(--u)*${r})`;board.style.gridTemplate=`repeat(${r}, 1fr) / repeat(${c}, 1fr)`;
  for(let i=0;i<c*r;i++){const d=document.createElement('div');d.className='g';board.appendChild(d);bc.push(d)}}
 /* ===== parcels ===== */
-function paint(p){const e=p.el,s=new Set(p.cells.map(c=>c[0]+','+c[1])),col=PAL[(p.k+G.i)%6];e.textContent='';e.dataset.special=p.fragile?'fragile':'';
+function paint(p){const e=p.el,s=new Set(p.cells.map(c=>c[0]+','+c[1])),col=PAL[(p.k+G.i)%6];e.textContent='';e.dataset.special=p.special||'';
  p.cells.forEach(([x,y],n)=>{const d=document.createElement('div'),X=(a,b)=>s.has((x+a)+','+(y+b))?0:1,t=X(0,-1),bt=X(0,1),l=X(-1,0),rt=X(1,0);d.className='c'+(n===0?' t':'');
   d.style.cssText=`left:calc(var(--u)*${x});top:calc(var(--u)*${y});background-color:${col};border-width:${t*3}px ${rt*3}px ${bt*3}px ${l*3}px;border-radius:${t&&l?9:0}px ${t&&rt?9:0}px ${bt&&rt?9:0}px ${bt&&l?9:0}px`;
   if(n===0)d.textContent=p.fragile?'!':p.star?'★':p.lock?'🔒':'';e.appendChild(d)})}
@@ -494,9 +494,9 @@ stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up
 stage.addEventListener('contextmenu',e=>{e.preventDefault();rotSel()});
 /* ===== orders, scoring, run flow ===== */
 function newOrder(){const ramp=G.campaign?Math.floor(G.campaignLevel*GR.length/CAMPAIGN_LEVELS):G.i;const o=G.o=gen(G.seed,G.i,ramp);if(!o||!Array.isArray(o.ps)||!o.ps.length)throw new Error('Could not create a playable order');G.c=o.c;G.r=o.r;build(o.c,o.r);if(Array.isArray(G.ps))G.ps.forEach(p=>{if(p&&p.el)p.el.remove()});
- G.ps=o.ps.map(p=>{const el=document.createElement('div');el.className='pc';stage.appendChild(el);const q={k:p.k,cells:p.cells,lock:p.k===o.lock||p.special==='fragile',fragile:p.special==='fragile',star:p.k===o.star,pl:null,el};el._p=q;paint(q);return q});
+ G.ps=o.ps.map(p=>{const el=document.createElement('div');el.className='pc';stage.appendChild(el);const q={k:p.k,cells:p.cells,lock:p.k===o.lock||p.special==='fragile',fragile:p.special==='fragile',priority:p.special==='priority',special:p.special||'',star:p.k===o.star,pl:null,el};el._p=q;paint(q);return q});
  G.os=0;G.om=0;sel=G.ps[0];board.dataset.e=o.edge||'';
- set('#rl',o.special&&o.special.kind==='fragile'?'FRAGILE CARGO — Keep the marked parcel upright. It cannot rotate. Clean delivery earns +50 bonus points.':{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);$('#contract').classList.toggle('special-cargo',!!o.special);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
+ set('#rl',o.special&&o.special.kind==='fragile'?'FRAGILE CARGO — Keep the marked parcel upright. It cannot rotate. Clean delivery earns +50 bonus points.':o.special&&o.special.kind==='priority'?'PRIORITY CARGO — The starred parcel must touch the highlighted '+o.edge+' wall. Clean delivery earns +50 bonus points.':{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);$('#contract').classList.toggle('special-cargo',!!o.special);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
 function start(daily,endless,campaignMode,extraLives=0){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
  if(!S||typeof S!=='object')S={};if(!S.campaign||typeof S.campaign!=='object')S.campaign={level:0};
