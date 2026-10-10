@@ -317,7 +317,7 @@ function newOrder(){const o=G.o=gen(G.seed,G.i);G.c=o.c;G.r=o.r;build(o.c,o.r);i
 function start(daily,endless){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
  G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,date:utc(),i:0,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false};
  G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
- $('#game').classList.toggle('endless',!!endless);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(endless?'Endless!':'Go!')}
+ $('#game').classList.toggle('endless',!!endless);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();updateContract();hud();SDK.gs();sfx('go');flt(endless?'Endless!':'Go!')}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
  set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const s=G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
  TMW.classList.toggle('hide',!!G.endless);TMW.classList.toggle('low',!G.endless&&G.run&&G.t<=10);if(!G.endless&&s!==G.ls){G.ls=s;if(G.run&&!G.paused&&s<=5&&s>0)sfx('tick',s)}}
