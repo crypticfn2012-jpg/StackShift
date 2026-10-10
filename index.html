@@ -261,7 +261,7 @@ function trackPlaytime(dt){if(!S||document.hidden||!(dt>0))return;const p=S.play
  const grant=(seconds,coins,label)=>{if(p.claimed.includes(seconds))return;p.claimed.push(seconds);S.coins+=coins;S.life+=coins;earned+=coins;lastReward=`${label} stay reward: +${coins} coins`};
  for(const r of PLAYTIME_REWARDS)if(p.seconds>=r.seconds)grant(r.seconds,r.coins,formatDuration(r.seconds));
  for(let at=1800;at<=p.seconds;at+=600)grant(at,100,formatDuration(at));
- playtimeFlush+=dt;if(earned||playtimeFlush>=10){save();playtimeFlush=0}if(earned){ach();toast(lastReward);sfx('ach')}}
+ playtimeFlush+=dt;if(earned||playtimeFlush>=10){save();playtimeFlush=0}if(earned){ach();save();toast(lastReward);sfx('ach')}}
 function dailyStreakNow(){const d=S.dailyStreak||{lastDate:'',current:0};if(!d.lastDate)return 0;const gap=(Date.parse(utc()+'T00:00:00Z')-Date.parse(d.lastDate+'T00:00:00Z'))/86400000;return gap>=0&&gap<=1?d.current:0}
 function recordDailyStreak(date){const d=S.dailyStreak||(S.dailyStreak={lastDate:'',current:0,best:0});if(d.lastDate===date)return 0;const gap=d.lastDate?(Date.parse(date+'T00:00:00Z')-Date.parse(d.lastDate+'T00:00:00Z'))/86400000:0;d.current=gap===1?d.current+1:1;d.best=Math.max(d.best,d.current);d.lastDate=date;return d.current===3?50:d.current>=7&&d.current%7===0?100:0}
 /* ===== audio: tiny synth, short crisp transients, compressed master ===== */
@@ -398,7 +398,7 @@ function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]){let unlocked=false;try{unl
 function achievements(){const count=AL.filter(a=>!!S.ach[a[0]]).length;let h='<h2>Achievements</h2><p class="sub">'+count+' / '+AL.length+' unlocked · Each achievement earns 25 coins.</p><div class="ach-list">';for(const[id,name,desc]of AL){const done=!!S.ach[id];h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'•')+'</span><div><b>'+name+'</b><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked':'Locked')+'</small></div></div>'}h+='</div><button class="b pri" data-a="achClose">Close</button>';ov(h)}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
- if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
+ if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;S.coins+=coins;S.life+=coins;ach();save();
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
@@ -408,9 +408,10 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
  const mistakeLine=g.mist?L('mistakesText').replace('{n}',g.mist):L('noMistakes');
  const played=Math.floor(S.playtime&&S.playtime.seconds||0),next=nextPlaytimeReward();
  const stayLine='Run time '+formatDuration(g.el)+' · Total playtime '+formatDuration(played)+' · Next stay reward in '+formatDuration(Math.max(0,next.seconds-played))+' (+'+next.coins+' coins)';
+ const streakLine=g.streakBonus?'<p class="sub">'+(S.dailyStreak&&S.dailyStreak.current||0)+'-day daily streak reward: +'+g.streakBonus+' coins</p>':'';
  ov('<h2>'+title+'</h2><div class="big">'+g.score+'</div><p class="sub">'+subtitle+'</p>'+
  '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
- '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p><p class="sub">'+stayLine+'</p>'+
+ '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p>'+streakLine+'<p class="sub">'+stayLine+'</p>'+
  '<button class="b pri" data-a="again">'+L('playAgain')+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
