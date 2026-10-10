@@ -55,6 +55,8 @@ button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 #bar{height:100%;background:var(--or);border-right:4px solid var(--navy)}
 #tm{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink);font-size:15px}
 #st{min-width:84px;text-align:right;color:var(--or);font-size:15px;text-shadow:0 2px 0 var(--navy)}
+#lives{flex:none;font:900 15px var(--f);letter-spacing:1px;color:#ff6b62;text-shadow:0 2px 0 var(--navy);white-space:nowrap}
+@media(max-width:430px){#st{min-width:0;font-size:12px}#lives{font-size:12px;letter-spacing:0}}
 .ib{width:46px;height:46px;flex:none;border:4px solid var(--navy);background:var(--cream);color:var(--ink);border-radius:50%;font:900 15px var(--f);cursor:pointer;box-shadow:0 4px 0 var(--navy)}
 #ord{display:flex;align-items:center;gap:10px;margin:12px 0 4px;padding:6px 10px;background:var(--paper);color:var(--ink);border:4px solid var(--navy);border-radius:12px;overflow:hidden}
 #ord .van{width:64px;flex:none}.van.go{animation:drive .5s}
@@ -95,6 +97,19 @@ button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 #acts .b{margin:0;min-height:54px;font-size:17px;flex:1}#dl{flex:1.7!important}
 #ov{position:fixed;inset:0;background:rgba(10,16,32,.78);display:grid;place-items:center;padding:16px;z-index:20;overflow:auto}
 #ov .card{width:100%;max-width:390px;background:var(--paper);color:var(--ink);border:5px solid var(--navy);border-radius:18px;padding:18px;box-shadow:0 8px 0 #0a1022}
+#ov .card.settings-card{width:min(520px,calc(100vw - 24px));max-width:520px;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;padding:20px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}
+.settings-row{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;background:var(--cream);border:2px solid var(--navy);border-radius:11px;font-weight:800;font-size:13px}
+.settings-row span{min-width:0;line-height:1.2}
+.settings-row select{width:100%;min-width:0;max-width:150px;padding:7px;border:2px solid var(--navy);border-radius:7px;background:#fff;color:var(--ink);font:700 13px var(--f)}
+.settings-row:has(#settingLang),.settings-row:has(#settingVolume){grid-column:1/-1}
+.settings-row:has(#settingVolume){display:grid;grid-template-columns:1fr auto}
+.settings-row input[type=range]{width:100%;min-width:0;accent-color:var(--or);grid-column:1/-1}
+.settings-row input[type=checkbox]{width:22px;height:22px;flex:none;accent-color:var(--or);cursor:pointer}
+.settings-note{font-size:13px;font-weight:700;color:#5a5048;margin:10px 0}
+.settings-credits{border-top:2px dashed #c8b58d;padding-top:9px;font-size:13px}
+.settings-credits p{margin:4px 0}
+@media(max-width:430px){#ov .card.settings-card{padding:14px}.settings-grid{grid-template-columns:1fr;gap:7px}.settings-row:has(#settingLang),.settings-row:has(#settingVolume){grid-column:auto}.settings-row:has(#settingVolume){grid-template-columns:1fr auto}.settings-row select{max-width:58%}}
 #ov .card.cosmetics-card{width:min(760px,calc(100vw - 32px));max-width:760px;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;padding:22px}
 #ov .cosmetics-card .chips{gap:10px}
 #ov .cosmetics-card .chip{min-width:120px;flex:1 1 135px}
@@ -152,7 +167,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  
 </section>
 <section id="game" class="scr hide">
- <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
+ <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><span id="lives" aria-live="polite" aria-label="Lives"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
  <div id="ord"><div class="van" id="gvan"></div><div id="rl"></div><div><span id="on"></span><button class="lnk" data-a="nxt">Skip (−5s)</button></div></div>
  <div id="contract" aria-live="polite"><div class="mark">★</div><div class="copy"><b id="contractTitle">Shift contract</b><small id="contractDesc">Complete an extra objective for bonus coins.</small><div class="progress"><i id="contractBar"></i></div></div><small id="contractCount">0/3</small></div>
  <p id="tut" class="hide">Drag parcels into the van. Tap one to rotate it, or press R. Space delivers. Fast deliveries add time. <button class="lnk" data-a="skip">Got it</button></p>
@@ -178,7 +193,7 @@ const dims=cs=>[Math.max(...cs.map(c=>c[0]))+1,Math.max(...cs.map(c=>c[1]))+1];
 const edgeOK=(cs,gx,gy,e,c,r)=>cs.some(([x,y])=>e==='left'?x+gx===0:e==='right'?x+gx===c-1:e==='top'?y+gy===0:y+gy===r-1);
 /* The van (grid) grows with the order: bigger boxes and more of them get a bigger cargo bay. */
 const GR=[[4,3],[4,3],[5,3],[5,4],[5,4],[6,4],[6,4],[6,5],[7,5],[7,6],[8,6]];
-const CAMPAIGN_LEVELS=40;
+const CAMPAIGN_LEVELS=100;
 /* Every order is carved out of a placed solution, then re-verified, so it always has an answer. */
 function verify(o){const seen=new Set();for(const p of o.ps)for(const[x,y]of p.sol){const X=x+p.sx,Y=y+p.sy;if(X<0||X>=o.c||Y<0||Y>=o.r||seen.has(Y*o.c+X))return false;seen.add(Y*o.c+X)}
  if(o.rule==='fill'&&seen.size!==o.c*o.r)return false;
@@ -209,7 +224,8 @@ function gen(seed,i,difficulty){
 const C=[['van','van0','Sunrise',0,'none'],['van','van1','Pine',40,'hue-rotate(95deg) saturate(.9)'],['van','van2','Harbour',80,'hue-rotate(165deg)'],['van','van3','Plum',130,'hue-rotate(255deg) saturate(.9)'],
 ['pal','pal0','Kraft',0,['#d2a46a','#c58f55','#e0b97f','#b98450','#d9b07a','#c99a62']],['pal','pal1','Harbour',50,['#7aa0c4','#5b86ad','#8fb4cf','#6a96b8','#9bbdd4','#4f7aa0']],['pal','pal2','Citrus',90,['#e8a33d','#d9622b','#e9c46a','#c9503a','#f0b87a','#b8793a']],['pal','pal3','Slate',140,['#8d9199','#6f747d','#a6aab1','#5c616b','#b8bcc2','#7c828b']],
 ['grd','grd0','Plywood',0,['#ead9b5','#cdb98d']],['grd','grd1','Blueprint',60,['#27406b','#5878ad']],['grd','grd2','Chalkboard',100,['#2b3a35','#5d7a6f']],['grd','grd3','Cardboard',150,['#cfa66f','#a98350']],
-['dec','dec0','No decal',0,''],['dec','dec1','Star',30,'★'],['dec','dec2','Bolt',70,'⚡'],['dec','dec3','Crate',120,'▣'],['van','van4','Mint',170,'hue-rotate(70deg) saturate(1.2)'],['van','van5','Sunset',210,'hue-rotate(320deg) saturate(1.25)'],['van','van6','Ice Pop',260,'hue-rotate(185deg) saturate(1.3)'],['van','van7','Midnight',320,'brightness(.8) saturate(1.25)'],['pal','pal4','Berry',180,['#b65b83','#8b416a','#d17aa1','#a64f73','#e2a2be','#7b345c']],['pal','pal5','Ocean',220,['#2c9aa0','#187f91','#52b8b6','#1c6b7a','#8ad4cd','#225c78']],['pal','pal6','Firework',270,['#f04f3b','#7c5ce7','#f7c948','#30b8a5','#e65d9e','#5d6be8']],['pal','pal7','Lime',310,['#a8ce39','#6b9c2f','#d4e86a','#5b7f2a','#e0ee92','#87ad3a']],['grd','grd4','Neon Grid',190,['#20294a','#5866a8']],['grd','grd5','Terracotta',230,['#8e4f3d','#c07c57']],['grd','grd6','Frost',280,['#d6e8ee','#91b8c7']],['grd','grd7','Night Shift',330,['#111827','#34425c']],['dec','dec4','Crown',180,'♛'],['dec','dec5','Ghost',230,'◇'],['dec','dec6','Flower',280,'✿'],['dec','dec7','Comet',340,'☄']];
+['dec','dec0','No decal',0,''],['dec','dec1','Star',30,'★'],['dec','dec2','Bolt',70,'⚡'],['dec','dec3','Crate',120,'▣'],['van','van4','Mint',170,'hue-rotate(70deg) saturate(1.2)'],['van','van5','Sunset',210,'hue-rotate(320deg) saturate(1.25)'],['van','van6','Ice Pop',260,'hue-rotate(185deg) saturate(1.3)'],['van','van7','Midnight',320,'brightness(.8) saturate(1.25)'],['pal','pal4','Berry',180,['#b65b83','#8b416a','#d17aa1','#a64f73','#e2a2be','#7b345c']],['pal','pal5','Ocean',220,['#2c9aa0','#187f91','#52b8b6','#1c6b7a','#8ad4cd','#225c78']],['pal','pal6','Firework',270,['#f04f3b','#7c5ce7','#f7c948','#30b8a5','#e65d9e','#5d6be8']],['pal','pal7','Lime',310,['#a8ce39','#6b9c2f','#d4e86a','#5b7f2a','#e0ee92','#87ad3a']],['grd','grd4','Neon Grid',190,['#20294a','#5866a8']],['grd','grd5','Terracotta',230,['#8e4f3d','#c07c57']],['grd','grd6','Frost',280,['#d6e8ee','#91b8c7']],['grd','grd7','Night Shift',330,['#111827','#34425c']],['dec','dec4','Crown',180,'♛'],['dec','dec5','Ghost',230,'◇'],['dec','dec6','Flower',280,'✿'],['dec','dec7','Comet',340,'☄'],
+['van','campvan5','Golden Hauler',0,'hue-rotate(25deg) saturate(1.7) brightness(1.08)',5],['pal','camppal10','Aurora Cargo',0,['#5de1c5','#3e9bba','#b5f36d','#3f6db5','#b8fff0','#287a8a'],10],['dec','campdec15','Champion Star',0,'✦',15],['grd','campgrd25','Night Route',0,['#17253e','#53698e'],25],['van','campvan40','Prism Runner',0,'hue-rotate(150deg) saturate(1.8)',40],['pal','camppal50','Solar Flare',0,['#ff7a36','#e84455','#ffd166','#a63e67','#ffb15e','#8c2f45'],50],['dec','campdec75','Comet Trail',0,'✧',75],['grd','campgrd100','Master Route',0,['#132b25','#42a878'],100]];
 const cat=id=>C.find(c=>c[1]===id);
 let PAL=C[4][4];
 const vanHTML=(f,d)=>`<img src="${VAN}" alt="Delivery van" draggable="false" style="filter:${f}"><b class="dc">${d}</b>`;
@@ -283,7 +299,7 @@ function sfx(k,n=0){if(muted()||!audioUnlocked)return;try{ac();if(!AC||!MG)retur
  const t=(f,d,ty,v,at=0,sl=0)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ty;o.frequency.setValueAtTime(f,T+at);if(sl)o.frequency.exponentialRampToValueAtTime(sl,T+at+d);g.gain.setValueAtTime(.0001,T+at);g.gain.exponentialRampToValueAtTime(v,T+at+.006);g.gain.exponentialRampToValueAtTime(.0005,T+at+d);o.connect(g);g.connect(MG);o.start(T+at);o.stop(T+at+d+.03)};
  const z=(d,v,hp,at=0)=>{const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NZ;f.type='highpass';f.frequency.value=hp;g.gain.setValueAtTime(v,T+at);g.gain.exponentialRampToValueAtTime(.0005,T+at+d);s.connect(f);f.connect(g);g.connect(MG);s.start(T+at);s.stop(T+at+d+.03)};
  const arp=(st,b,ty,v,gap,len)=>st.forEach((s,i)=>t(b*N(s),len,ty,v,i*gap));
- ({ui:()=>{t(760,.05,'triangle',.1,0,520);z(.012,.07,5000)},hover:()=>{t(690,.035,'sine',.035,0,850)},
+ ({ui:()=>{t(760,.05,'triangle',.1,0,520);z(.012,.07,5000)},hover:()=>{t(690,.045,'sine',.055,0,850);t(1035,.035,'sine',.025,.018,1200)},
   pick:()=>{t(440,.07,'triangle',.12,0,720);z(.02,.06,3500)},
   rot:()=>{z(.018,.12,4200);t(1100,.035,'square',.04)},
   place:()=>{t(170,.13,'sine',.4,0,65);z(.035,.2,1500);t(620*N(Math.min(n,8)*2),.1,'triangle',.1,.025)},
@@ -348,7 +364,7 @@ function mv(){const r=stage.getBoundingClientRect(),p=drag.p,[w,h]=dims(p.cells)
  const lx=drag.cx-r.left-w*U/2,ly=drag.cy-r.top-h*U/2-(drag.t?U*.9:0);setPos(p,lx,ly,1);
  const gx=Math.round((lx-bx())/U),gy=Math.round(ly/U);drag.g=[gx,gy];drag.f=fit(p,gx,gy);clr();drag.on=false;
  for(const[x,y]of p.cells){const X=x+gx,Y=y+gy;if(X>=0&&X<G.c&&Y>=0&&Y<G.r){bc[Y*G.c+X].classList.add(drag.f===1?'ok':'bad');drag.on=true}}}
-function mist(m){G.om++;G.mist++;sfx('bad');toast(m);board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake')}
+function mist(m){G.om++;G.mist++;sfx('bad');toast(m);board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake');if(G.campaign&&G.run){G.lives=Math.max(0,(G.lives||0)-1);hud();if(G.lives===0){G.campaignFailed=true;toast('No lives left — level failed');end()}}}
 function rot(p){if(!p)return;if(p.lock){toast("This parcel can't be rotated");return}if(G&&G.run){G.rotations=(G.rotations||0)+1;updateContract()}p.cells=rotc(p.cells);paint(p);sfx('rot');if(drag&&drag.moved&&drag.p===p)mv();layout()}
 const rotSel=()=>{if(!G||!G.run||G.paused)return;rot(drag&&drag.moved?drag.p:sel&&!sel.pl&&!sel.lock?sel:G.ps.find(q=>!q.pl&&!q.lock))};
 stage.addEventListener('pointerdown',e=>{if(!G||!G.run||G.paused||e.button>0)return;const el=e.target.closest('.pc');if(!el)return;const p=el._p;
@@ -367,11 +383,11 @@ function newOrder(){const ramp=G.campaign?Math.floor(G.campaignLevel*GR.length/C
  set('#rl',{none:L('rulePack'),edge:L('ruleEdge').replace('{edge}',L(o.edge+'Edge')),lock:L('ruleLock'),fill:L('ruleFill')}[o.rule]);set('#on',G.campaign?'Campaign · Level '+(G.campaignLevel+1)+' / '+CAMPAIGN_LEVELS:L('orderLabel').replace('{n}',G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
 function start(daily,endless,campaignMode){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
- const savedCampaignLevel=Math.max(0,Math.floor(S.campaign.level||0));const campaignLevel=campaignMode?(savedCampaignLevel>=CAMPAIGN_LEVELS?0:savedCampaignLevel):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
+ const savedCampaignLevel=Math.max(0,Math.floor(S.campaign.level||0));const campaignLevel=campaignMode?(savedCampaignLevel>=CAMPAIGN_LEVELS?0:savedCampaignLevel):0;G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,campaign:!!campaignMode,campaignLevel:campaignLevel,lives:campaignMode?((campaignLevel+1)%15===0?1:3):0,campaignFailed:false,date:utc(),i:campaignLevel,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,fast:0,skips:0,rotations:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false,contract:null,contractPaid:false,win:false};
  G.contract=CONTRACTS[Math.abs(G.seed)%CONTRACTS.length];
  $('#game').classList.toggle('endless',!!endless||!!campaignMode);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(campaignMode?'Campaign level '+(G.campaignLevel+1):endless?L('endlessGo'):L('go'))}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
- set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const s=G.campaign?(G.campaignLevel+1)+'/'+CAMPAIGN_LEVELS:G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
+ set('#sc',G.sd);set('#st',G.streak>1?'🔥 ×'+G.streak:'');const lv=$('#lives');if(lv){lv.textContent=G.campaign?'♥ '.repeat(Math.max(0,G.lives||0)).trim()+(G.campaign&&G.lives===1?' !':''):'';lv.style.display=G.campaign?'inline':'none';lv.setAttribute('aria-label',G.campaign?(G.lives+' lives remaining'):'')}const s=G.campaign?(G.campaignLevel+1)+'/'+CAMPAIGN_LEVELS:G.endless?'∞':Math.ceil(G.t);set('#tm',s);$('#bar').style.width=G.endless?'100%':Math.min(100,G.t/SHIFT*100)+'%';
  TMW.classList.toggle('hide',!!G.endless||!!G.campaign);TMW.classList.toggle('low',!G.endless&&!G.campaign&&G.run&&G.t<=10);if(!G.endless&&!G.campaign&&s!==G.ls){G.ls=s;if(G.run&&!G.paused&&s<=5&&s>0)sfx('tick',s)}}
 function deliver(){if(!G||!G.run||G.paused||!Array.isArray(G.ps)||!G.ps.length||!G.ps.every(p=>p&&p.pl))return;const o=G.o;
  if(o.rule==='edge'){const p=G.ps[o.star];if(!edgeOK(p.cells,p.pl[0],p.pl[1],o.edge,o.c,o.r)){G.score=Math.max(0,G.score-30);mist('★ parcel must touch the '+o.edge+' wall (−30)');hud();return}}
@@ -383,7 +399,7 @@ function deliver(){if(!G||!G.run||G.paused||!Array.isArray(G.ps)||!G.ps.length||
  
  updateContract();const v=$('#gvan');v.classList.remove('go');void v.offsetWidth;v.classList.add('go');pop($('#sc'));if(G.streak>1)pop($('#st'));
  ach();save();
- if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
+ if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);const reward=C.find(c=>c[5]===G.campaignLevel);if(reward&&!S.own.includes(reward[1])){S.own.push(reward[1]);G.campaignUnlock=reward[2];toast('Campaign reward unlocked: '+reward[2]);sfx('ach');burst()}save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
  G.i++;newOrder();hud()}
 function skip(){if(!G||!G.run||G.paused)return;if(G.campaign){toast('Complete the level to progress');return}G.skips=(G.skips||0)+1;if(!G.endless&&!G.campaign){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
@@ -415,8 +431,8 @@ function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.rem
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
- const title=g.campaign?(g.win?'Campaign complete!':'Campaign ended'):L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
- const subtitle=g.campaign?(g.win?'You cleared all '+CAMPAIGN_LEVELS+' levels. Incredible work.':'You reached level '+(g.campaignLevel+1)+' of '+CAMPAIGN_LEVELS+'.'):(g.pb?L('newBest'):d<0?L('shortBest').replace('{diff}',-d).replace('{best}',g.prev):L('matchedBest'))+(g.daily&&!g.win?' · '+g.done+'/'+DN+' '+L('ordersStat'):'');
+ const title=g.campaign?(g.win?'Campaign complete!':g.campaignFailed?'Level failed':'Campaign ended'):L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
+ const subtitle=g.campaign?(g.win?'You cleared all '+CAMPAIGN_LEVELS+' levels. Incredible work.':g.campaignFailed?'You ran out of lives on level '+(g.campaignLevel+1)+'. Retry this level from the start.':'You reached level '+(g.campaignLevel+1)+' of '+CAMPAIGN_LEVELS+'.'):(g.pb?L('newBest'):d<0?L('shortBest').replace('{diff}',-d).replace('{best}',g.prev):L('matchedBest'))+(g.daily&&!g.win?' · '+g.done+'/'+DN+' '+L('ordersStat'):'');
  const mistakeLine=g.mist?L('mistakesText').replace('{n}',g.mist):L('noMistakes');
  const played=Math.floor(S.playtime&&S.playtime.seconds||0),next=nextPlaytimeReward();
  const stayLine='Run time '+formatDuration(g.el)+' · Total playtime '+formatDuration(played)+' · Next stay reward in '+formatDuration(Math.max(0,next.seconds-played))+' (+'+next.coins+' coins)';
@@ -424,7 +440,7 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
  ov('<h2>'+title+'</h2><div class="big">'+g.score+'</div><p class="sub">'+subtitle+'</p>'+
  '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
  '<p class="sub">+'+g.coins+' '+L('coins')+' · '+mistakeLine+'</p>'+streakLine+(g.campaignReward?'<p class="sub">Campaign complete: '+g.campaignTitle+' · +'+g.campaignReward+' coins included above</p>':'')+'<p class="sub">'+stayLine+'</p>'+
- '<button class="b pri" data-a="again">'+L('playAgain')+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
+ '<button class="b pri" data-a="again">'+(g.campaignFailed?'Retry level':L('playAgain'))+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
@@ -451,7 +467,7 @@ function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" 
  '<label class="settings-row"><span>'+L('reducedMotion')+'</span><input id="settingMotion" type="checkbox" '+(S.rm?'checked':'')+' aria-label="'+L('reducedMotion')+'"></label>'+
  '<label class="settings-row"><span>'+L('largeText')+'</span><input id="settingText" type="checkbox" '+(S.largeText?'checked':'')+' aria-label="'+L('largeText')+'"></label>'+
  '<label class="settings-row"><span>'+L('highContrast')+'</span><input id="settingContrast" type="checkbox" '+(S.hc?'checked':'')+' aria-label="'+L('highContrast')+'"></label></div>'+
- '<p class="settings-note">'+L('savedAuto')+'</p><div class="settings-credits"><b>Credits</b><p>Main developer: Ron</p><p>Studio: PixelForge Studios</p></div><button class="b pri" data-a="settingsClose">'+L('close')+'</button>')}
+ '<p class="settings-note">'+L('savedAuto')+'</p><div class="settings-credits"><b>Credits</b><p>Main developer: Ron</p><p>Studio: PixelForge Studios</p></div><button class="b pri" data-a="settingsClose">'+L('close')+'</button>');$('#ov .card').classList.add('settings-card')}
 
 function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]||{}).locale||'en-GB',ds=S.dailyStreak||{best:0};
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')} · Day streak ${dailyStreakNow()} · Best streak ${ds.best||0}</p><p class="sub">Streak reward: +50 coins at 3 days, +100 every 7 days.</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
@@ -461,7 +477,7 @@ function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>
 function toMenu(){if(G&&G.run){G.run=false;SDK.gx()}cl();menu()}
 function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]=pv;const g=cat(eq.grd)[4],p=cat(eq.pal)[4];
  let h=`<h2>${L('cosmetics')}</h2><p class="sub">${S.coins} ${L('coins')} · ${L('earnedByPlaying')}</p><div class="van"></div><div class="sw" style="background:${g[0]};border-color:${g[1]}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`;
- for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
+ for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k&&(!c[5]||S.own.includes(c[1]))).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
 const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
