@@ -383,9 +383,11 @@ function applyLanguage(){const put=(selector,key)=>{const e=$(selector);if(e)e.t
  put('#menu .tag','tagline');put('#menu [data-a=play]','timed');put('#menu [data-a=endless]','endless');put('#menu [data-a=shop]','cosmetics');put('#menu [data-a=settings]','settings');put('#acts [data-a=clr]','reset');put('#acts [data-a=rot]','rotate');put('#acts [data-a=dlv]','deliver');put('#ord [data-a=nxt]','skip');put('.sb small','score');
  const tut=$('#tut');if(tut){if(tut.firstChild&&tut.firstChild.nodeType===3)tut.firstChild.textContent=L('tutorial')+' ';const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}}
 
-function menu(){const dly=S.daily.d===utc(),dt=new Date();
- $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString('en',{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>route</div><div class="bd"><b style="font-size:18px">Daily route</b><p>Deliver ${DN} orders before the clock runs out. Same orders for everyone today (UTC).</p><p>${dly&&S.daily.done?'Completed ✓ · best '+S.daily.best:dly?'Attempted · best '+S.daily.best:'Not attempted yet'}</p><button class="b pri" data-a="daily">Play daily</button></div>`;
- set('#rec',`Best ${S.best} · ${S.orders} orders · ${S.perfect} perfect · best streak ${S.streak} · ${S.shifts} shifts · ${S.coins} coins`);set('#snd','Sound: '+(muted()?'off':'on'));show('menu')}
+function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]).locale;
+ const status=dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted');
+ $('#dly').innerHTML='<div class="stub">'+dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})+'<b>'+dt.getUTCDate()+'</b>'+L('daily')+'</div><div class="bd"><b style="font-size:18px">'+L('daily')+'</b><p>'+L('dailyBlurb').replace('{n}',DN)+' '+L('sameToday')+'</p><p>'+status+'</p><button class="b pri" data-a="daily">'+L('playDaily')+'</button></div>';
+ set('#rec',L('best')+' '+S.best+' · '+S.orders+' '+L('orders')+' · '+S.perfect+' '+L('perfect')+' · '+L('streak')+' '+S.streak+' · '+S.shifts+' '+L('shifts')+' · '+S.coins+' '+L('coins'));set('#snd',muted()?L('soundOff'):L('soundOn'));show('menu');applyLanguage()}
+
 function toMenu(){if(G&&G.run){G.run=false;SDK.gx()}cl();menu()}
 function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]=pv;const g=cat(eq.grd)[4],p=cat(eq.pal)[4];
  let h=`<h2>Cosmetics</h2><p class="sub">${S.coins} coins · earned by playing, never bought</p><div class="van"></div><div class="sw" style="background:${g[0]};border-color:${g[1]}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</div>`;
