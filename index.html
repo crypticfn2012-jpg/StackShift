@@ -109,6 +109,57 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(max-height:640px){.ttl{font-size:48px}.tag{font-size:13px}#road{height:86px}#mvan{width:160px;margin-left:-80px}#road::after{bottom:5px}.dkt .stub{width:60px}.dkt .stub b{font-size:25px}.rec{font-size:10px}.row .b{font-size:15px}}
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
 
+/* Keep the complete main menu visible without changing puzzle/game screens. */
+#menu .ttl{margin-top:4px;margin-bottom:12px}
+#menu .tag{margin-top:4px}
+#menu #road{height:126px}
+#menu .dkt{margin:10px 0 6px}
+#menu .dkt .bd{padding:7px 10px 8px}
+#menu .dkt .bd::after{height:5px;margin-top:5px}
+#menu .dkt p{font-size:13px;line-height:1.22}
+#menu .dkt .b{min-height:36px;margin:5px 0}
+#menu .row .b{margin:5px 0}
+#menu .rec{margin:6px 0;font-size:12px}
+#menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 5px}
+#menu .menu-tile{min-height:92px;padding:8px 10px;gap:4px}
+#menu .menu-tile b{font-size:14px}
+#menu .menu-tile small{font-size:10px}
+#menu .menu-tile-foot{padding-top:4px;font-size:10px}
+@media(max-height:780px){
+ #menu .ttl{font-size:clamp(44px,10vw,62px);margin:2px 0 8px;-webkit-text-stroke:5px var(--navy);text-shadow:0 4px 0 var(--navy)}
+ #menu .tag{font-size:12px;line-height:1.2;margin:3px 0}
+ #menu #road{height:78px}
+ #menu #mvan{width:150px;margin-left:-75px}
+ #menu .dkt{margin:5px 0 3px;border-width:3px;box-shadow:0 3px 0 var(--navy)}
+ #menu .dkt .stub{width:53px}
+ #menu .dkt .stub b{font-size:23px}
+ #menu .dkt .bd{padding:5px 8px}
+ #menu .dkt p{font-size:11px;line-height:1.15}
+ #menu .dkt .b{min-height:30px;padding:5px 8px;margin:3px 0;font-size:13px}
+ #menu .row .b{min-height:36px;padding:6px 8px;margin:3px 0;font-size:14px}
+ #menu .rec{font-size:10px;margin:3px 0}
+ #menu .menu-links{margin:4px 0 2px;gap:6px}
+ #menu .menu-tile{min-height:68px;padding:6px 8px;border-width:2px;box-shadow:0 2px 0 var(--navy);gap:3px}
+ #menu .menu-tile-top{display:none}
+ #menu .menu-tile b{font-size:13px}
+ #menu .menu-tile small{font-size:10px}
+ #menu .menu-tile-foot{padding-top:3px;font-size:10px}
+}
+@media(max-height:640px){
+ #menu .ttl{font-size:42px;margin:0 0 5px}
+ #menu #road{height:54px}
+ #menu #mvan{width:115px;margin-left:-57px}
+ #menu .dkt p{font-size:10px}
+ #menu .menu-tile{min-height:56px}
+}
+@media(max-width:520px){
+ #menu .menu-links{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #menu .menu-tile{min-height:78px}
+ #menu .menu-tile b{font-size:13px}
+ #menu .menu-tile small{font-size:10px}
+}
+
+
 /* Minimal polish layered onto the original UI. */
 .b,.ib,.chip,.lnk{transition:transform .13s ease,filter .13s ease}
 .b:hover:not(:disabled),.ib:hover:not(:disabled),.chip:hover:not(:disabled),.lnk:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06)}
@@ -159,7 +210,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <div class="dkt" id="dly"></div>
  <div class="row"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
  <p class="rec" id="rec"></p>
- <div id="achLink" class="menu-links" aria-label="Progress and competition"><button class="menu-tile" data-a="campaign"><span class="menu-tile-top"><span class="menu-tile-mark">01</span><span class="menu-tile-count" id="campaignCount">0 / 12</span></span><b>Career campaign</b><small>Work through your delivery career</small><span class="menu-tile-foot">View missions <span aria-hidden="true">→</span></span></button><button class="menu-tile" data-a="achievements"><span class="menu-tile-top"><span class="menu-tile-mark">02</span><span class="menu-tile-count" id="achievementCount">0 unlocked</span></span><b>Achievements</b><small>Collect rewards for milestones</small><span class="menu-tile-foot">View achievements <span aria-hidden="true">→</span></span></button><button class="menu-tile" data-a="leaderboard"><span class="menu-tile-top"><span class="menu-tile-mark">03</span><span class="menu-tile-count">DAILY</span></span><b>Daily leaderboard</b><small>Compare your Daily Route score</small><span class="menu-tile-foot">Leaderboard info <span aria-hidden="true">→</span></span></button></div>
+ <div id="achLink" class="menu-links" aria-label="Progress"><button class="menu-tile" data-a="campaign"><span class="menu-tile-top"><span class="menu-tile-mark">01</span><span class="menu-tile-count" id="campaignCount">0 / 12</span></span><b>Career campaign</b><small>Work through your delivery career</small><span class="menu-tile-foot">View missions <span aria-hidden="true">→</span></span></button><button class="menu-tile" data-a="achievements"><span class="menu-tile-top"><span class="menu-tile-mark">02</span><span class="menu-tile-count" id="achievementCount">0 unlocked</span></span><b>Achievements</b><small>Collect rewards for milestones</small><span class="menu-tile-foot">View achievements <span aria-hidden="true">→</span></span></button></div>
 </section>
 <section id="game" class="scr hide">
  <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
@@ -225,9 +276,7 @@ function applyTheme(eq){const r=document.documentElement.style,g=cat(eq.grd)[4];
  const h=vanHTML(cat(eq.van)[4],cat(eq.dec)[4]);$$('.van').forEach(e=>e.innerHTML=h)}
 
 /* ===== platform: CrazyGames SDK v3 (optional; game runs without it) ===== */
-/* Add the Encryption Key from CrazyGames Developer Portal > Leaderboards.
-   Keep this blank until the game's leaderboard is enabled and a key is configured. */
-const LEADERBOARD_ENCRYPTION_KEY='';
+
 const SDK={on:false,c:null,mute:false,
  async init(){try{
   await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);setTimeout(no,2500)});
@@ -237,20 +286,6 @@ const SDK={on:false,c:null,mute:false,
   if(c.game&&c.game.loadingStart)c.game.loadingStart()
  }catch(e){this.on=false}},
  call(f){try{this.on&&f(this.c.game)}catch(e){}},
- async submitScore(score){
-  if(!this.on||!this.c||!this.c.user||typeof this.c.user.submitScore!=='function'||!LEADERBOARD_ENCRYPTION_KEY)return false;
-  try{
-   const iv=crypto.getRandomValues(new Uint8Array(12));
-   const keyBytes=Uint8Array.from(atob(LEADERBOARD_ENCRYPTION_KEY),ch=>ch.charCodeAt(0));
-   const key=await crypto.subtle.importKey('raw',keyBytes,{name:'AES-GCM'},false,['encrypt']);
-   const data=new TextEncoder().encode(String(score));
-   const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);
-   const out=new Uint8Array(iv.length+encrypted.byteLength);out.set(iv);out.set(new Uint8Array(encrypted),iv.length);
-   const encryptedScore=btoa(String.fromCharCode(...out));
-   this.c.user.submitScore({encryptedScore,score});
-   return true
-  }catch(e){return false}
- },
  gs(){this.call(g=>g.gameplayStart())},gx(){this.call(g=>g.gameplayStop())},ht(){this.call(g=>g.happytime())},loaded(){this.call(g=>g.loadingStop())}};
 const CAMPAIGN=[
  {id:'route',title:'First route',desc:'Complete 3 deliveries in a timed shift',reward:50,check:(s,g)=>!g.daily&&!g.endless&&g.done>=3},
@@ -328,7 +363,7 @@ function sfx(k,n=0){if(muted()||!audioUnlocked)return;try{ac();if(!AC||!MG)retur
 let G=null,drag=null,sel=null,U=56,tt;const stage=$('#stage'),board=$('#board'),bc=[];
 const RM=()=>S.rm||matchMedia('(prefers-reduced-motion:reduce)').matches;
 const show=id=>$$('.scr').forEach(e=>e.classList.toggle('hide',e.id!==id));
-const ov=h=>{const o=$('#ov');const feature=/Career campaign|Achievements|Daily leaderboard/.test(h);o.innerHTML='<div class="card'+(feature?' feature-card':'')+'">'+h+'</div>';o.classList.remove('hide');const b=o.querySelector('.pri,button');b&&b.focus()};
+const ov=h=>{const o=$('#ov');const feature=/Career campaign|Achievements/.test(h);o.innerHTML='<div class="card'+(feature?' feature-card':'')+'">'+h+'</div>';o.classList.remove('hide');const b=o.querySelector('.pri,button');b&&b.focus()};
 const cl=()=>$('#ov').classList.add('hide');
 const set=(q,t)=>{const e=$(q);if(e.textContent!==String(t))e.textContent=t};
 const pop=e=>{e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')};
@@ -432,12 +467,11 @@ function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]){let unlocked=false;try{unl
 function achievements(){ach();save();const count=AL.filter(a=>!!S.ach[a[0]]).length;let h='<div class="feature-intro"><div><h2>Achievements</h2><p class="sub">Milestones earned by playing your way.</p></div><span class="feature-stat">'+count+' / '+AL.length+' UNLOCKED</span></div><p class="sub">Every achievement earns 25 coins.</p><div class="ach-list">';for(const[id,name,desc]of AL){const done=!!S.ach[id];h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'•')+'</span><div><b>'+name+'</b><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked':'Locked')+'</small></div></div>'}h+='</div><button class="b pri" data-a="achClose">Back to menu</button>';ov(h)}
 function advanceCampaign(){const c=S.campaign||(S.campaign={done:[]});if(!Array.isArray(c.done))c.done=[];const m=CAMPAIGN[c.done.length];if(!m)return 0;let complete=false;try{complete=!!m.check(S,G||{})}catch(e){}if(!complete)return 0;c.done.push(m.id);G.campaignTitle=m.title;G.campaignReward=m.reward;toast('Campaign complete: '+m.title+' (+'+m.reward+' coins)');return m.reward}
 function campaign(){const done=S.campaign&&Array.isArray(S.campaign.done)?S.campaign.done:[],pct=Math.round(done.length/CAMPAIGN.length*100);let h='<div class="feature-intro"><div><h2>Career campaign</h2><p class="sub">Long-term goals to work towards across your shifts.</p></div><span class="feature-stat">'+done.length+' / '+CAMPAIGN.length+' COMPLETE</span></div><div class="campaign-progress" role="progressbar" aria-valuenow="'+done.length+'" aria-valuemin="0" aria-valuemax="'+CAMPAIGN.length+'"><i style="width:'+pct+'%"></i></div><div class="ach-list">';for(let i=0;i<CAMPAIGN.length;i++){const m=CAMPAIGN[i],complete=done.includes(m.id),active=!complete&&i===done.length;h+='<div class="ach-item '+(complete?'':'locked')+(active?' active':'')+'"><span class="ach-mark">'+(complete?'✓':i+1)+'</span><div><b>'+m.title+'</b><small>'+m.desc+'</small><small class="ach-state">'+(complete?'Complete':active?'Next mission':'Locked')+' · '+m.reward+' coins</small></div></div>'}h+='</div><p class="sub">Progress is saved automatically.</p><button class="b pri" data-a="campaignClose">Back to menu</button>';ov(h)}
-function leaderboard(){const ready=!!(SDK.on&&LEADERBOARD_ENCRYPTION_KEY&&SDK.c&&SDK.c.user&&typeof SDK.c.user.submitScore==='function');const info=ready?'<p class="sub">Daily Route scores are submitted to CrazyGames. Rankings use its weekly seasons, so the built-in board does not reset every day.</p><p class="sub">Open the Stack Shift leaderboard on the CrazyGames game page to see the live standings.</p>':'<p class="sub">To enable score submissions, enable Leaderboards for Stack Shift in the CrazyGames Developer Portal and add its encryption key to index.html.</p><p class="sub">CrazyGames leaderboard seasons reset weekly, not daily. A true global leaderboard that resets every day needs a separate backend.</p>';ov('<div class="feature-intro"><div><h2>Daily leaderboard</h2><p class="sub">Your best score in today’s Daily Route.</p></div><span class="feature-stat">DAILY ROUTE</span></div><div class="leaderboard-info">'+info+'</div><button class="b pri" data-a="leaderboardClose">Back to menu</button>')}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
  if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=advanceCampaign();coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
- sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(G.daily&&G.score>0)SDK.submitScore(G.score);if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
+ sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
  const title=L(g.daily?(g.win?'dailyComplete':'dailyAttempt'):'shiftOver');
@@ -489,7 +523,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
-const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},leaderboard:leaderboard,leaderboardClose:()=>{cl();menu()},shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
