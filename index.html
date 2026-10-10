@@ -104,6 +104,20 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 @media(max-height:780px){#app{padding-top:5px;padding-bottom:3px}.ttl{font-size:clamp(48px,12vw,70px);margin:4px 0 14px}.tag{margin:7px 0}#road{height:112px}#mvan{width:190px;margin-left:-95px}.b{margin:7px 0;min-height:44px;padding:8px 10px}.b.big{min-height:48px;font-size:20px}.dkt{margin:8px 0 5px}.dkt .bd{padding:6px 9px}.dkt p{font-size:12px}.dkt .b{min-height:34px;margin:5px 0}.rec{margin:7px 0;font-size:11px}.mode-row .b{min-height:46px;font-size:17px}}
 @media(max-height:640px){.ttl{font-size:48px}.tag{font-size:13px}#road{height:86px}#mvan{width:160px;margin-left:-80px}#road::after{bottom:5px}.dkt .stub{width:60px}.dkt .stub b{font-size:25px}.rec{font-size:10px}.row .b{font-size:15px}}
 @media(max-width:390px){.mode-row{gap:7px}.mode-row .b{font-size:16px}}
+
+/* Minimal polish layered onto the original UI. */
+.b,.ib,.chip,.lnk{transition:transform .13s ease,filter .13s ease}
+.b:hover:not(:disabled),.ib:hover:not(:disabled),.chip:hover:not(:disabled),.lnk:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.06)}
+.b:active:not(:disabled),.ib:active:not(:disabled),.chip:active:not(:disabled),.lnk:active:not(:disabled){transform:translateY(1px) scale(.985)}
+.b:focus-visible,.ib:focus-visible,.chip:focus-visible,.lnk:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f5862a;outline-offset:3px}
+.rm .b:hover:not(:disabled),.rm .ib:hover:not(:disabled),.rm .chip:hover:not(:disabled),.rm .lnk:hover:not(:disabled){transform:none;filter:none}
+.large-text{font-size:18px}.high-contrast{--bg:#07101f;--bg2:#000;--cream:#fff;--paper:#fff;--ink:#000;--or:#ffbd24;--gbg:#fff;--gln:#555;--ok:#00652c;--bad:#a00020}
+.settings-grid{display:grid;gap:8px;text-align:left;margin:10px 0 14px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #ffffff20}
+.settings-row span{font-size:14px}.settings-row select{max-width:58%;min-width:125px}.settings-row input[type=range]{width:46%;accent-color:#f5862a}.settings-row input[type=checkbox]{width:19px;height:19px;accent-color:#f5862a}
+.settings-note{font-size:12px;opacity:.78;margin:4px 0 12px}
+@media(prefers-reduced-motion:reduce){.b,.ib,.chip,.lnk,.scr{transition:none!important;animation:none!important}}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
@@ -119,7 +133,7 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  <div id="road"><div class="van" id="mvan"></div></div>
  <div class="row mode-row"><button class="b pri big" data-a="play">Timed puzzle</button><button class="b big" data-a="endless">Endless mode</button></div>
  <div class="dkt" id="dly"></div>
- <div class="row"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
+ <div class="row"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd" id="snd">Sound: on</button></div>
  <p class="rec" id="rec"></p>
 </section>
 <section id="game" class="scr hide">
@@ -369,7 +383,21 @@ function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
  if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
-const pcard=()=>ov(`<h2>Paused</h2><button class="b pri" data-a="resume">Resume</button><button class="b" data-a="snd">Sound: ${muted()?'off':'on'}</button><button class="b" data-a="rmt">Reduced motion: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">Restart shift</button><button class="b" data-a="menu">Quit to menu</button>`);
+const pcard=()=>ov(`<h2>Paused</h2><button class="b pri" data-a="resume">Resume</button><button class="b" data-a="settings">Settings</button><button class="b" data-a="snd">Sound: ${muted()?'off':'on'}</button><button class="b" data-a="rmt">Reduced motion: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">Restart shift</button><button class="b" data-a="menu">Quit to menu</button>`);
+let settingsBack=false;
+const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
+function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
+function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
+ ov('<h2>Settings</h2><div class="settings-grid">'+
+ '<label class="settings-row"><span>Language</span><select id="settingLang" aria-label="Language">'+options+'</select></label>'+
+ '<label class="settings-row"><span>Master volume <b id="volumeVal">'+Math.round(S.volume??80)+'%</b></span><input id="settingVolume" type="range" min="0" max="100" step="5" value="'+(S.volume??80)+'" aria-label="Master volume"></label>'+
+ '<label class="settings-row"><span>Sound effects</span><input id="settingMute" type="checkbox" '+(!S.mute?'checked':'')+' aria-label="Sound effects"></label>'+
+ '<label class="settings-row"><span>Hover sounds</span><input id="settingHover" type="checkbox" '+(S.hoverSound?'checked':'')+' aria-label="Hover sounds"></label>'+
+ '<label class="settings-row"><span>Reduced motion</span><input id="settingMotion" type="checkbox" '+(S.rm?'checked':'')+' aria-label="Reduced motion"></label>'+
+ '<label class="settings-row"><span>Larger text</span><input id="settingText" type="checkbox" '+(S.largeText?'checked':'')+' aria-label="Larger text"></label>'+
+ '<label class="settings-row"><span>High contrast</span><input id="settingContrast" type="checkbox" '+(S.hc?'checked':'')+' aria-label="High contrast"></label></div>'+
+ '<p class="settings-note">Preferences save automatically. Language preference is saved; some game text remains English.</p><button class="b pri" data-a="settingsClose">Done</button>')}
+
 function menu(){const dly=S.daily.d===utc(),dt=new Date();
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString('en',{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>route</div><div class="bd"><b style="font-size:18px">Daily route</b><p>Deliver ${DN} orders before the clock runs out. Same orders for everyone today (UTC).</p><p>${dly&&S.daily.done?'Completed ✓ · best '+S.daily.best:dly?'Attempted · best '+S.daily.best:'Not attempted yet'}</p><button class="b pri" data-a="daily">Play daily</button></div>`;
  set('#rec',`Best ${S.best} · ${S.orders} orders · ${S.perfect} perfect · best streak ${S.streak} · ${S.shifts} shifts · ${S.coins} coins`);set('#snd','Sound: '+(muted()?'off':'on'));show('menu')}
@@ -379,13 +407,19 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van','Van paint'],['pal','Parcel colours'],['grd','Cargo floor'],['dec','Decal']])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?'equipped':'owned'):c[3]+' coins'}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?'Equipped':'Equip '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>Buy ${it[2]} · ${it[3]} coins</button>`}
  ov(h+'<button class="b" data-a="done">Done</button>');applyTheme(eq)}
-const A={play:()=>start(0),daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
+let hoverButton=null,lastHoverSound=0;
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('.b,.ib,.chip,.lnk');if(!b||b===hoverButton||(e.relatedTarget&&b.contains(e.relatedTarget)))return;hoverButton=b;if(S.hoverSound&&!muted()&&Date.now()-lastHoverSound>120){lastHoverSound=Date.now();sfx('hover')}},true);
+document.addEventListener('pointerout',e=>{const b=e.target.closest('.b,.ib,.chip,.lnk');if(b===hoverButton&&(!e.relatedTarget||!b.contains(e.relatedTarget)))hoverButton=null},true);
+document.addEventListener('input',e=>{if(e.target.id!=='settingVolume')return;S.volume=Number(e.target.value);const v=$('#volumeVal');if(v)v.textContent=S.volume+'%';applySettings();save()});
+document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='settingLang')S.lang=t.value;else if(t.id==='settingMute')S.mute=!t.checked;else if(t.id==='settingHover')S.hoverSound=t.checked;else if(t.id==='settingMotion')S.rm=t.checked;else if(t.id==='settingText')S.largeText=t.checked;else if(t.id==='settingContrast')S.hc=t.checked;else return;save();applySettings();if(t.id==='settingLang'){settings();$('#settingLang')?.focus()}});
+
 addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause();return}if(G.paused)return;
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
@@ -394,6 +428,6 @@ let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;
  if(G&&G.run&&!G.paused){if(!G.endless)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
-(async()=>{await SDK.init();S=load();applyTheme(S.eq);document.documentElement.classList.toggle('rm',RM());size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
+(async()=>{await SDK.init();S=load();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
 
 </script></body></html>
