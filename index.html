@@ -221,22 +221,25 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #acts{grid-area:acts;position:relative;bottom:auto;display:flex;flex-direction:column;padding:0;background:none;gap:10px;align-self:start}
  #acts .b{min-height:52px;font-size:17px}
 }
-/* Desktop menu: stats sit beside the menu without forcing horizontal overflow. */
-@media(min-width:1100px){
- #app{box-sizing:border-box;width:100%;max-width:1660px;padding:14px clamp(12px,2vw,32px) 16px}
- #menu{display:grid;grid-template-columns:minmax(150px,.78fr) minmax(0,1.65fr) minmax(150px,.78fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(12px,2vw,30px);row-gap:5px;align-items:center;max-width:none;width:100%;margin:0 auto}
- #menu>.ttl{grid-area:title;justify-self:center;font-size:clamp(68px,7vw,100px);margin:5px 0 12px}
- #menu>.tag{grid-area:tag;justify-self:center;text-align:center;max-width:34em;margin:0 auto 8px;font-size:16px}
- #menu>#road{grid-area:road;width:100%;height:clamp(120px,17vh,170px);margin:0;border-radius:16px;overflow:hidden}
- #menu>.mode-row{grid-area:modes;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:8px 0}
- #menu>.mode-row .b{min-height:70px;margin:0;padding:10px 8px;font-size:clamp(16px,1.35vw,21px)}
- #menu>#dly{grid-area:daily;margin:8px 0 5px}
- #menu>.menu-utility{grid-area:utility;margin:4px 0 0}
- #menu>.menu-utility .b{margin:0;min-height:48px;font-size:15px}
+/* Responsive menu: keep the complete start screen inside the viewport. */
+@media(min-width:1000px){
+ body:has(#menu:not(.hide)){height:100dvh;min-height:0;overflow:hidden}
+ body:has(#menu:not(.hide)) #app{box-sizing:border-box;width:100%;height:100dvh;max-width:1660px;margin:0 auto;padding:8px clamp(12px,1.8vw,28px);display:flex;align-items:center;justify-content:center;overflow:hidden}
+ #menu{box-sizing:border-box;display:grid;grid-template-columns:minmax(120px,.72fr) minmax(0,1.7fr) minmax(120px,.72fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(12px,1.8vw,26px);row-gap:clamp(2px,.55vh,6px);align-items:center;max-width:none;width:100%;max-height:100%;margin:0 auto;overflow:hidden}
+ #menu>.ttl{grid-area:title;justify-self:center;font-size:clamp(48px,5.8vw,76px);line-height:.82;margin:0 0 4px;-webkit-text-stroke:5px var(--navy);text-shadow:0 4px 0 var(--navy)}
+ #menu>.tag{grid-area:tag;justify-self:center;text-align:center;max-width:34em;margin:0 auto 3px;font-size:clamp(12px,1.1vw,15px)}
+ #menu>#road{grid-area:road;width:100%;height:clamp(76px,14vh,112px);margin:0;border-radius:14px;overflow:hidden}
+ #menu>#road::after{bottom:5px}
+ #menu>#road #mvan{transform:scale(.78);transform-origin:bottom center}
+ #menu>.mode-row{grid-area:modes;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:3px 0}
+ #menu>.mode-row .b{min-width:0;min-height:48px;margin:0;padding:7px 5px;font-size:clamp(13px,1.15vw,17px);line-height:1.1}
+ #menu>#dly{grid-area:daily;margin:3px 0;font-size:12px}
+ #menu>.menu-utility{grid-area:utility;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 0}
+ #menu>.menu-utility .b{min-width:0;min-height:38px;margin:0;padding:6px;font-size:13px}
  #menu>#rec{display:contents}
- #rec .stat-tile{align-self:stretch;display:flex;flex-direction:column;justify-content:center;min-height:74px;padding:13px 15px}
- #rec .stat-tile span{font-size:12px}
- #rec .stat-tile b{font-size:clamp(22px,2vw,30px)}
+ #rec .stat-tile{align-self:stretch;display:flex;flex-direction:column;justify-content:center;min-height:0;padding:clamp(7px,.9vh,11px) clamp(8px,.8vw,13px)}
+ #rec .stat-tile span{font-size:clamp(9px,.8vw,11px);line-height:1.15}
+ #rec .stat-tile b{font-size:clamp(17px,1.5vw,23px);line-height:1.05;margin-top:4px}
  #rec .stat-tile:nth-child(1){grid-area:left1}
  #rec .stat-tile:nth-child(2){grid-area:left2}
  #rec .stat-tile:nth-child(3){grid-area:left3}
@@ -246,17 +249,25 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #rec .stat-tile:nth-child(7){grid-area:right3}
  #rec .stat-tile:nth-child(8){grid-area:right4;grid-column:auto}
 }
-@media(max-width:1179px){
+@media(min-width:1000px) and (max-height:700px){
+ #menu>.ttl{font-size:clamp(44px,5vw,60px);margin:0}
+ #menu>#road{height:clamp(58px,10vh,76px)}
+ #menu>.mode-row .b{min-height:42px}
+ #rec .stat-tile{padding:5px 8px}
+ #rec .stat-tile b{font-size:18px}
+ #menu>#dly{font-size:11px}
+ #menu>.menu-utility .b{min-height:32px;padding:4px;font-size:12px}
+}
+@media(max-width:999px){
  #rec{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
  .stat-tile{padding:10px}
  .stat-tile b{font-size:22px}
  .stat-tile.reward{grid-column:span 2}
 }
-@media(min-width:701px) and (max-width:1179px){
+@media(min-width:701px) and (max-width:999px){
  #rec{grid-template-columns:repeat(4,minmax(0,1fr))}
  .stat-tile.reward{grid-column:span 2}
 }
-
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
