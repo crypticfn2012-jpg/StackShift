@@ -397,7 +397,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
 const A={play:()=>start(0),daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless),again0:()=>start(G.daily,G.endless),menu:toMenu,copy:b=>copy(b),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
- done:()=>{applyTheme(S.eq);cl();menu()},snd:()=>{S.mute=!S.mute;save();menu();if(G&&G.paused)pcard()},
+ done:()=>{applyTheme(S.eq);cl();menu()},settings:()=>openSettings(!!(G&&G.run&&G.paused)),settingsClose:()=>{cl();if(SETTINGS_BACK&&G&&G.run&&G.paused){SETTINGS_BACK=false;pcard()}else{SETTINGS_BACK=false;applyTheme(S.eq);menu()}},snd:()=>{S.mute=!S.mute;save();if(G&&G.run&&G.paused)pcard();else menu()},
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
