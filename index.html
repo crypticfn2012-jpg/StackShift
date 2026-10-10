@@ -361,7 +361,7 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
  '<div class="st"><div><b>'+g.done+'</b><span>'+L('ordersStat')+'</span></div><div><b>'+g.perf+'</b><span>'+L('perfectStat')+'</span></div><div><b>'+g.bs+'</b><span>'+L('bestStreakStat')+'</span></div><div><b>'+avg+'s</b><span>'+L('perOrderStat')+' · '+L('cleanStat').replace('{n}',acc)+'</span></div></div>'+
  '<p class="sub">+'+L('coinsEarned').replace('{n}',g.coins)+' · '+mistakeLine+'</p>'+
  '<button class="b pri" data-a="again">'+L('playAgain')+'</button><div class="row"><button class="b" data-a="copy">'+L('copyResult')+'</button><button class="b" data-a="menu">'+L('menuBtn')+'</button></div>')}
-function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
+function copy(b){const t=shareTxt(),ok=()=>{b.textContent=L('copied');toast(L('resultCopied'))},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
  if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
