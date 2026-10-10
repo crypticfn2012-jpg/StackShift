@@ -401,6 +401,9 @@ const A={play:()=>start(0),daily:()=>start(1),endless:()=>start(0,true),again:()
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
+let lastHoverBtn=null,lastHoverAt=0;
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('button:not(:disabled)');if(!b||!b.matches('.b,.ib,.chip,.lnk')||b===lastHoverBtn||(e.relatedTarget&&b.contains(e.relatedTarget)))return;lastHoverBtn=b;if(S&&S.hoverSound&&!muted()&&Date.now()-lastHoverAt>100){lastHoverAt=Date.now();sfx('hover')}},true);
+document.addEventListener('pointerout',e=>{const b=e.target.closest('button');if(b&&b===lastHoverBtn&&(!e.relatedTarget||!b.contains(e.relatedTarget)))lastHoverBtn=null},true);
 addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause();return}if(G.paused)return;
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
