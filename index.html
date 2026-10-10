@@ -123,8 +123,20 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
 #ov .van{width:160px;margin:0 auto}.sw{display:flex;gap:6px;padding:8px;border:4px solid;border-radius:10px;margin:8px 0}.sw i{flex:1;height:26px;border:3px solid var(--navy);border-radius:5px;display:block}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--cream);color:var(--ink);border:3px solid var(--navy);padding:8px 14px;border-radius:12px;font-weight:800;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:40;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-.rm *,.rm *::before,.rm *::after{animation:none!important}
-@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+.rm *,.rm *::before,.rm *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Accessibility options */
+.large-text{font-size:18px}
+.large-text body{font-size:18px}
+.large-text .b,.large-text .chip,.large-text .settings-row{font-size:1.08em}
+.large-text .sub,.large-text .rec,.large-text .settings-note,.large-text .settings-credits{font-size:1.08em;line-height:1.45}
+.large-text .st span{font-size:14px}
+.large-text .settings-row span{line-height:1.35}
+.high-contrast{--cream:#fffdf4;--paper:#fff4d6;--ink:#07132d;--bg:#14213f;--bg2:#050b19;--or:#ff9b35;--ok:#176b36;--bad:#a71919;--gbg:#fffdf4;--gln:#14213f}
+.high-contrast body{color:#fffdf4}
+.high-contrast .sub,.high-contrast .st span,.high-contrast .chip small{color:#252525}
+.high-contrast .b,.high-contrast .chip,.high-contrast .settings-row,.high-contrast .st div{border-width:3px;border-color:#050b19}
+.high-contrast button:focus-visible,.high-contrast select:focus-visible,.high-contrast input:focus-visible{outline:4px solid #ffb000;outline-offset:3px}
 /* Compact responsive menu and branded startup splash */
 #menu .mode-row{margin:5px 0 8px;gap:10px}#menu .mode-row .b{margin:5px 0;min-height:54px;padding:8px;font-size:19px}
 #boot{position:fixed;inset:0;z-index:100;background:#000;display:grid;place-items:center;padding:24px;transition:opacity .4s,visibility .4s}
@@ -301,6 +313,8 @@ function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK
  if(!raw)return d;let j;try{j=JSON.parse(raw)}catch(e){try{st.set(KEY+'.bak',raw)}catch(_){}return d}
  if(!j||typeof j!=='object')return d;
  for(const k of Object.keys(d)){const v=j[k],t=d[k];if(v!==null&&typeof v===typeof t&&Array.isArray(v)===Array.isArray(t))d[k]=(t&&typeof t==='object'&&!Array.isArray(t))?Object.assign(t,v):v}
+ if(!LANGS.some(x=>x.id===d.lang&&x.t))d.lang='en';
+ d.volume=Math.max(0,Math.min(100,Number(d.volume)||0));
  for(const k of['best','orders','perfect','streak','shifts','wins','coins','life'])if(!(d[k]>=0)||!isFinite(d[k]))d[k]=0;
  d.own=[...new Set([...DEF().own,...d.own.filter(id=>cat(id))])];
  for(const k of['van','pal','grd','dec']){const c=cat(d.eq[k]);if(!c||c[0]!==k||!d.own.includes(c[1]))d.eq[k]=DEF().eq[k]}
@@ -527,7 +541,7 @@ function applyLanguage(){
  const tut=$('#tut');if(tut){const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}
  const h=$('#hud .sb small');if(h)h.textContent=L('score');
 }
-function settings(){const options=LANG_OPTIONS.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
+function settings(){const availableLanguages=LANG_OPTIONS.filter(x=>x[0]==='en'||LANGS.some(v=>v.id===x[0]&&v.t));const options=availableLanguages.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
  ov('<h2>'+L('settings')+'</h2><div class="settings-grid">'+
  '<label class="settings-row"><span>'+L('language')+'</span><select id="settingLang" aria-label="'+L('language')+'">'+options+'</select></label>'+
  '<label class="settings-row"><span>'+L('volume')+' <b id="volumeVal">'+Math.round(S.volume??80)+'%</b></span><input id="settingVolume" type="range" min="0" max="100" step="5" value="'+(S.volume??80)+'" aria-label="'+L('volume')+'"></label>'+
