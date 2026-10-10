@@ -8,8 +8,9 @@
 :root{--bg:#26395f;--bg2:#1a2748;--navy:#14213f;--cream:#fbf0d4;--paper:#f4e3b8;--ink:#14213f;--or:#f5862a;--ok:#2f8a55;--bad:#c8382b;--gbg:#ead9b5;--gln:#cdb98d;--u:56px;--f:"Arial Rounded MT Bold","Avenir Next Rounded",Nunito,"Trebuchet MS",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b2845;--bg2:#101a33}}
 :root[data-theme=dark]{--bg:#1b2845;--bg2:#101a33}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;min-height:100%;color:var(--cream);background:var(--bg2) radial-gradient(130% 80% at 50% 0,var(--bg),var(--bg2)) fixed;font:800 16px/1.3 var(--f);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
+*{box-sizing:border-box}
+html{height:100%;max-width:100%;overflow-x:hidden;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{max-width:100%;overflow-x:hidden;margin:0;min-height:100%;color:var(--cream);background:var(--bg2) radial-gradient(130% 80% at 50% 0,var(--bg),var(--bg2)) fixed;font:800 16px/1.3 var(--f);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overscroll-behavior:none}
 #app{max-width:620px;margin:0 auto;padding:12px 10px 6px}
 .hide{display:none!important}
 .scr{animation:in .25s ease}@keyframes in{from{opacity:0;transform:translateY(8px)}}
@@ -220,10 +221,10 @@ h2{font:900 28px/1.05 var(--f);margin:0 0 10px;letter-spacing:-.5px}h3{font-size
  #acts{grid-area:acts;position:relative;bottom:auto;display:flex;flex-direction:column;padding:0;background:none;gap:10px;align-self:start}
  #acts .b{min-height:52px;font-size:17px}
 }
-/* Desktop menu: stats sit beside the menu, not underneath it. */
-@media(min-width:900px){
- #app{width:100%;max-width:1660px;padding:14px clamp(12px,2vw,32px) 16px}
- #menu{display:grid;grid-template-columns:minmax(135px,.72fr) minmax(420px,1.8fr) minmax(135px,.72fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(12px,2vw,30px);row-gap:5px;align-items:center;max-width:none;width:100%;margin:0 auto}
+/* Desktop menu: stats sit beside the menu without forcing horizontal overflow. */
+@media(min-width:1100px){
+ #app{box-sizing:border-box;width:100%;max-width:1660px;padding:14px clamp(12px,2vw,32px) 16px}
+ #menu{display:grid;grid-template-columns:minmax(150px,.78fr) minmax(0,1.65fr) minmax(150px,.78fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"left1 title right1" "left2 tag right2" "left3 road right3" "left4 modes right4" ". daily ." ". utility .";column-gap:clamp(12px,2vw,30px);row-gap:5px;align-items:center;max-width:none;width:100%;margin:0 auto}
  #menu>.ttl{grid-area:title;justify-self:center;font-size:clamp(68px,7vw,100px);margin:5px 0 12px}
  #menu>.tag{grid-area:tag;justify-self:center;text-align:center;max-width:34em;margin:0 auto 8px;font-size:16px}
  #menu>#road{grid-area:road;width:100%;height:clamp(120px,17vh,170px);margin:0;border-radius:16px;overflow:hidden}
