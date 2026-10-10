@@ -2,6 +2,9 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Stack Shift</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg" sizes="any">
+<link rel="alternate icon" href="./favicon.ico">
+<meta name="theme-color" content="#14213f">
 <style>
 :root{--bg:#26395f;--bg2:#1a2748;--navy:#14213f;--cream:#fbf0d4;--paper:#f4e3b8;--ink:#14213f;--or:#f5862a;--ok:#2f8a55;--bad:#c8382b;--gbg:#ead9b5;--gln:#cdb98d;--u:56px;--f:"Arial Rounded MT Bold","Avenir Next Rounded",Nunito,"Trebuchet MS",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b2845;--bg2:#101a33}}
@@ -290,7 +293,7 @@ function newOrder(){const o=G.o=gen(G.seed,G.i);G.c=o.c;G.r=o.r;build(o.c,o.r);i
  G.os=0;G.om=0;sel=G.ps[0];board.dataset.e=o.edge||'';
  set('#rl',{none:'Pack every parcel into the van.',edge:'★ parcel must touch the '+o.edge+' wall.',lock:'🔒 parcel can’t be rotated.',fill:'Fill the van with no gaps.'}[o.rule]);set('#on','Order '+(G.i+1));
  stage.classList.remove('sw');void stage.offsetWidth;stage.classList.add('sw');G.rdy=false;size()}
-function start(daily,endless){cl();$('.pc').forEach(e=>e.remove());
+function start(daily,endless){cl();document.querySelectorAll('.pc').forEach(e=>e.remove());
  G={seed:daily?hash('STACKSHIFT:'+utc()):(Math.random()*2**30)|0,daily:!!daily,endless:!!endless,date:utc(),i:0,t:SHIFT,score:0,streak:0,bs:0,done:0,perf:0,mist:0,run:true,paused:false,ps:null,os:0,om:0,sd:0,el:0,ls:0,rdy:false};
  $('#game').classList.toggle('endless',!!endless);show('game');$('#tut').classList.toggle('hide',S.seen);newOrder();hud();SDK.gs();sfx('go');flt(endless?'Endless!':'Go!')}
 function hud(){if(!G)return;G.sd=G.sd<G.score?Math.min(G.score,G.sd+Math.max(1,Math.ceil((G.score-G.sd)*.2))):G.score;
