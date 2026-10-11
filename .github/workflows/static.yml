@@ -52,6 +52,48 @@ jobs:
           const source = scripts[0][2];
           new vm.Script(source, { filename: 'index.html:inline-game-script' });
 
+          // Smoke-test the real puzzle generator independently of the browser DOM.
+          const generatorStart = source.indexOf('const rng=');
+          const generatorEnd = source.indexOf('/* ===== cosmetics ===== */', generatorStart);
+          if (generatorStart < 0 || generatorEnd < 0) throw new Error('Puzzle generator section is missing');
+          const generatorContext = {};
+          vm.runInNewContext(
+            source.slice(generatorStart, generatorEnd) + '\\nglobalThis.__api = { gen, verify, dims, GR };',
+            generatorContext,
+            { timeout: 10000 }
+          );
+          const api = generatorContext.__api;
+          let generated = 0;
+          for (const seed of [1, 113, 2026]) {
+            for (let difficulty = 0; difficulty < api.GR.length; difficulty++) {
+              for (let order = 0; order < 6; order++) {
+                const puzzle = api.gen(seed, order, difficulty);
+                if (!puzzle || !Array.isArray(puzzle.ps) || puzzle.ps.length === 0) {
+                  throw new Error('Generator returned an empty puzzle');
+                }
+                if (!api.verify(puzzle)) throw new Error('Generated solution overlaps or violates its rule');
+                const used = new Set();
+                for (const piece of puzzle.ps) {
+                  if (!Array.isArray(piece.cells) || piece.cells.length === 0) throw new Error('Generated parcel has no cells');
+                  const [width, height] = api.dims(piece.cells);
+                  const shape = new Set(piece.cells.map(([x, y]) => x + ',' + y));
+                  if (shape.size !== piece.cells.length) throw new Error('Generated parcel contains duplicate cells');
+                  for (const [x, y] of piece.cells) {
+                    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= width || y >= height) {
+                      throw new Error('Generated parcel has invalid local coordinates');
+                    }
+                  }
+                  for (const [x, y] of piece.sol) {
+                    const cell = (y + piece.sy) * puzzle.c + x + piece.sx;
+                    if (used.has(cell)) throw new Error('Generated solution has overlapping parcels');
+                    used.add(cell);
+                  }
+                }
+                generated++;
+              }
+            }
+          }
+
           const start = source.indexOf('const AL=[');
           const end = source.indexOf('];\nfunction ach()', start);
           if (start < 0 || end < 0) throw new Error('Achievement catalog is missing');
@@ -69,7 +111,7 @@ jobs:
             if (!source.includes(required)) throw new Error(`Missing expected integration: ${required}`);
           }
 
-          console.log(`Validated game JavaScript, ${ids.length} unique achievements, CrazyGames callbacks and progression saves.`);
+          console.log(`Validated game JavaScript, ${generated} generated puzzles, ${ids.length} unique achievements, CrazyGames callbacks and progression saves.`);
           NODE
       - name: Setup Pages
         uses: actions/configure-pages@v5
