@@ -579,6 +579,31 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
  #menu>#road #mvan{width:185px;margin-left:-92.5px;bottom:15px}
 }
 
+
+/* Balance the menu footprint: widen the panel and use a two-column layout on desktop. */
+@media(min-width:760px){
+ body:has(#menu:not(.hide)) #app{width:100%;max-width:1120px;padding:22px 30px 30px}
+ #menu{width:100%;max-width:1060px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;column-gap:30px;row-gap:14px;padding:30px}
+ #menu>.ttl,#menu>.tag,#menu>#road{grid-column:1/-1}
+ #menu>#road{height:205px;min-height:205px}
+ #menu>#rec,#menu>#dly{min-width:0;align-self:stretch}
+ #menu>#dly{margin-top:0}
+ #menu>.mode-row,#menu>.menu-utility{grid-column:1/-1}
+}
+@media(min-width:760px) and (max-width:999px){
+ body:has(#menu:not(.hide)) #app{max-width:960px;padding:18px 22px 26px}
+ #menu{max-width:920px;padding:25px;column-gap:22px}
+}
+@media(min-width:1000px){
+ body:has(#menu:not(.hide)) #app{max-width:1120px}
+ #menu{max-width:1060px;padding:32px;column-gap:30px}
+}
+@media(max-width:759px){
+ body:has(#menu:not(.hide)) #app{max-width:560px}
+ #menu{grid-template-columns:minmax(0,1fr)}
+ #menu>#rec,#menu>#dly{grid-column:1}
+}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
