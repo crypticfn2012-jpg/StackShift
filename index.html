@@ -945,9 +945,102 @@ const CONTRACTS=[
 function contractProgress(){if(!G||!G.contract)return 0;const k=G.contract.kind;if(k==="clean")return G.perf;if(k==="orders")return G.done;if(k==="streak")return G.bs;if(k==="score")return G.score;if(k==="fast")return G.fast||0;if(k==="spotless")return G.mist===0?G.done:0;if(k==="noskip")return G.skips===0?G.done:0;if(k==="rotator")return Math.min(5,G.rotations||0)+Math.min(3,G.done);if(k==="daily")return G.daily&&G.done>=DN?1:0;if(k==="endless")return G.endless?G.done:0;if(k==="steady")return G.streak>=3?G.done:0;if(k==="perfect")return G.perf;return 0}
 function updateContract(){if(!G||!G.contract)return;const c=G.contract,p=Math.min(c.goal,contractProgress());set("#contractTitle",c.titleKey?L(c.titleKey):c.title);set("#contractDesc",G.contractPaid?L("bonusClaimed"):c.descKey?L(c.descKey):c.desc);set("#contractCount",p+"/"+c.goal);$("#contractBar").style.width=(p/c.goal*100)+"%";$(".mark")&&set(".mark",c.icon);if(p>=c.goal&&!G.contractPaid){G.contractPaid=true;S.coins+=c.reward;S.life+=c.reward;save();set("#contractDesc",L("contractComplete")+"! +"+c.reward+" "+L("coins"));toast(L("contractComplete")+": +"+c.reward+" "+L("coins"));sfx("ach")}}
 
-const AL=[['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1],['s5','Hot streak','Reach a 5-order streak',s=>s.streak>=5],['k1','Four figures','Score 1000 in one shift',s=>s.best>=1000],['clean','Spotless shift','Deliver 3+ orders with no mistakes',(s,g)=>g.mist===0&&g.done>=3],['o25','Veteran','Deliver 25 orders in total',s=>s.orders>=25],['o100','Regular customer','Deliver 100 orders in total',s=>s.orders>=100],['daily1','Daily driver','Complete a daily route',s=>!!(s.daily&&s.daily.done)],['day3','Three-day streak','Complete daily routes 3 days in a row',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=3],['day7','Full week','Reach a 7-day daily streak',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=7],['stay5','Clocked in','Spend 5 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=300],['stay20','Long haul','Spend 20 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=1200],['coins1k','Big saver','Earn 1,000 coins in total',s=>s.life>=1000],['shifts10','Experienced driver','Finish 10 shifts',s=>s.shifts>=10]];
-function ach(){for(const[id,n,,f]of AL)if(!S.ach[id]){let unlocked=false;try{unlocked=!!f(S,G||{})}catch(e){}if(unlocked){S.ach[id]=1;S.coins+=25;S.life+=25;toast('Achievement: '+n+' (+25 coins)');sfx('ach')}}}
-function achievements(){ach();save();const count=AL.filter(a=>!!S.ach[a[0]]).length;let h='<div class="feature-intro"><div><h2>Achievements</h2><p class="sub">Milestones earned by playing your way.</p></div><span class="feature-stat">'+count+' / '+AL.length+' UNLOCKED</span></div><p class="sub">Every achievement earns 25 coins.</p><div class="ach-list">';for(const[id,name,desc]of AL){const done=!!S.ach[id];h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'•')+'</span><div><b>'+name+'</b><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked':'Locked')+'</small></div></div>'}h+='</div><button class="b pri" data-a="achClose">Back to menu</button>';ov(h)}
+let achFilter='all';
+const AL=[
+ ['first','Clean drop','Deliver a perfect order',s=>s.perfect>=1,'Skill'],
+ ['s5','Hot streak','Reach a 5-order streak',s=>s.streak>=5,'Skill'],
+ ['k1','Four figures','Score 1,000 in one shift',s=>s.best>=1000,'Skill'],
+ ['clean','Spotless shift','Deliver 3+ orders with no mistakes',(s,g)=>g.mist===0&&g.done>=3,'Skill'],
+ ['o25','Veteran','Deliver 25 orders in total',s=>s.orders>=25,'Career'],
+ ['o100','Regular customer','Deliver 100 orders in total',s=>s.orders>=100,'Career'],
+ ['daily1','Daily driver','Complete a daily route',s=>!!(s.daily&&s.daily.done),'Daily'],
+ ['day3','Three-day streak','Complete daily routes 3 days in a row',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=3,'Daily'],
+ ['day7','Full week','Reach a 7-day daily streak',s=>(s.dailyStreak&&s.dailyStreak.best||0)>=7,'Daily'],
+ ['stay5','Clocked in','Spend 5 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=300,'Playtime'],
+ ['stay20','Long haul','Spend 20 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=1200,'Playtime'],
+ ['coins1k','Big saver','Earn 1,000 coins over your career',s=>s.life>=1000,'Economy'],
+ ['shifts10','Experienced driver','Finish 10 shifts',s=>s.shifts>=10,'Career'],
+
+ ['deliver1','First delivery','Deliver your first order',s=>s.orders>=1,'Career'],
+ ['o10','Getting known','Deliver 10 orders in total',s=>s.orders>=10,'Career'],
+ ['o50','Local legend','Deliver 50 orders in total',s=>s.orders>=50,'Career'],
+ ['o500','Cargo regular','Deliver 500 orders in total',s=>s.orders>=500,'Career'],
+ ['o1000','Delivery icon','Deliver 1,000 orders in total',s=>s.orders>=1000,'Career'],
+ ['streak3','Finding your rhythm','Reach a 3-order streak',s=>s.streak>=3,'Skill'],
+ ['streak10','Unstoppable','Reach a 10-order streak',s=>s.streak>=10,'Skill'],
+ ['streak15','No stopping now','Reach a 15-order streak',s=>s.streak>=15,'Skill'],
+ ['score2500','Big shift','Score 2,500 in one shift',s=>s.best>=2500,'Skill'],
+ ['score5000','Five thousand club','Score 5,000 in one shift',s=>s.best>=5000,'Skill'],
+ ['score10000','Perfectly packed','Score 10,000 in one shift',s=>s.best>=10000,'Skill'],
+ ['perfect5','Careful hands','Deliver 5 perfect orders',s=>s.perfect>=5,'Skill'],
+ ['perfect10','Flawless ten','Deliver 10 perfect orders',s=>s.perfect>=10,'Skill'],
+ ['perfect25','Precision driver','Deliver 25 perfect orders',s=>s.perfect>=25,'Skill'],
+ ['perfect50','Perfectionist','Deliver 50 perfect orders',s=>s.perfect>=50,'Skill'],
+ ['perfect100','Master packer','Deliver 100 perfect orders',s=>s.perfect>=100,'Skill'],
+ ['daily3','Three days delivered','Complete 3 daily routes',s=>(s.dailyCompletions||0)>=3,'Daily'],
+ ['daily7','A week on route','Complete 7 daily routes',s=>(s.dailyCompletions||0)>=7,'Daily'],
+ ['daily30','Daily lifer','Complete 30 daily routes',s=>(s.dailyCompletions||0)>=30,'Daily'],
+ ['campaign1','First chapter','Complete your first campaign level',s=>(s.campaign&&s.campaign.level||0)>=1,'Campaign'],
+ ['campaign10','Ten down','Complete 10 campaign levels',s=>(s.campaign&&s.campaign.level||0)>=10,'Campaign'],
+ ['campaign25','Quarter way','Complete 25 campaign levels',s=>(s.campaign&&s.campaign.level||0)>=25,'Campaign'],
+ ['campaign50','Halfway there','Complete 50 campaign levels',s=>(s.campaign&&s.campaign.level||0)>=50,'Campaign'],
+ ['campaign100','Route master','Complete all 100 campaign levels',s=>(s.campaign&&s.campaign.level||0)>=100,'Campaign'],
+ ['cosmetics10','Making it yours','Own 10 cosmetics',s=>(s.own&&s.own.length||0)>=10,'Collection'],
+ ['cosmetics20','Personal fleet','Own 20 cosmetics',s=>(s.own&&s.own.length||0)>=20,'Collection'],
+ ['cosmetics30','Style collector','Own 30 cosmetics',s=>(s.own&&s.own.length||0)>=30,'Collection'],
+ ['cosmetics40','Full wardrobe','Own 40 cosmetics',s=>(s.own&&s.own.length||0)>=40,'Collection'],
+ ['stay1','Just got here','Spend 1 minute on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=60,'Playtime'],
+ ['stay10','On the clock','Spend 10 minutes on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=600,'Playtime'],
+ ['stay60','Long-distance driver','Spend 1 hour on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=3600,'Playtime'],
+ ['stay120','Part of the furniture','Spend 2 hours on Stack Shift',s=>(s.playtime&&s.playtime.seconds||0)>=7200,'Playtime'],
+ ['coins500','Pocket money','Earn 500 coins over your career',s=>s.life>=500,'Economy'],
+ ['coins5k','Coin crate','Earn 5,000 coins over your career',s=>s.life>=5000,'Economy'],
+ ['coins10k','Big business','Earn 10,000 coins over your career',s=>s.life>=10000,'Economy'],
+ ['coins25k','Shipping tycoon','Earn 25,000 coins over your career',s=>s.life>=25000,'Economy'],
+ ['endless5','Long haul shift','Deliver 5 orders in Endless',(s,g)=>!!g.endless&&g.done>=5,'Modes'],
+ ['endless10','Endless regular','Deliver 10 orders in Endless',(s,g)=>!!g.endless&&g.done>=10,'Modes'],
+ ['endless25','The shift never ends','Deliver 25 orders in Endless',(s,g)=>!!g.endless&&g.done>=25,'Modes'],
+ ['clean5','Clean run','Finish 5 orders in a standard shift with no mistakes',(s,g)=>!g.daily&&!g.endless&&!g.campaign&&g.done>=5&&g.mist===0,'Skill'],
+ ['clean7','Spotless route','Finish 7 orders in a standard shift with no mistakes',(s,g)=>!g.daily&&!g.endless&&!g.campaign&&g.done>=7&&g.mist===0,'Skill'],
+ ['express5','Express lane','Finish 5 orders in under 8 seconds each',(s,g)=>(g.fast||0)>=5,'Skill'],
+ ['express10','Courier on turbo','Finish 10 orders in under 8 seconds each',(s,g)=>(g.fast||0)>=10,'Skill'],
+ ['noskip10','No detours','Complete 10 orders in a standard shift without skipping',(s,g)=>!g.daily&&!g.endless&&!g.campaign&&g.done>=10&&g.skips===0,'Skill'],
+ ['rotationless','Keep it simple','Deliver 5 orders without rotating a parcel',(s,g)=>g.done>=5&&(g.rotations||0)===0,'Skill'],
+ ['rotate10','Spin cycle','Rotate parcels 10 times in one run',(s,g)=>(g.rotations||0)>=10,'Skill'],
+ ['shifts1','Clocking in','Finish your first shift',s=>s.shifts>=1,'Career'],
+ ['shifts5','Getting settled','Finish 5 shifts',s=>s.shifts>=5,'Career'],
+ ['shifts25','Reliable driver','Finish 25 shifts',s=>s.shifts>=25,'Career'],
+ ['shifts50','Route veteran','Finish 50 shifts',s=>s.shifts>=50,'Career'],
+ ['shifts100','The depot knows you','Finish 100 shifts',s=>s.shifts>=100,'Career']
+];
+function ach(){
+ const unlocked=[];
+ for(const[id,name,,check]of AL){
+  if(S.ach[id])continue;
+  let ok=false;try{ok=!!check(S,G||{})}catch(e){}
+  if(ok){S.ach[id]=1;S.coins+=25;S.life+=25;unlocked.push(name)}
+ }
+ if(unlocked.length){save();toast(unlocked.length===1?'Achievement: '+unlocked[0]+' (+25 coins)':unlocked.length+' achievements unlocked (+'+(unlocked.length*25)+' coins)');sfx('ach')}
+}
+const ACH_FILTERS=[['all','All'],['unlocked','Unlocked'],['locked','Locked'],['Career','Career'],['Skill','Skill'],['Daily','Daily'],['Campaign','Campaign'],['Collection','Collection'],['Playtime','Playtime'],['Economy','Economy'],['Modes','Modes']];
+function achievements(nextFilter=achFilter){
+ ach();
+ achFilter=ACH_FILTERS.some(([id])=>id===nextFilter)?nextFilter:'all';
+ save();
+ const count=AL.filter(a=>!!S.ach[a[0]]).length,pct=Math.round(count/AL.length*100);
+ const filtered=AL.filter(a=>achFilter==='all'||(achFilter==='unlocked'&&!!S.ach[a[0]])||(achFilter==='locked'&&!S.ach[a[0]])||a[4]===achFilter);
+ let h='<div class="feature-intro"><div><h2>Achievements</h2><p class="sub">A bigger set of goals to chase across every mode.</p></div><span class="feature-stat">'+count+' / '+AL.length+' UNLOCKED</span></div>';
+ h+='<div class="ach-progress"><div><b>'+pct+'%</b><span>complete</span></div><div class="ach-progress-track"><i style="width:'+pct+'%"></i></div></div>';
+ h+='<div class="ach-filterbar">'+ACH_FILTERS.map(([id,label])=>'<button class="ach-filter'+(achFilter===id?' active':'')+'" data-a="achFilter" data-filter="'+id+'" aria-pressed="'+(achFilter===id?'true':'false')+'">'+label+'</button>').join('')+'</div>';
+ h+='<p class="sub ach-reward-note">Every achievement rewards 25 coins. Showing '+filtered.length+' goals.</p><div class="ach-list">';
+ for(const[id,name,desc,check,category]of filtered){
+  const done=!!S.ach[id];
+  h+='<div class="ach-item '+(done?'unlocked':'locked')+'"><span class="ach-mark">'+(done?'✓':'□')+'</span><div class="ach-copy"><div class="ach-heading"><b>'+name+'</b><span class="ach-category">'+category+'</span></div><small>'+desc+'</small><small class="ach-state">'+(done?'Unlocked · +25 coins':'Locked · 25 coins')+'</small></div></div>'
+ }
+ if(!filtered.length)h+='<p class="sub">Nothing in this filter yet.</p>';
+ h+='</div><button class="b pri" data-a="achClose">Back to menu</button>';
+ ov(h);$('#ov .card').classList.add('achievements-card')
+}
 function advanceCampaign(){const c=S.campaign||(S.campaign={done:[]});if(!Array.isArray(c.done))c.done=[];const m=CAMPAIGN[c.done.length];if(!m)return 0;let complete=false;try{complete=!!m.check(S,G||{})}catch(e){}if(!complete)return 0;c.done.push(m.id);G.campaignTitle=m.title;G.campaignReward=m.reward;toast('Campaign complete: '+m.title+' (+'+m.reward+' coins)');return m.reward}
 function campaign(){start(0,false,true)}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
