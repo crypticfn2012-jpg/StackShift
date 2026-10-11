@@ -31,6 +31,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate game script and achievements
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import vm from 'node:vm';
+
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script\\b([^>]*)>([\\s\\S]*?)<\\/script>/gi)]
+            .filter((match) => !/\\bsrc\\s*=/i.test(match[1]) && match[2].trim());
+
+          if (scripts.length !== 1) {
+            throw new Error(`Expected one inline game script; found ${scripts.length}`);
+          }
+
+          const source = scripts[0][2];
+          new vm.Script(source, { filename: 'index.html:inline-game-script' });
+
+          const start = source.indexOf('const AL=[');
+          const end = source.indexOf('];\\nfunction ach()', start);
+          if (start < 0 || end < 0) throw new Error('Achievement catalog is missing');
+
+          const ids = [...source.slice(start, end).matchAll(/\\['([^']+)'/g)].map((m) => m[1]);
+          if (ids.length < 50) throw new Error(`Expected at least 50 achievements; found ${ids.length}`);
+          if (new Set(ids).size !== ids.length) throw new Error('Achievement IDs must be unique');
+
+          for (const required of [
+            'adFinished:()=>',
+            'adError:error=>',
+            'reportGameCompletedPercentage',
+            'dailyCompletions:0'
+          ]) {
+            if (!source.includes(required)) throw new Error(`Missing expected integration: ${required}`);
+          }
+
+          console.log(`Validated game JavaScript, ${ids.length} unique achievements, CrazyGames callbacks and progression saves.`);
+          NODE
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
