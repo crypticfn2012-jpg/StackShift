@@ -58,7 +58,7 @@ jobs:
           if (generatorStart < 0 || generatorEnd < 0) throw new Error('Puzzle generator section is missing');
           const generatorContext = {};
           vm.runInNewContext(
-            source.slice(generatorStart, generatorEnd) + '\\nglobalThis.__api = { gen, verify, dims, GR };',
+            source.slice(generatorStart, generatorEnd) + '\nglobalThis.__api = { gen, verify, dims, GR };',
             generatorContext,
             { timeout: 10000 }
           );
