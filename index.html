@@ -541,6 +541,44 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
 }
 @media(prefers-reduced-motion:reduce){.b,.chip,.ib{transition:none!important}}
 
+
+/* Final menu fit: keep the full van visible and give the menu more room. */
+@media(min-width:1000px){
+ body:has(#menu:not(.hide)) #app{max-width:900px;padding:20px 28px 28px}
+ #menu{width:100%;max-width:1200px;padding:30px;gap:14px 28px}
+ #menu>#road{height:230px;min-height:230px;max-height:none;overflow:visible}
+ #menu>#road #mvan{width:260px;margin-left:-130px;bottom:22px}
+}
+@media(min-width:600px) and (max-width:999px){
+ body:has(#menu:not(.hide)) #app{max-width:850px;padding:18px 22px 26px}
+ #menu{width:100%;max-width:900px;padding:26px;gap:13px 22px}
+ #menu>#road{height:205px;min-height:205px;max-height:none;overflow:visible}
+ #menu>#road #mvan{width:235px;margin-left:-117.5px;bottom:20px}
+}
+@media(max-width:599px){
+ body:has(#menu:not(.hide)){height:auto;min-height:100dvh;overflow-y:auto}
+ body:has(#menu:not(.hide)) #app{width:100%;max-width:560px;padding:14px 12px 24px;overflow:visible}
+ #menu{width:100%;max-width:none;padding:20px 14px;gap:12px;max-height:none;overflow:visible}
+ #menu>#road{height:180px;min-height:180px;max-height:none;overflow:visible}
+ #menu>#road #mvan{width:205px;margin-left:-102.5px;bottom:18px}
+}
+@media(max-width:380px){
+ #menu{padding:17px 10px}
+ #menu>#road{height:168px;min-height:168px}
+ #menu>#road #mvan{width:190px;margin-left:-95px;bottom:17px}
+}
+@media(max-height:780px){
+ body:has(#menu:not(.hide)){height:auto;min-height:100dvh;overflow-y:auto}
+ body:has(#menu:not(.hide)) #app{height:auto;min-height:100dvh;overflow:visible}
+ #menu{max-height:none;overflow:visible}
+ #menu>#road{height:190px;min-height:190px;max-height:none;overflow:visible}
+ #menu>#road #mvan{width:220px;margin-left:-110px;bottom:18px}
+}
+@media(max-height:600px){
+ #menu>#road{height:155px;min-height:155px}
+ #menu>#road #mvan{width:185px;margin-left:-92.5px;bottom:15px}
+}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
