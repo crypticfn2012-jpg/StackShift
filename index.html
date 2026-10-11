@@ -842,25 +842,25 @@ function bump(){board.classList.remove('bump');void board.offsetWidth;board.clas
 function flt(t){const f=document.createElement('div');f.className='fl';f.textContent=t;stage.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function placed(p){const[w,h]=dims(p.cells),n=G.ps.filter(q=>q.pl).length;sfx('place',n);buzz(8);
  for(const[x,y]of p.cells){const k=bc[(y+p.pl[1])*G.c+x+p.pl[0]];if(k){k.classList.add('hit');setTimeout(()=>k.classList.remove('hit'),280)}}
- spark(bx()+(p.pl[0]+w/2)*U,(p.pl[1]+h/2)*U,7,['#fbf0d4','#f5862a',PAL[(p.k+G.i)%6]],U*.7);bump()}
+ spark(bx()+(p.pl[0]+w/2)*U,boardTop()+(p.pl[1]+h/2)*U,7,['#fbf0d4','#f5862a',PAL[(p.k+G.i)%6]],U*.7);bump()}
 function cheer(clean,pts,tb){const L=tb>=6?'Lightning!':tb>=5?'Speedy!':clean?'Perfect!':'Delivered';
  sfx('done',G.streak);setTimeout(()=>sfx('time',tb),170);if(clean&&G.streak>=3&&G.streak%3===0){setTimeout(()=>sfx('streak'),260);burst()}
  buzz([12,40,18]);const f=document.createElement('div');f.className='fl';f.innerHTML=`+${pts}<small>${L} · +${tb}s</small>`;stage.appendChild(f);setTimeout(()=>f.remove(),1000);
  const t=document.createElement('div');t.className='tb';t.textContent='+'+tb+'s';$('#hud').appendChild(t);setTimeout(()=>t.remove(),900);
  TMW.classList.remove('gain');void TMW.offsetWidth;TMW.classList.add('gain');
- spark(stage.clientWidth/2,G.r*U/2,clean?18:10,[...PAL.slice(0,3),'#fbf0d4','#f5862a'],U*2.2);bump()}
+ spark(stage.clientWidth/2,boardTop()+G.r*U/2,clean?18:10,[...PAL.slice(0,3),'#fbf0d4','#f5862a'],U*2.2);bump()}
 function flyOut(){const o=G&&G.ps;if(!Array.isArray(o))return;G.ps=null;o.forEach(p=>{if(!p||!p.el)return;if(RM())p.el.remove();else{p.el.classList.add('out');setTimeout(()=>p.el.remove(),300)}})}
 function countUp(){const e=$('#ov .big');if(!e||!G||RM()||G.score<30)return;const T=G.score;let t0=null;e.textContent='0';const st=ts=>{t0=t0||ts;const k=Math.min(1,(ts-t0)/700);e.textContent=Math.round(T*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
 const bx=()=>((stage.clientWidth||7*U)-G.c*U)/2,boardTop=()=>U*.85;
 function setPos(p,x,y,s){p.el.style.transform=`translate(${x}px,${y}px) scale(${s})`}
 function layout(){if(!G||!G.ps)return;const B=bx(),sw=stage.clientWidth||7*U,top=boardTop();let x=0,y=top+G.r*U+.8*U,rh=0;board.style.left=B+'px';board.style.top=top+'px';
- for(const p of G.ps){if(drag&&drag.moved&&p===drag.p)continue;if(p.pl){setPos(p,B+p.pl[0]*U,p.pl[1]*U,1);continue}
+ for(const p of G.ps){if(drag&&drag.moved&&p===drag.p)continue;if(p.pl){setPos(p,B+p.pl[0]*U,top+p.pl[1]*U,1);continue}
   const[w,h]=dims(p.cells),pw=w*U*TS,ph=h*U*TS;if(x+pw>sw&&x>0){x=0;y+=rh+.3*U;rh=0}setPos(p,x,y,TS);x+=pw+.4*U;rh=Math.max(rh,ph)}
  stage.style.height=(y+rh)+'px';const all=G.ps.every(p=>p.pl),live=G.run&&!G.paused,dl=$('#dl');dl.disabled=!(live&&all);dl.classList.toggle('rdy',live&&all);if(all&&!G.rdy&&live)setTimeout(()=>sfx('rdy'),140);G.rdy=all}
 function build(c,r){board.textContent='';bc.length=0;board.style.width=`calc(var(--u)*${c})`;board.style.height=`calc(var(--u)*${r})`;board.style.gridTemplate=`repeat(${r}, 1fr) / repeat(${c}, 1fr)`;
  for(let i=0;i<c*r;i++){const d=document.createElement('div');d.className='g';board.appendChild(d);bc.push(d)}}
 /* ===== parcels ===== */
-function paint(p){const e=p.el,s=new Set(p.cells.map(c=>c[0]+','+c[1])),col=PAL[(p.k+G.i)%6];e.textContent='';e.dataset.special=p.special||'';
+function paint(p){const e=p.el,[w,h]=dims(p.cells),s=new Set(p.cells.map(c=>c[0]+','+c[1])),col=PAL[(p.k+G.i)%6];e.style.width=`calc(var(--u)*${w})`;e.style.height=`calc(var(--u)*${h})`;e.textContent='';e.dataset.special=p.special||'';
  p.cells.forEach(([x,y],n)=>{const d=document.createElement('div'),X=(a,b)=>s.has((x+a)+','+(y+b))?0:1,t=X(0,-1),bt=X(0,1),l=X(-1,0),rt=X(1,0);d.className='c'+(n===0?' t':'');
   d.style.cssText=`left:calc(var(--u)*${x});top:calc(var(--u)*${y});background-color:${col};border-width:${t*3}px ${rt*3}px ${bt*3}px ${l*3}px;border-radius:${t&&l?9:0}px ${t&&rt?9:0}px ${bt&&rt?9:0}px ${bt&&l?9:0}px`;
   if(n===0)d.textContent=p.fragile?'!':p.star?'★':p.lock?'🔒':'';e.appendChild(d)})}
@@ -868,18 +868,21 @@ function fit(p,gx,gy){const oc=new Set();for(const q of G.ps)if(q!==p&&q.pl)for(
  for(const[x,y]of p.cells){const X=x+gx,Y=y+gy;if(X<0||X>=G.c||Y<0||Y>=G.r)return'Keep the whole parcel inside the van';if(oc.has(Y*G.c+X))return'That spot is already taken'}return 1}
 const clr=()=>bc.forEach(c=>c.className='g');
 function mv(){const r=stage.getBoundingClientRect(),p=drag.p,[w,h]=dims(p.cells);
- const lx=drag.cx-r.left-w*U/2,ly=drag.cy-r.top-h*U/2-(drag.t?U*.9:0);setPos(p,lx,ly,1);
+ const lx=drag.cx-r.left-drag.ox,ly=drag.cy-r.top-drag.oy;setPos(p,lx,ly,1);
  const gx=Math.round((lx-bx())/U),gy=Math.round((ly-boardTop())/U);drag.g=[gx,gy];drag.f=fit(p,gx,gy);clr();drag.on=false;
  for(const[x,y]of p.cells){const X=x+gx,Y=y+gy;if(X>=0&&X<G.c&&Y>=0&&Y<G.r){bc[Y*G.c+X].classList.add(drag.f===1?'ok':'bad');drag.on=true}}}
 function mist(m){G.om++;G.mist++;sfx('bad');toast(m);board.classList.remove('shake');void board.offsetWidth;board.classList.add('shake');if(G.campaign&&G.run){G.lives=Math.max(0,(G.lives||0)-1);hud();if(G.lives===0){G.campaignFailed=true;toast('No lives left — level failed');end()}}}
 function rot(p){if(!p)return;if(p.lock){toast("This parcel can't be rotated");return}if(G&&G.run){G.rotations=(G.rotations||0)+1;updateContract()}p.cells=rotc(p.cells);paint(p);sfx('rot');if(drag&&drag.moved&&drag.p===p)mv();layout()}
 const rotSel=()=>{if(!G||!G.run||G.paused)return;rot(drag&&drag.moved?drag.p:sel&&!sel.pl&&!sel.lock?sel:G.ps.find(q=>!q.pl&&!q.lock))};
-stage.addEventListener('pointerdown',e=>{if(!G||!G.run||G.paused||e.button>0)return;const el=e.target.closest('.pc');if(!el)return;const p=el._p;
- drag={p,id:e.pointerId,sx:e.clientX,sy:e.clientY,cx:e.clientX,cy:e.clientY,t:e.pointerType==='touch',moved:false,was:!!p.pl,f:0,on:false};p.pl=null;sel=p;stage.setPointerCapture(e.pointerId);e.preventDefault()});
+stage.addEventListener('pointerdown',e=>{if(!G||!G.run||G.paused||e.button>0)return;const el=e.target.closest('.pc');if(!el)return;const p=el._p,oldPl=p.pl?[...p.pl]:null,was=!!p.pl,[w]=dims(p.cells),rect=el.getBoundingClientRect(),scale=rect.width/(w*U)|| (was?1:TS);
+ drag={p,id:e.pointerId,sx:e.clientX,sy:e.clientY,cx:e.clientX,cy:e.clientY,moved:false,was,oldPl,ox:(e.clientX-rect.left)/scale,oy:(e.clientY-rect.top)/scale,f:0,on:false};p.pl=null;sel=p;stage.setPointerCapture(e.pointerId);e.preventDefault()});
 stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;drag.cx=e.clientX;drag.cy=e.clientY;
  if(!drag.moved){if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<6)return;drag.moved=true;drag.p.el.classList.add('lift');sfx('pick')}mv()});
-function up(e){if(!drag||e.pointerId!==drag.id)return;const d=drag,p=d.p;drag=null;clr();p.el.classList.remove('lift');
- if(!d.moved){if(!d.was)rot(p)}else if(d.f===1){p.pl=d.g;placed(p)}else if(d.on)mist(d.f);
+function up(e){if(!drag||e.pointerId!==drag.id)return;const d=drag,p=d.p,cancelled=e.type==='pointercancel';drag=null;clr();p.el.classList.remove('lift');
+ if(cancelled){p.pl=d.oldPl}
+ else if(!d.moved){p.pl=d.oldPl;if(!d.was)rot(p)}
+ else if(d.f===1){p.pl=d.g;placed(p)}
+ else{p.pl=null;mist(d.f)}
  sel=p;layout()}
 stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
 stage.addEventListener('contextmenu',e=>{e.preventDefault();rotSel()});
