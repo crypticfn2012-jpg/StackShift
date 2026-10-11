@@ -737,7 +737,7 @@ const CAMPAIGN=[
 ];
 /* ===== save (versioned, validated; SDK Data module on CrazyGames, localStorage elsewhere) ===== */
 const st={get(k){if(SDK.on){try{const v=SDK.c.data.getItem(k);if(v!==null&&v!==undefined)return v}catch(e){}}try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on){try{SDK.c.data.setItem(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
-const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[],level:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
+const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyCompletions:0,dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[],level:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
 let S=DEF();
 function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK.on)raw=localStorage.getItem(KEY)}catch(e){}
  if(!raw)return d;let j;try{j=JSON.parse(raw)}catch(e){try{st.set(KEY+'.bak',raw)}catch(_){}return d}
@@ -745,7 +745,7 @@ function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK
  for(const k of Object.keys(d)){const v=j[k],t=d[k];if(v!==null&&typeof v===typeof t&&Array.isArray(v)===Array.isArray(t))d[k]=(t&&typeof t==='object'&&!Array.isArray(t))?Object.assign(t,v):v}
  if(!LANGS.some(x=>x.id===d.lang&&x.t))d.lang='en';
  d.volume=Math.max(0,Math.min(100,Number(d.volume)||0));
- for(const k of['best','orders','perfect','streak','shifts','wins','coins','life'])if(!(d[k]>=0)||!isFinite(d[k]))d[k]=0;
+ for(const k of['best','orders','perfect','streak','shifts','wins','coins','life','dailyCompletions'])if(!(d[k]>=0)||!isFinite(d[k]))d[k]=0;
  d.own=[...new Set([...DEF().own,...d.own.filter(id=>cat(id))])];
  for(const k of['van','pal','grd','dec']){const c=cat(d.eq[k]);if(!c||c[0]!==k||!d.own.includes(c[1]))d.eq[k]=DEF().eq[k]}
  d.dailyStreak=Object.assign(DEF().dailyStreak,d.dailyStreak&&typeof d.dailyStreak==='object'?d.dailyStreak:{});
@@ -925,7 +925,7 @@ function deliver(){if(!G||!G.run||G.paused||!Array.isArray(G.ps)||!G.ps.length||
  
  updateContract();const v=$('#gvan');v.classList.remove('go');void v.offsetWidth;v.classList.add('go');pop($('#sc'));if(G.streak>1)pop($('#st'));
  ach();save();
- if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);const reward=C.find(c=>c[5]===G.campaignLevel);if(reward&&!S.own.includes(reward[1])){S.own.push(reward[1]);G.campaignUnlock=reward[2];toast('Campaign reward unlocked: '+reward[2]);sfx('ach');burst()}save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
+ if(G.daily&&G.done>=DN){G.win=true;end();return}if(G.campaign){G.campaignLevel++;S.campaign.level=Math.max(S.campaign.level||0,G.campaignLevel);SDK.progress(S.campaign.level/CAMPAIGN_LEVELS*100);ach();save();const reward=C.find(c=>c[5]===G.campaignLevel);if(reward&&!S.own.includes(reward[1])){S.own.push(reward[1]);G.campaignUnlock=reward[2];toast('Campaign reward unlocked: '+reward[2]);sfx('ach');burst()}save();if(G.campaignLevel>=CAMPAIGN_LEVELS){G.win=true;end();return}}flyOut();
  G.i++;newOrder();hud()}
 function skip(){if(!G||!G.run||G.paused)return;if(G.campaign){toast('Complete the level to progress');return}G.skips=(G.skips||0)+1;if(!G.endless&&!G.campaign){G.t-=5;toast('Order skipped (−5s)');if(G.t<=0){G.t=0;hud();end();return}}else toast('Order skipped');G.streak=0;G.i++;newOrder();updateContract();hud()}
 function reset(){if(!G||!G.run||G.paused)return;G.ps.forEach(p=>p.pl=null);sfx('reset');layout()}
@@ -952,7 +952,7 @@ function advanceCampaign(){const c=S.campaign||(S.campaign={done:[]});if(!Array.
 function campaign(){start(0,false,true)}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
- if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
+ if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){S.dailyCompletions=(Number(S.dailyCompletions)||0)+1;const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=0;coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
@@ -970,11 +970,11 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
- if(G.paused){pcard();if(!auto){SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
+ if(G.paused){pcard();G.sx=1;if(!auto)SDK.gx()}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
 const pcard=()=>{const offer=lifeAdOffer('pause'),hasAd=offer.includes('data-a="lifeAd"');ov(`<h2>${L('pause')}</h2>${hasAd?'<button class="b" data-a="resume">Continue without ad</button>':'<button class="b pri" data-a="resume">'+L('resume')+'</button>'}${offer}<button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`)};
 let settingsBack=false;
 const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
-function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
+function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=muted()?0:.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
 function applyLanguage(){
  const put=(sel,key)=>{const e=$(sel);if(e)e.textContent=L(key)};
  put('#menu .tag','tagline');put('#menu [data-a=play]','timed');put('#menu [data-a=endless]','endless');put('#menu [data-a=shop]','cosmetics');put('#menu [data-a=achievements]','achievements');put('#menu [data-a=settings]','settings');
