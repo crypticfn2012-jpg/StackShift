@@ -604,7 +604,35 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
  #menu>#rec,#menu>#dly{grid-column:1}
 }
 
-</style></head>
+</style><style id="achievement-polish">
+#ov .card.achievements-card{width:min(650px,calc(100vw - 24px));max-width:650px;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;padding:18px}
+.achievements-card .feature-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 14px}
+.achievements-card .feature-intro h2{margin:0 0 4px;font-size:clamp(24px,5vw,32px)}
+.achievements-card .feature-intro .sub{margin:0;color:#554b41;font-size:13px}
+.achievements-card .feature-stat{flex:none;padding:7px 9px;border:2px solid var(--navy);border-radius:10px;background:var(--cream);font-size:12px;font-weight:900;white-space:nowrap}
+.ach-progress{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:10px 12px;background:var(--cream);border:2px solid var(--navy);border-radius:12px}
+.ach-progress>div:first-child{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.ach-progress b{font-size:24px}.ach-progress span{font-size:12px;font-weight:800;color:#5a5048}
+.ach-progress-track{height:12px;flex:1;overflow:hidden;border:2px solid var(--navy);border-radius:999px;background:#d8c7a3}
+.ach-progress-track i{display:block;height:100%;background:var(--ok);border-right:2px solid var(--navy);transition:width .2s}
+.ach-filterbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0 8px}
+.ach-filter{min-width:0;padding:8px 5px;border:2px solid var(--navy);border-radius:9px;background:var(--cream);color:var(--navy);font:900 12px var(--f);cursor:pointer}
+.ach-filter.active{background:var(--or);box-shadow:0 3px 0 var(--navy);transform:translateY(-1px)}
+.ach-reward-note{margin:6px 0 10px;color:#5a5048;font-size:12px;font-weight:800}
+.ach-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:42dvh;overflow:auto;overscroll-behavior:contain;padding:2px 4px 8px 0}
+.ach-item{display:flex;align-items:flex-start;gap:9px;min-width:0;padding:10px;border:2px solid #9a896e;border-radius:11px;background:rgba(251,240,212,.54)}
+.ach-item.unlocked{border-color:var(--ok);background:#fff3d4}
+.ach-item.locked{opacity:.76}
+.ach-mark{display:grid;place-items:center;flex:none;width:30px;height:30px;border:2px solid var(--navy);border-radius:9px;background:#e2d0ab;color:var(--navy);font-weight:1000;font-size:18px}
+.ach-item.unlocked .ach-mark{background:var(--ok);color:#fff;border-color:#205f39}
+.ach-copy{min-width:0;flex:1}.ach-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+.ach-heading b{font-size:13px;line-height:1.2;overflow-wrap:anywhere}
+.ach-category{flex:none;padding:3px 5px;border-radius:6px;background:#e7d5b2;color:#504433;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.25px}
+.ach-copy>small{display:block;margin-top:5px;color:#5a5048;font-size:11px;line-height:1.3;font-weight:700}
+.ach-copy .ach-state{color:var(--navy);font-size:10px;font-weight:900}
+@media(max-width:460px){#ov .card.achievements-card{padding:12px}.achievements-card .feature-intro{display:block}.achievements-card .feature-stat{display:inline-block;margin-top:8px}.ach-filterbar{grid-template-columns:repeat(3,minmax(0,1fr))}.ach-list{grid-template-columns:1fr;max-height:46dvh}}
+</style>
+</head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
 <svg class="boot-logo" viewBox="0 0 500 330" role="img" aria-label="PixelForge Studios">
@@ -809,18 +837,30 @@ async function requestLifeAd(context){
  if(lifeAdBusy||!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed))return;
  if(!SDK.on||!SDK.c||!SDK.c.ad||typeof SDK.c.ad.requestAd!=='function'){toast('Rewarded ads are unavailable right now');return}
  const wait=lifeAdCooldown()-Date.now();if(wait>0){toast('Try again in '+Math.ceil(wait/1000)+' seconds');return}
- lifeAdBusy=true;lifeAdNextAt=Date.now()+180000;try{localStorage.setItem(LIFE_AD_KEY,String(lifeAdNextAt))}catch(e){}
+ lifeAdBusy=true;
  const previousGain=MG?MG.gain.value:null;
  const card=$('#ov .card');if(card){card.querySelectorAll('button').forEach(b=>b.disabled=true);const adButton=card.querySelector('[data-a=lifeAd]');if(adButton)adButton.textContent='Loading ad...'}
+ const setCooldown=ms=>{lifeAdNextAt=Date.now()+ms;try{localStorage.setItem(LIFE_AD_KEY,String(lifeAdNextAt))}catch(e){}};
  try{
-  if(MG)MG.gain.value=0;
-  await SDK.c.ad.requestAd('rewarded');
+  await new Promise((resolve,reject)=>{
+   let settled=false,started=false;
+   let adTimer;
+   const finish=error=>{if(settled)return;settled=true;clearTimeout(adTimer);error?reject(error instanceof Error?error:new Error(error&&error.message||'Rewarded ad failed')):resolve()};
+   adTimer=setTimeout(()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad timed out'))},120000);
+   try{
+    SDK.c.ad.requestAd('rewarded',{
+     adStarted:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},
+     adFinished:()=>{if(!started)setCooldown(180000);finish()},
+     adError:error=>{if(!started)setCooldown(30000);finish(error||new Error('No ad available'))}
+    })
+   }catch(e){if(!started)setCooldown(30000);finish(e)}
+  });
   if(!G||!G.campaign)throw new Error('Campaign ended');
-  if(context==='pause'&&G.run){
+  if(context==='pause'&&G.run&&G.paused){
    G.lives=(G.lives||0)+1;G.paused=false;cl();hud();layout();if(G.sx){SDK.gs();G.sx=0}toast('Extra life added');sfx('ach');
   }else if(context==='results'&&G.campaignFailed){
    const retryLevel=G.campaignLevel;G.adBonusLives=(G.adBonusLives||0)+1;const bonus=G.adBonusLives;start(0,false,true,bonus);G.campaignLevel=retryLevel;G.i=retryLevel;toast('Extra life added — good luck');sfx('ach');
-  }
+  }else throw new Error('The campaign is no longer waiting for a life');
  }catch(e){
   toast('No ad available right now. Try again later.');
   if(context==='pause'&&G&&G.run&&G.paused)pcard();
@@ -1102,7 +1142,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
 const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
- done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},
+ done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},achFilter:b=>achievements(b.dataset.filter),
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),lifeAd:b=>requestLifeAd(b.dataset.context),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
