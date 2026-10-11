@@ -1103,7 +1103,7 @@ function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/
 function copy(b){const t=shareTxt(),ok=()=>{b.textContent='Copied';toast('Result copied')},fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():prompt('Copy your result:',t)};
  navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,fb):fb()}
 function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
- if(G.paused){pcard();G.sx=1;SDK.gx()}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
+ if(G.paused){pcard();if(auto){G.sx=0}else{SDK.gx();G.sx=1}}else{cl();if(G.sx){SDK.gs();G.sx=0}}layout()}
 const pcard=()=>{const offer=lifeAdOffer('pause'),hasAd=offer.includes('data-a="lifeAd"');ov(`<h2>${L('pause')}</h2>${hasAd?'<button class="b" data-a="resume">Continue without ad</button>':'<button class="b pri" data-a="resume">'+L('resume')+'</button>'}${offer}<button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`)};
 let settingsBack=false;
 const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
