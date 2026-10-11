@@ -412,6 +412,103 @@ body{background-color:var(--bg2);background-image:radial-gradient(ellipse at 50%
 @media(max-width:380px){
  #menu>#rec .stat-tile span{font-size:8px}
 }
+
+/* Stack Shift UI polish: clearer type, calmer surfaces, consistent controls. */
+:root{
+ --f:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ --ui-line:rgba(225,235,250,.14);
+ --ui-muted:#c5d0e0;
+ --ui-shadow:0 24px 70px rgba(3,8,20,.30);
+}
+body{font-family:var(--f);font-weight:500;letter-spacing:0;background-color:#101a2d;background-image:radial-gradient(ellipse at 50% -15%,rgba(75,104,155,.3),transparent 58%),linear-gradient(180deg,#182641 0%,#101827 100%);color:#f7f9fd}
+#app{max-width:680px}
+.ttl{font-family:var(--f);font-weight:850;letter-spacing:-.075em;-webkit-text-stroke:0!important;text-shadow:none!important;transform:none!important;color:#f7f9fd}
+.ttl span{color:#ffad59}
+.tag,.rec{color:#d3dceb;font-weight:450;line-height:1.55}
+.b,.ib,.chip,.lnk,button,select,input{font-family:var(--f)}
+.b{font-size:15px;font-weight:650;border:1px solid rgba(255,255,255,.13);border-radius:11px;background:#263854;color:#f4f7fc;box-shadow:none;min-height:46px;padding:11px 15px}
+.b.pri{background:#f59a43;color:#1b2432;border:1px solid #f8b56f;box-shadow:none;font-weight:750}
+.b.big{font-size:16px;min-height:54px}
+.b:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.b:disabled{opacity:.42}
+@media(hover:hover) and (pointer:fine){
+ .b:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 5px 14px rgba(0,0,0,.16)}
+ .b.pri:not(:disabled):hover{background:#ffad59;box-shadow:0 5px 14px rgba(245,154,67,.18)}
+}
+.b:focus-visible,.ib:focus-visible,.chip:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #ffbd78;outline-offset:3px}
+.row{gap:10px}
+#menu{gap:11px}
+#menu>.ttl{letter-spacing:-.075em}
+#menu>.tag{font-weight:450}
+#menu .mode-row .b{font-weight:650;line-height:1.25;white-space:normal}
+#menu .mode-row .b.pri{background:#f59a43}
+#menu .dkt,#dly{border:1px solid rgba(20,33,63,.16);border-radius:13px;box-shadow:0 5px 16px rgba(4,10,24,.12)}
+.dkt .stub{background:#f5a047;border-right:1px dashed rgba(20,33,63,.28)}
+.dkt .bd{padding:13px 15px}
+.dkt p{line-height:1.45}
+.dkt .b{background:#263854;color:#f4f7fc;border:1px solid rgba(255,255,255,.12);box-shadow:none}
+#menu .menu-utility .b{font-size:13px;font-weight:600;color:#e5ebf5;background:rgba(255,255,255,.045);border:1px solid rgba(225,235,250,.16);border-radius:10px;box-shadow:none}
+#menu .menu-utility .b:hover{background:rgba(255,255,255,.09)}
+#menu #rec .stat-tile{border-radius:10px}
+#menu #rec .stat-tile span{font-size:10px;letter-spacing:.055em;color:#c5d0e0}
+#menu #rec .stat-tile b{font-variant-numeric:tabular-nums;font-weight:750}
+#hud{background:rgba(7,13,25,.38);border:1px solid var(--ui-line);border-radius:14px;padding:11px 13px}
+.sb small{color:#c5d0e0;font-size:11px;font-weight:600;letter-spacing:.04em}
+#sc{font-weight:800;font-size:32px;letter-spacing:-.04em;color:#fff;text-shadow:none}
+.tmw{border:1px solid rgba(20,33,63,.2);height:26px}
+#bar{background:linear-gradient(90deg,#f08a32,#ffc06e)}
+#st{color:#ffc078;font-weight:700;text-shadow:none}
+#lives{font-weight:700;text-shadow:none}
+.ib{border:1px solid rgba(255,255,255,.16);border-radius:10px;background:#263854;color:#fff;box-shadow:none}
+#ord{border:1px solid rgba(20,33,63,.14);border-radius:13px;box-shadow:0 4px 14px rgba(3,8,20,.10)}
+#contract{background:rgba(255,255,255,.055);border:1px solid var(--ui-line);border-radius:13px;padding:12px 14px}
+#contract .mark{background:#f59a43;color:#182337;border-radius:9px}
+#contract b{color:#fff;font-size:14px;font-weight:700}
+#contract small{color:#d2dbea;font-size:12px;line-height:1.45;font-weight:450}
+#contractCount{color:#fff;font-weight:700}
+#contract .progress{background:rgba(255,255,255,.14)}
+#contract .progress i{background:#f59a43}
+#tut{color:#e0e7f1;font-size:13px;line-height:1.6;font-weight:450}
+.lnk{color:#263854;font-weight:650;text-decoration:none}
+#tut .lnk{color:#ffbd78}
+#stage{margin-top:16px}
+#board{background:#e9dfca;box-shadow:inset 0 2px 5px rgba(20,33,63,.08);border-radius:8px}
+#board::after{border:2px solid rgba(20,33,63,.72);border-radius:10px;inset:-3px}
+.g{border-color:#c6b99d}
+.c{color:#1b2b46}
+#acts{gap:9px;padding:12px 0 14px}
+#acts .b{min-height:46px;font-size:14px}
+#ov{background:rgba(5,10,21,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#ov .card{background:#f7f4ed;color:#1b2a41;border:1px solid rgba(255,255,255,.65);border-radius:18px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.34)}
+#ov .card.settings-card,#ov .card.cosmetics-card{padding:22px}
+h2{font-family:var(--f);font-size:24px;line-height:1.2;letter-spacing:-.04em;font-weight:750;color:#182840}
+h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
+.sub{color:#566276;font-size:13px;line-height:1.5;font-weight:450}
+.big{font-family:var(--f);font-weight:800;color:#e6812c;-webkit-text-stroke:0!important;text-shadow:none!important}
+.st{gap:9px}
+.st div{background:#fffdf8;border:1px solid #e4dfd4;border-radius:11px;padding:11px 12px}
+.st b{font-size:23px;font-weight:800;color:#182840}
+.st span{font-size:11px;font-weight:600;color:#586579}
+.chip{background:#fffdf8;color:#1b2a41;border:1px solid #ddd7cb;border-radius:10px;padding:9px 11px;font-weight:600;box-shadow:none}
+.chip small{color:#5a6576;font-weight:450;line-height:1.4}
+.chip.on{background:#ffecd7;border-color:#e99547;color:#4b2d13;box-shadow:inset 0 0 0 1px rgba(233,149,71,.18)}
+.chip.on small{color:#70451f}
+.settings-row{background:#fffdf8;color:#24344b;border:1px solid #e1dbd0;border-radius:10px;font-weight:600;font-size:13px;padding:12px}
+.settings-row select{background:#fff;color:#1b2a41;border:1px solid #d7dce4;padding:8px;font-size:13px}
+.settings-note{color:#566276;font-weight:450;line-height:1.5}
+.settings-credits{border-top:1px solid #e0dace;color:#566276;font-weight:450}
+#toast{background:#f7f4ed;color:#182840;border:1px solid #e1dbd0;border-radius:11px;box-shadow:0 8px 30px rgba(0,0,0,.24);font-weight:600}
+@media(max-width:599px){
+ #menu{padding:15px 12px;gap:10px}
+ #menu>.ttl{font-size:clamp(40px,12vw,52px)}
+ #menu>.tag{font-size:13px}
+ #menu>.mode-row .b{font-size:12px;min-height:52px;padding:8px 5px}
+ #menu>.menu-utility .b{font-size:11px}
+ #ov .card,#ov .card.settings-card,#ov .card.cosmetics-card{padding:16px}
+ #acts .b{font-size:13px;padding:9px 8px}
+}
+@media(prefers-reduced-motion:reduce){.b,.chip,.ib{transition:none!important}}
+
 </style></head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
