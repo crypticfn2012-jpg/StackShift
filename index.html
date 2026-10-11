@@ -698,14 +698,29 @@ function applyTheme(eq){const r=document.documentElement.style,g=cat(eq.grd)[4];
 
 const SDK={on:false,c:null,mute:false,
  async init(){try{
-  await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);setTimeout(no,2500)});
-  const c=window.CrazyGames&&window.CrazyGames.SDK;if(!c)return;let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('SDK init timeout')),1800)})]).finally(()=>clearTimeout(initTimer));if(c.environment==='disabled')return;
-  this.c=c;this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
-  if(c.game&&c.game.addSettingsChangeListener)c.game.addSettingsChangeListener(s=>{this.mute=!!s.muteAudio});
-  if(c.game&&c.game.loadingStart)c.game.loadingStart()
- }catch(e){this.on=false}},
- call(f){try{this.on&&f(this.c.game)}catch(e){}},
- gs(){this.call(g=>g.gameplayStart())},gx(){this.call(g=>g.gameplayStop())},ht(){this.call(g=>g.happytime())},loaded(){this.call(g=>g.loadingStop())}};
+  let c=window.CrazyGames&&window.CrazyGames.SDK;
+  if(!c){
+   await new Promise((resolve,reject)=>{
+    let settled=false;const s=document.createElement('script');
+    const finish=err=>{if(settled)return;settled=true;clearTimeout(timer);s.onload=null;s.onerror=null;err?reject(err):resolve()};
+    const timer=setTimeout(()=>finish(new Error('CrazyGames SDK script timed out')),10000);
+    s.async=true;s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=()=>finish();s.onerror=()=>finish(new Error('CrazyGames SDK failed to load'));document.head.appendChild(s)
+   });
+   c=window.CrazyGames&&window.CrazyGames.SDK
+  }
+  if(!c||typeof c.init!=='function')return;
+  let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('CrazyGames SDK init timed out')),10000)})]).finally(()=>clearTimeout(initTimer));
+  this.c=c;if(c.environment==='disabled')return;
+  this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
+  if(c.game&&typeof c.game.addSettingsChangeListener==='function')c.game.addSettingsChangeListener(s=>{this.mute=!!(s&&s.muteAudio)});
+  if(c.game&&typeof c.game.loadingStart==='function')c.game.loadingStart()
+ }catch(e){this.on=false;this.c=null;console.warn('CrazyGames SDK unavailable; using local saves',e)}},
+ call(f){try{if(this.on&&this.c&&this.c.game)f(this.c.game)}catch(e){}},
+ gs(){this.call(g=>{if(typeof g.gameplayStart==='function')g.gameplayStart()})},
+ gx(){this.call(g=>{if(typeof g.gameplayStop==='function')g.gameplayStop()})},
+ ht(){this.call(g=>{if(typeof g.happytime==='function')g.happytime()})},
+ progress(value){const n=Math.max(0,Math.min(100,Number(value)||0));this.call(g=>{if(typeof g.reportGameCompletedPercentage==='function')g.reportGameCompletedPercentage(n)})},
+ loaded(){this.call(g=>{if(typeof g.loadingStop==='function')g.loadingStop()});if(typeof S!=='undefined'&&typeof CAMPAIGN_LEVELS==='number')this.progress((S.campaign&&S.campaign.level||0)/CAMPAIGN_LEVELS*100)}};
 const CAMPAIGN=[
  {id:'route',title:'First route',desc:'Complete 3 deliveries in a timed shift',reward:50,check:(s,g)=>!g.daily&&!g.endless&&g.done>=3},
  {id:'clean',title:'Careful loading',desc:'Make 3 perfect deliveries in one shift',reward:75,check:(s,g)=>g.perf>=3},
