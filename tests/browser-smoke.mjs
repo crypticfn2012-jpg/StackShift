@@ -153,7 +153,7 @@ try {
   await page.locator('#ov [data-a="resume"]').click();
   await page.waitForSelector('#ov.hide', { state: 'attached' });
   await page.waitForFunction(() => window.__stackShiftEvents.gameplayStart > 1);
-  await page.locator('#rt').click();
+  assert.equal(await page.locator('#rt').isDisabled(), true, 'Rotate should remain disabled when idle after resuming');
   await page.locator('#acts [data-a="clr"]').click();
   assert.equal(await page.locator('#dl').isDisabled(), true, 'Deliver must be disabled until all parcels are placed');
   await page.setViewportSize({ width: 907, height: 510 });
