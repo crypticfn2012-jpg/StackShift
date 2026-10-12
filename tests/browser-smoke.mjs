@@ -111,6 +111,40 @@ try {
   });
   assert.ok(dimensions.cell >= 24, 'parcel cells should remain readable in the compact desktop iframe: ' + dimensions.cell);
   assert.ok(dimensions.board.left >= dimensions.stage.left - 1 && dimensions.board.right <= dimensions.stage.right + 1, 'board must fit horizontally inside the game stage');
+  const scrollMetrics = await page.evaluate(() => ({
+    viewport: innerHeight, document: document.documentElement.scrollHeight,
+    body: document.body.scrollHeight, controls: document.querySelector('#acts').getBoundingClientRect()
+  }));
+  assert.ok(scrollMetrics.document <= scrollMetrics.viewport + 1 && scrollMetrics.body <= scrollMetrics.viewport + 1,
+    'game page must not scroll at 821x462: ' + JSON.stringify(scrollMetrics));
+  assert.ok(scrollMetrics.controls.bottom <= scrollMetrics.viewport + 1, 'controls should remain visible at 821x462');
+
+  // A tray click only selects a parcel; it never rotates it.
+  const trayIndex = await page.locator('.pc').evaluateAll(els => els.findIndex(el => el._p && !el._p.lock && el.offsetWidth !== el.offsetHeight));
+  assert.ok(trayIndex >= 0, 'a non-square, rotatable tray piece should exist');
+  const trayParcel = page.locator('.pc').nth(trayIndex);
+  const shapeBefore = await trayParcel.evaluate(el => Array.from(el.children, c => c.style.left + ',' + c.style.top).join('|'));
+  await trayParcel.click();
+  const shapeAfterTap = await trayParcel.evaluate(el => Array.from(el.children, c => c.style.left + ',' + c.style.top).join('|'));
+  assert.equal(shapeAfterTap, shapeBefore, 'clicking a tray preview must not rotate it');
+  assert.equal(await page.locator('#rt').isDisabled(), true, 'Rotate must be disabled while idle');
+  await page.keyboard.press('r');
+  assert.equal(await trayParcel.evaluate(el => Array.from(el.children, c => c.style.left + ',' + c.style.top).join('|')), shapeBefore,
+    'R without an active drag must not rotate a preview');
+
+  const trayBox = await trayParcel.boundingBox();
+  assert.ok(trayBox, 'tray parcel should have a visible hitbox');
+  await page.mouse.move(trayBox.x + trayBox.width/2, trayBox.y + trayBox.height/2);
+  await page.mouse.down();
+  await page.mouse.move(trayBox.x + trayBox.width/2 + 10, trayBox.y + trayBox.height/2 + 8, { steps: 2 });
+  assert.equal(await page.locator('#rt').isDisabled(), false, 'Rotate should enable during an active drag');
+  await page.keyboard.press('r');
+  const shapeDuringDrag = await trayParcel.evaluate(el => Array.from(el.children, c => c.style.left + ',' + c.style.top).join('|'));
+  assert.notEqual(shapeDuringDrag, shapeBefore, 'R during a drag should rotate the currently dragged parcel');
+  await page.mouse.up();
+  assert.equal(await page.locator('#rt').isDisabled(), true, 'Rotate should disable after drag ends');
+  await page.locator('#acts [data-a="clr"]').click();
+  assert.equal(await page.locator('#dl').isDisabled(), true, 'Deliver must be disabled until all parcels are placed');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#ov').evaluate((el) => el.classList.contains('hide')), true, 'Escape must remain available to browser/platform fullscreen controls');
   await page.keyboard.press('p');
@@ -137,6 +171,8 @@ try {
   assert.ok(playBox && playBox.height >= 44, 'primary menu control should have a usable touch target');
   await playButton.tap();
   await mp.waitForSelector('#game:not(.hide)', { state: 'visible' });
+  assert.ok(await mp.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1 && document.body.scrollHeight <= innerHeight + 1),
+    'game page must not scroll at 800x450 landscape touch size');
   const mobileMetrics = await mp.evaluate(() => {
     const stage = document.querySelector('#stage').getBoundingClientRect();
     const board = document.querySelector('#board').getBoundingClientRect();
@@ -155,9 +191,21 @@ try {
   await mp.waitForSelector('#ov:not(.hide)', { state: 'visible' });
   await mp.locator('#ov [data-a="resume"]').click();
   assert.equal(await mp.locator('#ov').evaluate((el) => el.classList.contains('hide')), true);
+  await mp.setViewportSize({ width: 390, height: 844 });
+  await mp.waitForTimeout(100);
+  const portrait = await mp.evaluate(() => ({
+    viewport: innerHeight, document: document.documentElement.scrollHeight,
+    body: document.body.scrollHeight,
+    cell: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')),
+    actions: document.querySelector('#acts').getBoundingClientRect()
+  }));
+  assert.ok(portrait.document <= portrait.viewport + 1 && portrait.body <= portrait.viewport + 1,
+    'game page must not scroll at 390x844 portrait: ' + JSON.stringify(portrait));
+  assert.ok(portrait.cell >= 24, 'portrait parcel cells should remain readable: ' + portrait.cell);
+  assert.ok(portrait.actions.bottom <= portrait.viewport + 1, 'portrait controls should remain visible');
   await mobile.context.close();
   assert.deepEqual(pageErrors, [], 'browser sessions must not throw uncaught runtime exceptions: ' + pageErrors.join(' | '));
-  console.log('Browser smoke tests passed: startup, SDK loading events, locale persistence, legal pages, desktop/touch gameplay, board sizing, parcel hitboxes, rotation/reset, pause/resume, Escape handling, and zero uncaught page errors.');
+  console.log('Browser smoke tests passed: startup, SDK loading events, locale persistence, legal pages, no-scroll desktop/landscape/portrait layouts, drag-only rotation, board sizing, parcel hitboxes, pause/resume, Escape handling, and zero uncaught page errors.');
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

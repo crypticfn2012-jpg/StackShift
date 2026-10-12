@@ -92,12 +92,19 @@ fitContext.G.ps = [{ cells: [[0, 0]], pl: [0, 0] }];
 assert.match(fitContext.runFit(parcel, 0, 0), /already taken/, 'overlap should be rejected');
 assert.equal(fitContext.runFit(parcel, 1, 0), 1, 'adjacent parcels should be allowed');
 
-// Approximate the responsive cell-size policy at required iframe sizes.
-for (const [width, height, coarse] of [[821, 462, false], [907, 510, false], [800, 450, true], [1080, 607, false]]) {
-  const stageWidth = width - 20;
+// Approximate sizing at required short landscape, mobile landscape, and portrait viewports.
+for (const [width, height] of [[821,462],[907,510],[800,450],[1080,607],[390,844],[768,1024]]) {
+  const compactLandscape = width > height && height <= 700;
+  const compactPortrait = height > width && width < 600;
+  const tabletPortrait = height > width && width >= 600;
+  const stageWidth = compactLandscape ? (width - 20) * 0.58 : compactPortrait ? width - 20 : tabletPortrait ? (width - 20) * 0.57 : width - 20;
   const widthBudget = Math.max(8, stageWidth - 16);
-  const heightBudget = Math.max(80, height - (coarse ? 150 : Math.min(235, Math.max(170, height * 0.42))));
-  const cell = Math.max(4, Math.min(96, Math.floor(Math.min(widthBudget / 5.2, widthBudget / 5, heightBudget / 7.2))));
+  const reservedHeight = compactLandscape ? 190 : compactPortrait ? 340 : tabletPortrait ? 330 : Math.min(310, Math.max(230, height * 0.34));
+  const heightBudget = Math.max(80, height - reservedHeight);
+  const cell = Math.max(4, Math.min(96, Math.floor(Math.min(widthBudget/5.2,widthBudget/5,heightBudget/8.1))));
   assert.ok(cell >= 24, 'parcel cells too small at ' + width + 'x' + height + ': ' + cell + 'px');
 }
+assert.match(source, /function syncRotateControl\(\)/, 'rotation must be restricted to active drags');
+assert.match(source, /else if\(!d\.moved\)\{p\.pl=d\.oldPl\}/, 'a click/tap without dragging must not rotate a tray parcel');
+assert.match(html, /id="rt"[^>]*disabled/, 'rotate must be disabled while idle');
 console.log('Acceptance smoke tests passed: syntax, SDK lifecycle, locale/controls/legal links, placement validation, iframe sizing, and ' + generated + ' deterministic puzzle cases.');

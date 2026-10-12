@@ -7,7 +7,7 @@ Play: https://crypticfn2012-jpg.github.io/StackShift/
 ## Controls
 
 - Drag parcels into the van.
-- Tap or click an unplaced parcel, or press **R**, to rotate it.
+- Tap or click a parcel to select it. Rotation is only available while dragging: press **R**, or use Rotate with a second finger on touch devices.
 - Press **Space** or **Enter** to deliver once every parcel is placed.
 - Press **P** or use the on-screen pause button to pause or resume. **Escape is reserved for browser/platform fullscreen controls.**
 
