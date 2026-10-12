@@ -652,7 +652,7 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
 /* Keep an active shift inside the iframe; menu panels keep their existing layout. */
 body:has(#game:not(.hide)){height:100dvh;min-height:0;overflow:hidden;overscroll-behavior:none}
 body:has(#game:not(.hide)) #app{width:100%;max-width:1540px;height:100dvh;max-height:100dvh;min-height:0;margin:0 auto;padding:clamp(5px,1.2vh,14px) clamp(8px,1.6vw,24px);overflow:hidden;display:flex;flex-direction:column}
-body:has(#game:not(.hide)) #game{display:grid;flex:1;min-height:0;min-width:0;height:100%;max-height:100%;overflow:hidden;align-items:stretch}
+body:has(#game:not(.hide)) #game{display:grid;flex:1 1 0%;min-height:0;min-width:0;height:auto;max-height:100%;overflow:hidden;align-items:stretch;align-content:stretch}
 body:has(#game:not(.hide)) #stage{min-width:0;max-width:100%;margin:0;overflow:hidden;isolation:isolate}
 #stage::before{content:"";display:none;position:absolute;z-index:0;left:2px;right:2px;top:var(--tray-top,70%);bottom:1px;border:1px solid rgba(229,219,197,.36);border-radius:10px;background:rgba(248,243,231,.035);pointer-events:none}
 #stage::after{content:"PARCEL TRAY · DRAG INTO THE VAN";display:none;position:absolute;z-index:1;top:calc(var(--tray-top,70%) + 4px);left:10px;color:#b9c5d8;font:800 9px/1.1 var(--f);letter-spacing:.08em;pointer-events:none}
