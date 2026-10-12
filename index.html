@@ -108,6 +108,10 @@ button:focus-visible{outline:4px solid #fff;outline-offset:3px}
 .settings-row input[type=range]{width:100%;min-width:0;accent-color:var(--or);grid-column:1/-1}
 .settings-row input[type=checkbox]{width:22px;height:22px;flex:none;accent-color:var(--or);cursor:pointer}
 .settings-note{font-size:13px;font-weight:700;color:#5a5048;margin:10px 0}
+.settings-account{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin:12px 0;padding:12px;border:1px solid #cdbfa8;border-radius:12px;background:#fff8e8;color:#14213f}
+.settings-account b{font-size:13px}.settings-account p{margin:5px 0 0;color:#5a5048;font-size:12px;line-height:1.4;font-weight:650}
+#ov .settings-account .b{width:auto;min-width:132px;max-width:170px;margin:0;min-height:40px;padding:8px 10px;font-size:12px;box-shadow:0 3px 0 var(--navy)}#accountAction[hidden]{display:none!important}
+@media(max-width:430px){.settings-account{grid-template-columns:minmax(0,1fr)}#ov .settings-account .b{max-width:none;width:100%}}
 .settings-credits{border-top:2px dashed #c8b58d;padding-top:9px;font-size:13px}
 .settings-credits p{margin:4px 0}
 @media(max-width:430px){#ov .card.settings-card{padding:14px}.settings-grid{grid-template-columns:1fr;gap:7px}.settings-row:has(#settingLang),.settings-row:has(#settingVolume){grid-column:auto}.settings-row:has(#settingVolume){grid-template-columns:1fr auto}.settings-row select{max-width:58%}}
@@ -882,7 +886,8 @@ function applyTheme(eq){const r=document.documentElement.style,g=cat(eq.grd)[4];
 
 /* ===== platform: CrazyGames SDK v3 (optional; game runs without it) ===== */
 
-const SDK={on:false,c:null,mute:false,
+const LEADERBOARD_ENCRYPTION_KEY='KoiAqdxJreewq67vmVKaQKd/xCPdvrSGz0K8dnC4NzM=';
+const SDK={on:false,c:null,mute:false,user:null,accountAvailable:false,dataAvailable:false,saveWarned:false,
  async init(){try{
   let c=window.CrazyGames&&window.CrazyGames.SDK;
   if(!c){
@@ -898,15 +903,34 @@ const SDK={on:false,c:null,mute:false,
   let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('CrazyGames SDK init timed out')),4000)})]).finally(()=>clearTimeout(initTimer));
   this.c=c;if(c.environment==='disabled')return;
   this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
+  this.dataAvailable=!!(c.data&&typeof c.data.getItem==='function'&&typeof c.data.setItem==='function');
+  this.accountAvailable=!!(c.user&&c.user.isUserAccountAvailable&&typeof c.user.getUser==='function'&&typeof c.user.showAuthPrompt==='function');
+  if(this.accountAvailable){if(typeof c.user.addAuthListener==='function')c.user.addAuthListener(user=>{this.user=user||null;this.refreshAccountUI()});this.refreshUser()}
   if(c.game&&typeof c.game.addSettingsChangeListener==='function')c.game.addSettingsChangeListener(s=>{this.mute=!!(s&&s.muteAudio)});
   if(c.game&&typeof c.game.loadingStart==='function')c.game.loadingStart()
  }catch(e){this.on=false;this.c=null;console.warn('CrazyGames SDK unavailable; using local saves',e)}},
  call(f){try{if(this.on&&this.c&&this.c.game)f(this.c.game)}catch(e){}},
+ accountStatus(){if(!this.on)return 'Outside CrazyGames, progress is saved in this browser only.';if(!this.dataAvailable)return 'CrazyGames cloud save is unavailable. Check that Progress Save is enabled in your game settings.';if(this.user)return 'Signed in as '+String(this.user.username||'your CrazyGames account')+'. Progress uses CrazyGames saves.';if(this.accountAvailable)return 'Playing as a guest. Progress saves through CrazyGames; sign in to sync it across devices.';return 'Progress uses CrazyGames Data. Account sign-in is available on CrazyGames when enabled.'},
+ refreshAccountUI(){const status=$('#accountStatus'),button=$('#accountAction');if(status)status.textContent=this.accountStatus();if(button)button.hidden=!this.accountAvailable||!!this.user},
+ async refreshUser(){if(!this.accountAvailable||!this.c||!this.c.user)return null;try{this.user=await this.c.user.getUser()}catch(e){this.user=null}this.refreshAccountUI();return this.user},
+ async signIn(){if(!this.accountAvailable){toast('CrazyGames sign-in is not available in this preview.');return}if(this.user){toast('Signed in as '+String(this.user.username||'your CrazyGames account'));return}try{save();const result=await this.c.user.showAuthPrompt();this.user=result||await this.c.user.getUser();this.refreshAccountUI();if(this.user)toast('Signed in as '+String(this.user.username||'your CrazyGames account'));else toast('Guest progress is still saved.')}catch(e){if(e&&e.code!=='userCancelled'&&e.code!=='userAlreadySignedIn')console.warn('CrazyGames sign-in was not completed',e);await this.refreshUser();if(!this.user)toast('Sign-in cancelled. Your guest progress is still saved.')}},
+ canSubmitScore(){return !!(this.on&&this.accountAvailable&&this.user&&this.c&&this.c.user&&typeof this.c.user.submitScore==='function'&&window.crypto&&window.crypto.subtle)},
+ async submitBestScore(score){if(!this.canSubmitScore())return false;try{const safeScore=Math.max(0,Math.min(500000,Math.floor(Number(score)||0)));if(!safeScore)return false;const encryptedScore=await encryptLeaderboardScore(safeScore,LEADERBOARD_ENCRYPTION_KEY);await this.c.user.submitScore({encryptedScore:encryptedScore,score:safeScore});return true}catch(e){console.warn('CrazyGames leaderboard submission failed',e);return false}},
  gs(){this.call(g=>{if(typeof g.gameplayStart==='function')g.gameplayStart()})},
  gx(){this.call(g=>{if(typeof g.gameplayStop==='function')g.gameplayStop()})},
  ht(){this.call(g=>{if(typeof g.happytime==='function')g.happytime()})},
  progress(value){const n=Math.max(0,Math.min(100,Number(value)||0));this.call(g=>{if(typeof g.reportGameCompletedPercentage==='function')g.reportGameCompletedPercentage(n)})},
  loaded(){this.call(g=>{if(typeof g.loadingStop==='function')g.loadingStop()});if(typeof S!=='undefined'&&typeof CAMPAIGN_LEVELS==='number')this.progress((S.campaign&&S.campaign.level||0)/CAMPAIGN_LEVELS*100)}};
+async function encryptLeaderboardScore(score,encryptionKey){
+ const iv=window.crypto.getRandomValues(new Uint8Array(12));const algorithm={name:'AES-GCM',iv:iv};
+ const keyBytes=new Uint8Array(atob(encryptionKey).split('').map(c=>c.charCodeAt(0)));
+ if(keyBytes.length!==32)throw new Error('Leaderboard encryption key must be 32 bytes');
+ const cryptoKey=await window.crypto.subtle.importKey('raw',keyBytes,algorithm,false,['encrypt']);
+ const dataBuffer=new TextEncoder().encode(String(score));const encryptedBuffer=await window.crypto.subtle.encrypt(algorithm,cryptoKey,dataBuffer);
+ const combined=new Uint8Array(iv.length+encryptedBuffer.byteLength);combined.set(iv);combined.set(new Uint8Array(encryptedBuffer),iv.length);
+ return btoa(String.fromCharCode(...combined));
+}
+function leaderboardSeasonKey(){const now=new Date();if(now.getUTCDay()===1&&now.getUTCHours()<9)now.setUTCDate(now.getUTCDate()-1);now.setUTCDate(now.getUTCDate()-((now.getUTCDay()+6)%7));return now.toISOString().slice(0,10)}
 const CAMPAIGN=[
  {id:'route',title:'First route',desc:'Complete 3 deliveries in a timed shift',reward:50,check:(s,g)=>!g.daily&&!g.endless&&g.done>=3},
  {id:'clean',title:'Careful loading',desc:'Make 3 perfect deliveries in one shift',reward:75,check:(s,g)=>g.perf>=3},
@@ -922,14 +946,16 @@ const CAMPAIGN=[
  {id:'career250',title:'Delivery legend',desc:'Deliver 250 orders across your career',reward:500,check:s=>s.orders>=250}
 ];
 /* ===== save (versioned, validated; SDK Data module on CrazyGames, localStorage elsewhere) ===== */
-const st={get(k){if(SDK.on){try{const v=SDK.c.data.getItem(k);if(v!==null&&v!==undefined)return v}catch(e){}}try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on){try{SDK.c.data.setItem(k,v);return}catch(e){}}try{localStorage.setItem(k,v)}catch(e){(this.m=this.m||{})[k]=v}}};
-const DEF=()=>({v:1,best:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyCompletions:0,dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[],level:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
+const st={get(k){if(SDK.on){try{if(!SDK.c||!SDK.c.data||typeof SDK.c.data.getItem!=='function')throw new Error('CrazyGames Data module is unavailable');return SDK.c.data.getItem(k)}catch(e){if(!SDK.saveWarned){SDK.saveWarned=true;console.warn('CrazyGames Data read failed. Enable Progress Save in the Developer Portal.',e)}return null}}try{return localStorage.getItem(k)}catch(e){return this.m&&this.m[k]}},set(k,v){if(SDK.on){try{if(!SDK.c||!SDK.c.data||typeof SDK.c.data.setItem!=='function')throw new Error('CrazyGames Data module is unavailable');SDK.c.data.setItem(k,String(v));return true}catch(e){if(!SDK.saveWarned){SDK.saveWarned=true;console.warn('CrazyGames Data save failed. Enable Progress Save in the Developer Portal.',e)}return false}}try{localStorage.setItem(k,String(v));return true}catch(e){(this.m=this.m||{})[k]=String(v);return true}}};
+const DEF=()=>({v:1,best:0,leaderboardSeason:'',leaderboardBest:0,orders:0,perfect:0,streak:0,shifts:0,wins:0,coins:0,life:0,own:['van0','pal0','grd0','dec0'],eq:{van:'van0',pal:'pal0',grd:'grd0',dec:'dec0'},ach:{},daily:{d:'',done:false,best:0},dailyCompletions:0,dailyStreak:{lastDate:'',current:0,best:0},campaign:{done:[],level:0},playtime:{seconds:0,claimed:[]},mute:false,rm:false,seen:false,volume:80,hoverSound:true,lang:'en',largeText:false,hc:false});
 let S=DEF();
-function load(){const d=DEF();let raw=null;try{raw=st.get(KEY);if(raw==null&&SDK.on)raw=localStorage.getItem(KEY)}catch(e){}
+function load(){const d=DEF();let raw=null;try{raw=st.get(KEY)}catch(e){}
  if(!raw)return d;let j;try{j=JSON.parse(raw)}catch(e){try{st.set(KEY+'.bak',raw)}catch(_){}return d}
  if(!j||typeof j!=='object')return d;
  for(const k of Object.keys(d)){const v=j[k],t=d[k];if(v!==null&&typeof v===typeof t&&Array.isArray(v)===Array.isArray(t))d[k]=(t&&typeof t==='object'&&!Array.isArray(t))?Object.assign(t,v):v}
  if(!LANGS.some(x=>x.id===d.lang&&x.t))d.lang='en';
+ if(typeof d.leaderboardSeason!=='string')d.leaderboardSeason='';
+ d.leaderboardBest=Math.max(0,Math.min(500000,Math.floor(Number(d.leaderboardBest)||0)));
  d.volume=Math.max(0,Math.min(100,Number(d.volume)||0));
  for(const k of['best','orders','perfect','streak','shifts','wins','coins','life','dailyCompletions'])if(!(d[k]>=0)||!isFinite(d[k]))d[k]=0;
  d.own=[...new Set([...DEF().own,...d.own.filter(id=>cat(id))])];
@@ -1250,7 +1276,9 @@ function campaign(){start(0,false,true)}
 function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.remove('lift');drag=null;clr()}
  const prev=S.best,pb=G.score>prev&&G.score>0;let coins=Math.floor(G.score/60)+(pb?10:0);
  if(G.daily){G.win=G.done>=DN;const same=S.daily.d===G.date,alreadyDone=same&&S.daily.done;if(G.win&&!alreadyDone){S.dailyCompletions=(Number(S.dailyCompletions)||0)+1;const streakBonus=recordDailyStreak(G.date);G.streakBonus=streakBonus;G.dailyBonus=30+streakBonus;coins+=G.dailyBonus}S.daily={d:G.date,done:alreadyDone||!!G.win,best:Math.max(same?S.daily.best:0,G.score)}}
+ const rankSeason=leaderboardSeasonKey();const rankCandidate=!G.daily&&!G.endless&&!G.campaign&&G.score>0&&SDK.canSubmitScore()&&(S.leaderboardSeason!==rankSeason||G.score>Number(S.leaderboardBest||0))?{season:rankSeason,score:Math.floor(G.score)}:null;
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=0;coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
+ if(rankCandidate)SDK.submitBestScore(rankCandidate.score).then(ok=>{if(ok){S.leaderboardSeason=rankCandidate.season;S.leaderboardBest=rankCandidate.score;save()}});
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
@@ -1282,8 +1310,10 @@ function applyLanguage(){
  const tut=$('#tut');if(tut){tut.setAttribute('aria-label',L('controls'));const title=$('#tutTitle'),body=$('#tutText');if(title)title.textContent=L('controls');if(body)body.textContent=L('tutorial');const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}
  const h=$('#hud .sb small');if(h)h.textContent=L('score');
 }
+function htmlSafe(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;')}
+function accountPanelHTML(){return '<div class="settings-account"><div><b>CrazyGames account &amp; cloud save</b><p id="accountStatus">'+htmlSafe(SDK.accountStatus())+'</p></div><button class="b pri" id="accountAction" data-a="account" '+(!SDK.accountAvailable||!!SDK.user?'hidden':'')+'>Sign in with CrazyGames</button></div>'}
 function settings(){const availableLanguages=LANG_OPTIONS.filter(x=>x[0]==='en'||LANGS.some(v=>v.id===x[0]&&v.t));const options=availableLanguages.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
- ov('<h2>'+L('settings')+'</h2><div class="settings-grid">'+
+ ov('<h2>'+L('settings')+'</h2>'+accountPanelHTML()+'<div class="settings-grid">'+
  '<label class="settings-row"><span>'+L('language')+'</span><select id="settingLang" aria-label="'+L('language')+'">'+options+'</select></label>'+
  '<label class="settings-row"><span>'+L('volume')+' <b id="volumeVal">'+Math.round(S.volume??80)+'%</b></span><input id="settingVolume" type="range" min="0" max="100" step="5" value="'+(S.volume??80)+'" aria-label="'+L('volume')+'"></label>'+
  '<label class="settings-row"><span>'+L('sound')+'</span><input id="settingMute" type="checkbox" '+(!S.mute?'checked':'')+' aria-label="'+L('sound')+'"></label>'+
@@ -1304,7 +1334,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k&&(!c[5]||S.own.includes(c[1]))).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
-const A={play:()=>start(0),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),account:()=>SDK.signIn(),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},achFilter:b=>achievements(b.dataset.filter),
@@ -1325,6 +1355,6 @@ let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;tra
  if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
-(async()=>{await SDK.init();let savedBefore=null;try{savedBefore=st.get(KEY);if(savedBefore==null&&SDK.on)savedBefore=localStorage.getItem(KEY)}catch(e){}S=load();if(!savedBefore||!/\"lang\"\s*:/.test(savedBefore))S.lang=preferredLanguage();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
+(async()=>{await SDK.init();let savedBefore=null;try{savedBefore=st.get(KEY);if(savedBefore==null&&SDK.on&&SDK.dataAvailable){const legacy=localStorage.getItem(KEY);if(legacy!=null){SDK.c.data.setItem(KEY,legacy);savedBefore=legacy}}}catch(e){console.warn('Legacy save migration was not available',e)}S=load();if(!savedBefore||!/\"lang\"\s*:/.test(savedBefore))S.lang=preferredLanguage();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
 
 </script></body></html>
