@@ -83,7 +83,7 @@ try {
   await page.locator('#ov [data-a="settingsClose"]').click();
   await page.reload({ waitUntil: 'load' });
   await page.waitForSelector('#menu:not(.hide)', { state: 'visible' });
-  assert.equal(await page.evaluate(() => document.documentElement.lang), 'en', 'saved language must take precedence over SDK locale on later visits');
+  assert.equal(await page.evaluate(() => document.documentElement.lang), 'en-GB', 'saved language must take precedence over SDK locale on later visits');
 
   // Legal pages must actually be served and render their content.
   await page.goto(origin + '/terms.html', { waitUntil: 'load' });
