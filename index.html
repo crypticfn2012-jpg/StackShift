@@ -1131,7 +1131,12 @@ function up(e){if(!drag||e.pointerId!==drag.id)return;const d=drag,p=d.p,cancell
  if(cancelled){p.pl=d.oldPl}
  else if(!d.moved){p.pl=d.oldPl}
  else if(d.f===1){p.pl=d.g;placed(p)}
- else{p.pl=null;mist(d.f)}
+ else if(d.was){
+  // Moving an already-loaded parcel is an edit, not a failed delivery. Dropping
+  // outside the van returns it to the tray; an invalid in-van move snaps back.
+  const target=d.g||[0,0],outside=p.cells.some(([x,y])=>x+target[0]<0||x+target[0]>=G.c||y+target[1]<0||y+target[1]>=G.r);
+  p.pl=outside?null:d.oldPl;
+ }else{p.pl=null;mist(d.f)}
  sel=p;syncRotateControl();clearHint();layout()}
 stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
 stage.addEventListener('contextmenu',e=>{e.preventDefault();rotSel()});
@@ -1347,7 +1352,15 @@ const A={play:()=>start(0),hint:hint,account:()=>SDK.signIn(),settings:()=>{sett
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},achFilter:b=>achievements(b.dataset.filter),
  rmt:()=>{S.rm=!S.rm;save();document.documentElement.classList.toggle('rm',RM());pcard()},pause:()=>pause(),resume:()=>pause(),lifeAd:b=>requestLifeAd(b.dataset.context),rot:rotSel,dlv:deliver,nxt:skip,clr:reset,
  skip:()=>{S.seen=true;save();$('#tut').classList.add('hide')}};
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
+function requestPlayFullscreen(){
+ // A browser fullscreen request must come directly from a user gesture.
+ // CrazyGames owns its fullscreen control; don't compete with its player UI.
+ if(window.top!==window.self||window.CrazyGames?.SDK?.environment==='crazygames'||document.fullscreenElement)return;
+ const root=document.documentElement;if(!root||typeof root.requestFullscreen!=='function')return;
+ try{const request=root.requestFullscreen({navigationUI:'hide'});if(request&&typeof request.catch==='function')request.catch(()=>{})}catch(e){}
+}
+const FULLSCREEN_START_ACTIONS=new Set(['play','daily','endless','campaignPlay','again','again0']);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&A[b.dataset.a]){if(FULLSCREEN_START_ACTIONS.has(b.dataset.a))requestPlayFullscreen();if(!['rot','dlv','clr','nxt','buy'].includes(b.dataset.a))sfx('ui');A[b.dataset.a](b)}});
 let hoverButton=null,lastHoverSound=0;
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const target=e.target;if(!target||typeof target.closest!=='function')return;const b=target.closest('.b,.ib,.chip,.lnk');if(!b||b===hoverButton||(e.relatedTarget&&b.contains(e.relatedTarget)))return;hoverButton=b;if(S.hoverSound&&!muted()&&Date.now()-lastHoverSound>120){lastHoverSound=Date.now();sfx('hover')}},true);
 document.addEventListener('pointerout',e=>{const target=e.target;if(!target||typeof target.closest!=='function')return;const b=target.closest('.b,.ib,.chip,.lnk');if(!b)return;if(b===hoverButton&&(!e.relatedTarget||!b.contains(e.relatedTarget)))hoverButton=null},true);
