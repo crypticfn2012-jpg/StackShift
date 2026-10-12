@@ -88,7 +88,7 @@ vm.runInNewContext(source.slice(fitStart, fitEnd) + ';globalThis.runFit=fit;', f
 const parcel = { cells: [[0, 0], [1, 0]], pl: null };
 assert.equal(fitContext.runFit(parcel, 0, 0), 1, 'valid placement should be accepted');
 assert.match(fitContext.runFit(parcel, 2, 0), /inside the van/, 'out-of-bounds placement should be rejected');
-fitContext.G.ps = [{ cells: [[0, 0]], pl: [1, 0] }];
+fitContext.G.ps = [{ cells: [[0, 0]], pl: [0, 0] }];
 assert.match(fitContext.runFit(parcel, 0, 0), /already taken/, 'overlap should be rejected');
 assert.equal(fitContext.runFit(parcel, 1, 0), 1, 'adjacent parcels should be allowed');
 
