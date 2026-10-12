@@ -26,7 +26,7 @@ assert.match(source, /systemInfo[\s\S]{0,180}locale/, 'SDK locale must be read')
 assert.match(source, /function preferredLanguage\(\)/);
 assert.match(source, /e\.key===['"]p['"]\|\|e\.key===['"]P['"]/i, 'P must be the pause keyboard shortcut');
 assert.doesNotMatch(source, /e\.key===['"]Escape['"]\)\{pause\(\)/, 'Escape should remain reserved for platform fullscreen behaviour');
-assert.match(source, /Math\.min\(235,Math\.max\(170,VH\*\.42\)\)/, 'short embeds should budget more height for the board');
+assert.match(source, /const reservedHeight=compactLandscape\?190:compactPortrait\?340:tabletPortrait\?330/, 'short and portrait embeds should use the viewport-aware height budget');
 assert.match(html, /id=["']tutText["']/);
 assert.match(html, /href=["']\.\/terms\.html["']/);
 assert.match(html, /href=["']\.\/privacy\.html["']/);
