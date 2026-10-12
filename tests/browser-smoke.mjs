@@ -38,6 +38,9 @@ const initScript = () => {
   window.__stackShiftEvents = Object.fromEntries(names.map((name) => [name, 0]));
   window.__stackShiftTestUser = null;
   window.__stackShiftSubmittedScores = [];
+  window.__stackShiftFullscreenCalls = 0;
+  document.documentElement.requestFullscreen = async () => { window.__stackShiftFullscreenCalls++; };
+
   const call = (name) => (...args) => { window.__stackShiftEvents[name]++; return undefined; };
   window.CrazyGames = { SDK: {
     environment: 'browser-smoke-test',
@@ -117,6 +120,8 @@ try {
   await page.goto(origin + '/index.html', { waitUntil: 'load' });
   await page.waitForSelector('#menu:not(.hide)', { state: 'visible' });
   await page.locator('#menu [data-a="play"]').click();
+  assert.equal(await page.evaluate(() => window.__stackShiftFullscreenCalls), 1, 'starting a standalone browser game should request fullscreen');
+
   await page.waitForSelector('#game:not(.hide)', { state: 'visible' });
   await page.waitForFunction(() => window.__stackShiftEvents.gameplayStart > 0);
   assert.equal(await page.locator('#tut:not(.hide)').count(), 1, 'first-run controls tutorial should appear in game');
