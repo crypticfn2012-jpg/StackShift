@@ -939,17 +939,18 @@ function burst(){if(RM())return;for(let i=0;i<14;i++){const d=document.createEle
 /* cell size now fits each order's van to the screen, so small vans are drawn big */
 function size(){
  const rawWidth=stage.clientWidth||innerWidth-20,SW=Math.max(48,rawWidth),VH=window.visualViewport?.height||innerHeight,c=G&&G.c||5,r=G&&G.r||4;
- const land=matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches;
  const compactLandscape=matchMedia('(orientation: landscape) and (max-height: 700px)').matches;
  const compactPortrait=matchMedia('(orientation: portrait) and (max-width: 599px)').matches;
  const tabletPortrait=matchMedia('(orientation: portrait) and (min-width: 600px)').matches;
  const reservedHeight=compactLandscape?190:compactPortrait?340:tabletPortrait?330:Math.min(310,Math.max(230,VH*.34));
  const widthBudget=Math.max(8,SW-16),heightBudget=Math.max(80,VH-reservedHeight);
- // Budget for the board and the parcel tray below it, not just the board itself.
+ // Initial estimate includes the board and tray; then measure and shrink until the real tray fits.
  const byWidth=widthBudget/Math.max(c,5.2),byBoard=widthBudget/c,byHeight=heightBudget/(r+4.1);
- U=Math.max(4,Math.min(96,Math.floor(Math.min(byWidth,byBoard,byHeight))));
+ const minCell=G&&G.ps?24:4;
+ U=Math.max(minCell,Math.min(96,Math.floor(Math.min(byWidth,byBoard,byHeight))));
  document.documentElement.style.setProperty('--u',U+'px');
- layout()
+ layout();
+ if(G&&G.ps){for(let pass=0;pass<5;pass++){const actual=parseFloat(stage.style.height)||0;if(actual<=heightBudget+1||U<=minCell)break;let next=Math.max(minCell,Math.floor(U*(heightBudget/actual)*.97));if(next>=U)next=U-1;if(next<minCell)next=minCell;if(next===U)break;U=next;document.documentElement.style.setProperty('--u',U+'px');layout()}}
 }
 const TMW=$('.tmw'),buzz=p=>{try{!RM()&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const bonusFor=(os,area)=>{const r=os/(4+area*.5);return r<=.5?6:r<=.8?5:r<=1.1?4:r<=1.5?3:r<=2?2:1};

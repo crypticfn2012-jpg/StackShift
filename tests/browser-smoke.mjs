@@ -117,7 +117,7 @@ try {
   }));
   assert.ok(scrollMetrics.document <= scrollMetrics.viewport + 1 && scrollMetrics.body <= scrollMetrics.viewport + 1,
     'game page must not scroll at 821x462: ' + JSON.stringify(scrollMetrics));
-  assert.ok(scrollMetrics.controls.bottom <= scrollMetrics.viewport + 1, 'controls should remain visible at 821x462');
+  assert.ok(scrollMetrics.controls.bottom <= scrollMetrics.viewport + 1, 'controls should remain visible at 821x462: ' + JSON.stringify({controls:scrollMetrics.controls,viewport:scrollMetrics.viewport,doc:scrollMetrics.document,body:scrollMetrics.body}));
 
   // A tray click only selects a parcel; it never rotates it.
   const trayIndex = await page.locator('.pc').evaluateAll(els => els.findIndex(el => el._p && !el._p.lock && el.offsetWidth !== el.offsetHeight));
