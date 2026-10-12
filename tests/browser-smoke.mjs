@@ -131,9 +131,11 @@ try {
   // Touch-oriented landscape viewport: menu taps, board sizing, parcel tap, and pause.
   const mobile = await makePage({ viewport: { width: 800, height: 450 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
   const mp = mobile.page;
-  const playBox = await mp.locator('#menu [data-a="play"]').boundingBox();
+  await mp.waitForFunction(() => window.__stackShiftEvents.loadingStart > 0 && window.__stackShiftEvents.loadingStop > 0);
+  const playButton = mp.locator('#menu [data-a="play"]');
+  const playBox = await playButton.boundingBox();
   assert.ok(playBox && playBox.height >= 44, 'primary menu control should have a usable touch target');
-  await mp.touchscreen.tap(playBox.x + playBox.width / 2, playBox.y + playBox.height / 2);
+  await playButton.tap();
   await mp.waitForSelector('#game:not(.hide)', { state: 'visible' });
   const mobileMetrics = await mp.evaluate(() => {
     const stage = document.querySelector('#stage').getBoundingClientRect();
