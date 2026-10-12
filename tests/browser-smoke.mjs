@@ -34,13 +34,22 @@ await new Promise((resolve, reject) => {
 });
 const origin = 'http://127.0.0.1:' + server.address().port;
 const initScript = () => {
-  const names = ['init', 'loadingStart', 'loadingStop', 'gameplayStart', 'gameplayStop', 'happytime', 'progress'];
+  const names = ['init', 'loadingStart', 'loadingStop', 'gameplayStart', 'gameplayStop', 'happytime', 'progress', 'authPrompt', 'submitScore'];
   window.__stackShiftEvents = Object.fromEntries(names.map((name) => [name, 0]));
+  window.__stackShiftTestUser = null;
+  window.__stackShiftSubmittedScores = [];
   const call = (name) => (...args) => { window.__stackShiftEvents[name]++; return undefined; };
   window.CrazyGames = { SDK: {
     environment: 'browser-smoke-test',
     init: async () => { window.__stackShiftEvents.init++; },
-    user: { systemInfo: { locale: 'es-ES' } },
+    user: {
+      systemInfo: { locale: 'es-ES' },
+      isUserAccountAvailable: true,
+      getUser: async () => window.__stackShiftTestUser,
+      showAuthPrompt: async () => { window.__stackShiftEvents.authPrompt++; window.__stackShiftTestUser = { username: 'StackTester' }; return window.__stackShiftTestUser; },
+      addAuthListener: (listener) => { window.__stackShiftAuthListener = listener; },
+      submitScore: async (payload) => { window.__stackShiftEvents.submitScore++; window.__stackShiftSubmittedScores.push(payload); }
+    },
     data: {
       getItem: (key) => localStorage.getItem('sdk:' + key),
       setItem: (key, value) => localStorage.setItem('sdk:' + key, String(value))
@@ -77,6 +86,17 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.lang), 'es', 'new players should use their CrazyGames SDK locale');
   assert.equal(await page.locator('#menu [data-a="play"]').count(), 1, 'primary gameplay entry should be visible on the menu');
   await page.locator('#menu [data-a="settings"]').click();
+  assert.match(await page.locator('#accountStatus').innerText(), /Playing as a guest/, 'Settings should show the current CrazyGames guest/save state');
+  assert.equal(await page.locator('#accountAction').isVisible(), true, 'the platform sign-in action should be available when CrazyGames exposes accounts');
+  await page.locator('#accountAction').click();
+  await page.waitForFunction(() => document.querySelector('#accountStatus')?.textContent.includes('Signed in as StackTester'));
+  assert.equal(await page.locator('#accountAction').isVisible(), false, 'the sign-in button should disappear after login');
+  const sentScore = await page.evaluate(async () => await eval('SDK.submitBestScore(1234)'));
+  assert.equal(sentScore, true, 'the leaderboard SDK should accept a signed-in test score');
+  const scorePayload = await page.evaluate(() => window.__stackShiftSubmittedScores[0]);
+  assert.equal(scorePayload.score, 1234, 'the leaderboard should receive the plain score');
+  assert.equal(typeof scorePayload.encryptedScore, 'string', 'the leaderboard should also receive an encrypted score');
+  assert.ok(atob(scorePayload.encryptedScore).length > 12, 'encrypted score should contain an IV and ciphertext');
   assert.equal(await page.locator('#ov a[href="./terms.html"]').count(), 1, 'settings should link to Terms of Use');
   assert.equal(await page.locator('#ov a[href="./privacy.html"]').count(), 1, 'settings should link to Privacy Policy');
   await page.locator('#settingLang').selectOption('en');
