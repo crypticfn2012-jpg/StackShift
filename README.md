@@ -11,7 +11,20 @@ Play: https://crypticfn2012-jpg.github.io/StackShift/
 - Press **Space** or **Enter** to deliver once every parcel is placed.
 - Press **P** or use the on-screen pause button to pause or resume. **Escape is reserved for browser/platform fullscreen controls.**
 
-The game includes Timed Puzzle, Endless, Campaign, a shared daily route, unlockable cosmetics, achievements, and optional CrazyGames rewarded-ad lives where supported.
+The game includes Timed Puzzle, Endless, a 100-level Career Campaign, a daily route with streak rewards, special cargo rules, contracts, unlockable cosmetics, achievements, and optional CrazyGames rewarded-ad lives where supported.
+
+## CrazyGames account saves and leaderboards
+
+- On CrazyGames, the CrazyGames SDK Data Module is the source of truth for the full save. Outside CrazyGames, the game uses browser storage.
+- The Settings panel includes CrazyGames account sign-in when the platform exposes it. Guest Data Module progress is designed to sync to the account after sign-in.
+- The client submits a player's weekly personal-best **Timed Puzzle** score to the CrazyGames leaderboard SDK when the player is signed in and the platform has enabled leaderboards for Stack Shift. Daily, Endless, and Campaign runs are excluded to keep the competition fair.
+- **Developer Portal setup:** enable **Progress Save / Data Module** in the submission settings. CrazyGames leaderboards are only available to invited games, so leaderboard submissions will not appear globally until CrazyGames enables this feature for Stack Shift.
+- Configure the single leaderboard as metric **POINTS**, sorting **DESC**, incremental scoring **false**, minimum **0**, maximum **500000**, cooldown **10 seconds**, and guide text `Timed Shift Score — earn the highest delivery score`.
+- Set the leaderboard Encryption Key to this exact 32-byte Base64 key (it must match the client code):
+
+  `KoiAqdxJreewq67vmVKaQKd/xCPdvrSGz0K8dnC4NzM=`
+
+The client-side SDK submission is appropriate for this static browser game, but client scores are not tamper-proof; CrazyGames notes that server-side validation is stronger. Do not treat the encryption key as a server secret.
 
 ## Quality checks
 
