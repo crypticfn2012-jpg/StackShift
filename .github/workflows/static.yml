@@ -113,6 +113,8 @@ jobs:
 
           console.log(`Validated game JavaScript, ${generated} generated puzzles, ${ids.length} unique achievements, CrazyGames callbacks and progression saves.`);
           NODE
+      - name: Acceptance smoke tests
+        run: node tests/acceptance-smoke.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

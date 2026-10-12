@@ -632,6 +632,22 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
 .ach-copy .ach-state{color:var(--navy);font-size:10px;font-weight:900}
 @media(max-width:460px){#ov .card.achievements-card{padding:12px}.achievements-card .feature-intro{display:block}.achievements-card .feature-stat{display:inline-block;margin-top:8px}.ach-filterbar{grid-template-columns:repeat(3,minmax(0,1fr))}.ach-list{grid-template-columns:1fr;max-height:46dvh}}
 </style>
+<style id="acceptance-polish">
+#tut{display:grid;gap:8px;margin:8px 0 2px;padding:10px 12px;background:rgba(251,240,212,.07);border:1px solid rgba(251,240,212,.24);border-radius:12px;color:var(--cream)}
+#tut .tutorial-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+#tut .tutorial-head b{font-size:11px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase;color:#fff4d6}
+#tut .tutorial-head .lnk{flex:none;color:var(--or);margin:0}
+#tut .tutorial-keys{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+#tut .tutorial-keys span{display:grid;place-items:center;min-width:40px;height:30px;padding:3px 6px;background:#13213c;border:1px solid rgba(251,240,212,.5);border-radius:7px}
+#tut kbd{font:900 10px/1 var(--f);color:#fff4d6;white-space:nowrap}
+#tut #tutText{margin:0;font-size:12px;line-height:1.45;font-weight:650;color:#e9dcc0}
+.settings-legal{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.settings-legal a{display:inline-flex;align-items:center;min-height:36px;padding:7px 10px;border:1px solid #cdbfa8;border-radius:9px;color:#14213f;background:#fffdf6;font-size:12px;font-weight:800;text-decoration:underline}
+.settings-legal a:focus-visible{outline:3px solid #b96816;outline-offset:3px}
+.controls-note{line-height:1.45}
+@media(max-width:430px){#tut{padding:9px}#tut .tutorial-keys{gap:5px}#tut .tutorial-keys span{min-width:36px;height:28px}}
+@media(prefers-reduced-motion:reduce){#tut *{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
 <div id="boot" aria-label="Loading Stack Shift"><div class="boot-inner">
@@ -652,10 +668,10 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
  
 </section>
 <section id="game" class="scr hide">
- <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><span id="lives" aria-live="polite" aria-label="Lives"></span><button class="ib" data-a="pause" aria-label="Pause">II</button></div>
+ <div id="hud"><div class="sb"><small>Score</small><b id="sc" aria-label="Score">0</b></div><div class="tmw" role="timer" aria-label="Time remaining"><div id="bar"></div><span id="tm">90</span></div><span id="st"></span><span id="lives" aria-live="polite" aria-label="Lives"></span><button class="ib" data-a="pause" aria-label="Pause (P)" title="Pause (P)">II</button></div>
  <div id="ord"><div class="van" id="gvan"></div><div id="rl"></div><div><span id="on"></span><button class="lnk" data-a="nxt">Skip (−5s)</button></div></div>
  <div id="contract" aria-live="polite"><div class="mark">★</div><div class="copy"><b id="contractTitle">Shift contract</b><small id="contractDesc">Complete an extra objective for bonus coins.</small><div class="progress"><i id="contractBar"></i></div></div><small id="contractCount">0/3</small></div>
- <p id="tut" class="hide">Drag every parcel into the van without overlapping. Tap or click a parcel to rotate it, or use Rotate (R). When every parcel is placed, press Deliver (Space). Read the order rule above the board: some deliveries need a parcel against a highlighted wall. Clean, quick deliveries earn more points. <button class="lnk" data-a="skip">Got it</button></p>
+ <div id="tut" class="hide" role="note" aria-label="Controls"><div class="tutorial-head"><b id="tutTitle">Controls</b><button class="lnk" data-a="skip">Got it</button></div><div class="tutorial-keys" aria-hidden="true"><span><kbd>↔</kbd></span><span><kbd>R</kbd></span><span><kbd>SPACE</kbd></span><span><kbd>P</kbd></span></div><p id="tutText">Drag parcels into the van. Tap one to rotate it, or press R. Space delivers. Fast deliveries add time.</p></div>
  <div id="stage"><div id="board"></div></div>
  <div id="acts"><button class="b" data-a="clr">Reset</button><button class="b" id="rt" data-a="rot">Rotate</button><button class="b pri" id="dl" data-a="dlv" disabled>Deliver</button></div>
 </section>
@@ -731,13 +747,13 @@ const SDK={on:false,c:null,mute:false,
    await new Promise((resolve,reject)=>{
     let settled=false;const s=document.createElement('script');
     const finish=err=>{if(settled)return;settled=true;clearTimeout(timer);s.onload=null;s.onerror=null;err?reject(err):resolve()};
-    const timer=setTimeout(()=>finish(new Error('CrazyGames SDK script timed out')),10000);
+    const timer=setTimeout(()=>finish(new Error('CrazyGames SDK script timed out')),4000);
     s.async=true;s.src='https://sdk.crazygames.com/crazygames-sdk-v3.js';s.onload=()=>finish();s.onerror=()=>finish(new Error('CrazyGames SDK failed to load'));document.head.appendChild(s)
    });
    c=window.CrazyGames&&window.CrazyGames.SDK
   }
   if(!c||typeof c.init!=='function')return;
-  let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('CrazyGames SDK init timed out')),10000)})]).finally(()=>clearTimeout(initTimer));
+  let initTimer;await Promise.race([c.init(),new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(new Error('CrazyGames SDK init timed out')),4000)})]).finally(()=>clearTimeout(initTimer));
   this.c=c;if(c.environment==='disabled')return;
   this.on=true;this.mute=!!(c.game&&c.game.settings&&c.game.settings.muteAudio);
   if(c.game&&typeof c.game.addSettingsChangeListener==='function')c.game.addSettingsChangeListener(s=>{this.mute=!!(s&&s.muteAudio)});
@@ -883,7 +899,7 @@ function burst(){if(RM())return;for(let i=0;i<14;i++){const d=document.createEle
 function size(){
  const rawWidth=stage.clientWidth||innerWidth-20,SW=Math.max(48,rawWidth),VH=window.visualViewport?.height||innerHeight,c=G&&G.c||5,r=G&&G.r||4;
  const land=matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches;
- const widthBudget=Math.max(8,SW-16),heightBudget=Math.max(80,VH-(land?130:320));
+ const widthBudget=Math.max(8,SW-16),heightBudget=Math.max(80,VH-(land?150:Math.min(235,Math.max(170,VH*.42))));
  // Never force cells to a minimum size that makes the board wider than its stage.
  const byWidth=widthBudget/Math.max(c,5.2),byBoard=widthBudget/c,byHeight=heightBudget/(r+3.2);
  U=Math.max(4,Math.min(96,Math.floor(Math.min(byWidth,byBoard,byHeight))));
@@ -1107,6 +1123,7 @@ function pause(auto){if(!G||!G.run)return;G.paused=!G.paused;
 const pcard=()=>{const offer=lifeAdOffer('pause'),hasAd=offer.includes('data-a="lifeAd"');ov(`<h2>${L('pause')}</h2>${hasAd?'<button class="b" data-a="resume">Continue without ad</button>':'<button class="b pri" data-a="resume">'+L('resume')+'</button>'}${offer}<button class="b" data-a="settings">${L('settings')}</button><button class="b" data-a="rmt">${L('reducedMotion')}: ${S.rm?'on':'off'}</button><button class="b" data-a="again0">${L('restart')}</button><button class="b" data-a="menu">${L('quitMenu')}</button>`)};
 let settingsBack=false;
 const LANG_OPTIONS=[['en','English','en-GB'],['es','Español','es'],['fr','Français','fr'],['de','Deutsch','de'],['pt','Português','pt'],['it','Italiano','it'],['pl','Polski','pl'],['tr','Türkçe','tr'],['ru','Русский','ru'],['ja','日本語','ja'],['ko','한국어','ko'],['zh','简体中文','zh-CN']];
+function preferredLanguage(){try{const raw=String(SDK.c&&SDK.c.user&&SDK.c.user.systemInfo&&SDK.c.user.systemInfo.locale||'').trim().replace('_','-').toLowerCase();if(!raw)return 'en';const code=raw.split('-')[0];const match=LANG_OPTIONS.find(x=>x[0]===code&&LANGS.some(v=>v.id===x[0]&&v.t));return match?match[0]:'en'}catch(e){return 'en'}}
 function applySettings(){document.documentElement.lang=(LANG_OPTIONS.find(x=>x[0]===S.lang)||LANG_OPTIONS[0])[2];document.documentElement.classList.toggle('rm',!!S.rm);document.documentElement.classList.toggle('large-text',!!S.largeText);document.documentElement.classList.toggle('high-contrast',!!S.hc);if(MG)MG.gain.value=muted()?0:.9*(Math.max(0,Math.min(100,Number(S.volume??80)))/100)}
 function applyLanguage(){
  const put=(sel,key)=>{const e=$(sel);if(e)e.textContent=L(key)};
@@ -1114,7 +1131,7 @@ function applyLanguage(){
  put('#acts [data-a=clr]','reset');put('#acts [data-a=rot]','rotate');put('#acts [data-a=dlv]','deliver');put('#ord [data-a=nxt]','skip');
  put('#contractTitle',G&&G.contract?G.contract.titleKey?L(G.contract.titleKey):G.contract.title:'shiftContract');
  if($('#contractDesc')&&G&&G.contract&&!G.contractPaid)$('#contractDesc').textContent=G.contract.descKey?L(G.contract.descKey):G.contract.desc;
- const tut=$('#tut');if(tut){const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}
+ const tut=$('#tut');if(tut){tut.setAttribute('aria-label',L('controls'));const title=$('#tutTitle'),body=$('#tutText');if(title)title.textContent=L('controls');if(body)body.textContent=L('tutorial');const b=tut.querySelector('[data-a=skip]');if(b)b.textContent=L('gotIt')}
  const h=$('#hud .sb small');if(h)h.textContent=L('score');
 }
 function settings(){const availableLanguages=LANG_OPTIONS.filter(x=>x[0]==='en'||LANGS.some(v=>v.id===x[0]&&v.t));const options=availableLanguages.map(x=>'<option value="'+x[0]+'" '+(S.lang===x[0]?'selected':'')+'>'+x[1]+'</option>').join('');
@@ -1126,7 +1143,7 @@ function settings(){const availableLanguages=LANG_OPTIONS.filter(x=>x[0]==='en'|
  '<label class="settings-row"><span>'+L('reducedMotion')+'</span><input id="settingMotion" type="checkbox" '+(S.rm?'checked':'')+' aria-label="'+L('reducedMotion')+'"></label>'+
  '<label class="settings-row"><span>'+L('largeText')+'</span><input id="settingText" type="checkbox" '+(S.largeText?'checked':'')+' aria-label="'+L('largeText')+'"></label>'+
  '<label class="settings-row"><span>'+L('highContrast')+'</span><input id="settingContrast" type="checkbox" '+(S.hc?'checked':'')+' aria-label="'+L('highContrast')+'"></label></div>'+
- '<p class="settings-note">'+L('savedAuto')+'</p><div class="settings-credits"><b>Credits</b><p>Main developer: Ron</p><p>Studio: PixelForge Studios</p></div><button class="b pri" data-a="settingsClose">'+L('close')+'</button>');$('#ov .card').classList.add('settings-card')}
+ '<p class="settings-note controls-note"><b>'+L('controls')+'</b><br>'+L('controlsText')+'</p><p class="settings-note">'+L('savedAuto')+'</p><div class="settings-legal"><a href="./terms.html" target="_blank" rel="noopener noreferrer">Terms of Use</a><a href="./privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a></div><div class="settings-credits"><b>Credits</b><p>Main developer: Ron</p><p>Studio: PixelForge Studios</p></div><button class="b pri" data-a="settingsClose">'+L('close')+'</button>');$('#ov .card').classList.add('settings-card')}
 
 function menu(){const dly=S.daily.d===utc(),dt=new Date(),locale=(LANGS.find(l=>l.id===S.lang)||LANGS[0]||{}).locale||'en-GB',ds=S.dailyStreak||{best:0};
  $('#dly').innerHTML=`<div class="stub">${dt.toLocaleString(locale,{month:'short',timeZone:'UTC'})}<b>${dt.getUTCDate()}</b>${L('daily')}</div><div class="bd"><b style="font-size:18px">${L('daily')}</b><p>${L('dailyBlurb').replace('{n}',DN)} ${L('sameToday')}</p><p>${dly&&S.daily.done?L('completed')+' ✓ · '+L('best')+' '+S.daily.best:dly?L('attempted')+' · '+L('best')+' '+S.daily.best:L('notAttempted')} · Day streak ${dailyStreakNow()} · Best streak ${ds.best||0}</p><p class="sub">Streak reward: +50 coins at 3 days, +100 every 7 days.</p><button class="b pri" data-a="daily">${L('playDaily')}</button></div>`;
@@ -1152,7 +1169,7 @@ document.addEventListener('pointerout',e=>{const target=e.target;if(!target||typ
 document.addEventListener('input',e=>{if(e.target.id!=='settingVolume')return;S.volume=Number(e.target.value);const v=$('#volumeVal');if(v)v.textContent=S.volume+'%';applySettings();save()});
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='settingLang')S.lang=t.value;else if(t.id==='settingMute')S.mute=!t.checked;else if(t.id==='settingHover')S.hoverSound=t.checked;else if(t.id==='settingMotion')S.rm=t.checked;else if(t.id==='settingText')S.largeText=t.checked;else if(t.id==='settingContrast')S.hc=t.checked;else return;save();applySettings();applyLanguage();if(G&&G.contract)updateContract();if(t.id==='settingLang'){settings();$('#settingLang')?.focus()}});
 
-addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='Escape'){pause();return}if(G.paused)return;
+addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='p'||e.key==='P'){pause();return}if(G.paused)return;
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
 addEventListener('resize',size,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',size,{passive:true});
@@ -1160,6 +1177,6 @@ let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;tra
  if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
-(async()=>{await SDK.init();S=load();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
+(async()=>{await SDK.init();let savedBefore=null;try{savedBefore=st.get(KEY);if(savedBefore==null&&SDK.on)savedBefore=localStorage.getItem(KEY)}catch(e){}S=load();if(!savedBefore||!/\"lang\"\s*:/.test(savedBefore))S.lang=preferredLanguage();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
 
 </script></body></html>
