@@ -117,5 +117,9 @@ for (const [width, height] of [[821,462],[907,510],[800,450],[1080,607],[390,844
 }
 assert.match(source, /function syncRotateControl\(\)/, 'rotation must be restricted to active drags');
 assert.match(source, /else if\(!d\.moved\)\{p\.pl=d\.oldPl\}/, 'a click/tap without dragging must not rotate a tray parcel');
+assert.match(source, /else if\(d\.was\)\{[\s\S]{0,420}p\.pl=outside\?null:d\.oldPl;[\s\S]{0,60}\}else\{p\.pl=null;mist\(d\.f\)\}/, 'removing or repositioning a placed parcel must not consume a campaign life');
+assert.match(source, /function requestPlayFullscreen\(\)/, 'standalone browser gameplay should request fullscreen on play');
+assert.match(source, /window\.CrazyGames\?\.SDK\?\.environment==='crazygames'/, 'fullscreen requests must not compete with CrazyGames platform controls');
+
 assert.match(html, /id="rt"[^>]*disabled/, 'rotate must be disabled while idle');
 console.log('Acceptance smoke tests passed: syntax, SDK lifecycle, locale/controls/legal links, placement validation, iframe sizing, and ' + generated + ' deterministic puzzle cases.');
