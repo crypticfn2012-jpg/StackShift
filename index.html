@@ -688,6 +688,8 @@ body:has(#game:not(.hide)) #stage{min-width:0;max-width:100%;margin:0;overflow:h
 }
 @media(max-height:380px) and (orientation:landscape){#stage::after{font-size:7px}#tut #tutText{font-size:9px}#contract{display:none}}
 @media(prefers-reduced-motion:reduce){#stage .pc,#board{transition:none!important}}
+/* Avoid animating the whole game viewport into a clipped position in short embeds. */
+body:has(#game:not(.hide)) #game{animation:none!important;transform:none!important;}
 </style>
 </head>
 <body>
