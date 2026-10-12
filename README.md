@@ -11,7 +11,7 @@ Play: https://crypticfn2012-jpg.github.io/StackShift/
 - Press **Space** or **Enter** to deliver once every parcel is placed.
 - Press **P** or use the on-screen pause button to pause or resume. **Escape is reserved for browser/platform fullscreen controls.**
 
-The game includes Timed Puzzle, Endless, a 100-level Career Campaign, a daily route with streak rewards, special cargo rules, contracts, unlockable cosmetics, achievements, and optional CrazyGames rewarded-ad lives where supported.
+The game includes Timed Puzzle, Endless, a 100-level Career Campaign, a daily route with streak rewards, special cargo rules, a once-per-order parcel hint with a score penalty, contracts, unlockable cosmetics, achievements, and optional CrazyGames rewarded-ad lives where supported.
 
 ## CrazyGames account saves and leaderboards
 
