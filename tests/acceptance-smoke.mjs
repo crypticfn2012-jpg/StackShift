@@ -28,8 +28,8 @@ assert.match(source, /async function encryptLeaderboardScore\(score,encryptionKe
 assert.match(source, /submitScore\(\{encryptedScore:encryptedScore,score:safeScore\}\)/, 'signed-in timed scores should use the CrazyGames leaderboard SDK');
 assert.match(source, /function leaderboardSeasonKey\(\)/, 'leaderboard submission should track weekly seasons');
 assert.match(source, /function hint\(\)/, 'gameplay should provide a parcel-placement hint');
-assert.match(languages, /tutorial:\"Drag parcels into the van[\\s\\S]{0,220}Hint once per order/, 'English tutorial should explain drag-only rotation and the new hint');
-assert.match(languages, /tutorial:\"Arrastra los paquetes[\\s\\S]{0,220}Pista una vez por pedido/, 'Spanish tutorial should include the matching hint guidance');
+assert.match(languages, /tutorial:"Drag parcels into the van[\s\S]{0,220}Hint once per order/, 'English tutorial should explain drag-only rotation and the new hint');
+assert.match(languages, /tutorial:"Arrastra los paquetes[\s\S]{0,220}Pista una vez por pedido/, 'Spanish tutorial should include the matching hint guidance');
 assert.match(source, /G\.hints===0/, 'hint-assisted deliveries must not count as perfect');
 assert.match(html, /id="hintBtn"[^>]*data-a="hint"/, 'a visible hint control should be present in gameplay');
 assert.match(source, /const rankCandidate=!G\.daily&&!G\.endless&&!G\.campaign/, 'only Timed Puzzle scores should be ranked');
