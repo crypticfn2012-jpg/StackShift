@@ -115,6 +115,15 @@ jobs:
           NODE
       - name: Acceptance smoke tests
         run: node tests/acceptance-smoke.mjs
+      - name: Install browser smoke-test tools
+        run: |
+          mkdir -p /tmp/stackshift-browser-smoke
+          cd /tmp/stackshift-browser-smoke
+          npm init -y
+          npm install playwright
+          npx playwright install --with-deps chromium
+      - name: Browser smoke tests
+        run: node tests/browser-smoke.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
