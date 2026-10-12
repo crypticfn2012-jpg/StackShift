@@ -120,6 +120,9 @@ try {
   await page.waitForSelector('#game:not(.hide)', { state: 'visible' });
   await page.waitForFunction(() => window.__stackShiftEvents.gameplayStart > 0);
   assert.equal(await page.locator('#tut:not(.hide)').count(), 1, 'first-run controls tutorial should appear in game');
+  await page.locator('#hintBtn').click();
+  assert.equal(await page.locator('.hint-ghost').count(), 1, 'Hint should reveal the correct parcel position');
+  assert.equal(await page.locator('#hintBtn').isDisabled(), true, 'Hint should only be available once per order');
   const dimensions = await page.evaluate(() => {
     const stage = document.querySelector('#stage').getBoundingClientRect();
     const board = document.querySelector('#board').getBoundingClientRect();
