@@ -8,6 +8,7 @@ Play: https://crypticfn2012-jpg.github.io/StackShift/
 
 - Drag parcels into the van.
 - Tap or click a parcel to select it. Rotation is only available while dragging: press **R**, or use Rotate with a second finger on touch devices.
+- Use **Hint** once per order to reveal one parcel's correct placement. It costs 35 points and the assisted delivery does not count as perfect.
 - Press **Space** or **Enter** to deliver once every parcel is placed.
 - Press **P** or use the on-screen pause button to pause or resume. **Escape is reserved for browser/platform fullscreen controls.**
 
