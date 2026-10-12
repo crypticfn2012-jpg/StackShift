@@ -27,6 +27,9 @@ assert.match(source, /function accountPanelHTML\(\)/, 'CrazyGames account/save s
 assert.match(source, /async function encryptLeaderboardScore\(score,encryptionKey\)/, 'leaderboard client scores must be encrypted');
 assert.match(source, /submitScore\(\{encryptedScore:encryptedScore,score:safeScore\}\)/, 'signed-in timed scores should use the CrazyGames leaderboard SDK');
 assert.match(source, /function leaderboardSeasonKey\(\)/, 'leaderboard submission should track weekly seasons');
+assert.match(source, /function hint\(\)/, 'gameplay should provide a parcel-placement hint');
+assert.match(source, /G\.hints===0/, 'hint-assisted deliveries must not count as perfect');
+assert.match(html, /id="hintBtn"[^>]*data-a="hint"/, 'a visible hint control should be present in gameplay');
 assert.match(source, /const rankCandidate=!G\.daily&&!G\.endless&&!G\.campaign/, 'only Timed Puzzle scores should be ranked');
 assert.match(source, /systemInfo[\s\S]{0,180}locale/, 'SDK locale must be read');
 assert.match(source, /function preferredLanguage\(\)/);
