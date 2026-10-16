@@ -15,7 +15,17 @@ new vm.Script(languages, { filename: 'languages.js' });
 
 // Static checks for controls, embeds, safety, legal links, and platform lifecycle.
 assert.match(html, /name=["']viewport["'][^>]*viewport-fit=cover/i);
-assert.match(html, /user-select:\s*none/i);
+assert.match(html, /cdn\.y8\.com\/minimal-sdk\/2-0\/y8\.min\.js/, 'official Y8 SDK should be loaded asynchronously');
+assert.match(source, /const Y8_APP_ID='6ad27ea36da5b1f7cbf0c634'/, 'Y8 app ID should match the developer-provided credential');
+assert.match(source, /const Y8_GAME_ID='288001'/, 'Y8 game ID should match the developer-provided credential');
+assert.match(source, /const Y8_SCORE_TABLE='Score'/, 'Y8 leaderboard should use the Score table');
+assert.match(source, /window\.y8\.emitReadyEvent\(\)/, 'Y8 ready-event race must be handled');
+assert.match(source, /saveLeaderboardScore\(\{table:Y8_SCORE_TABLE,points:safeScore,allowDuplicates:false,highest:true\}\)/, 'Y8 timed scores should be sent to the configured table');
+assert.match(source, /showLeaderboard\(\{table:Y8_SCORE_TABLE,mode:'alltime',highest:true\}\)/, 'the menu leaderboard button should open the Score table');
+assert.match(source, /Y8\.submitBestScore\(G\.score\)/, 'completed standard timed runs should submit a Y8 score');
+assert.match(source, /window\.CrazyGames&&window\.CrazyGames\.SDK&&window\.CrazyGames\.SDK\.environment==='crazygames'\)return false/, 'Y8 services must stay disabled inside CrazyGames');
+assert.match(source, /y8Result=Y8\.sdk\.showAd\(\{type:'reward'/, 'campaign extra-life ads should use the Y8 rewarded-ad API when appropriate');
+assert.match(source, /user-select:\s*none/i);
 assert.match(html, /touch-action:\s*none/i);
 assert.match(html, /orientation:\s*landscape/i);
 assert.match(source, /SDK\.gs\(\)/, 'gameplay-start event must be wired');
