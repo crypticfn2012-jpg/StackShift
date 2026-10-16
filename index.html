@@ -4,6 +4,7 @@
 <title>Stack Shift</title>
 <link rel="icon" type="image/png" href="./favicon.png">
 <meta name="theme-color" content="#14213f">
+<script src="https://cdn.y8.com/minimal-sdk/2-0/y8.min.js" async></script>
 <style>
 :root{--bg:#26395f;--bg2:#1a2748;--navy:#14213f;--cream:#fbf0d4;--paper:#f4e3b8;--ink:#14213f;--or:#f5862a;--ok:#2f8a55;--bad:#c8382b;--gbg:#ead9b5;--gln:#cdb98d;--u:56px;--f:"Arial Rounded MT Bold","Avenir Next Rounded",Nunito,"Trebuchet MS",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b2845;--bg2:#101a33}}
@@ -813,7 +814,7 @@ body:has(#game:not(.hide)) #game{animation:none!important;transform:none!importa
  <div id="road"><div class="van" id="mvan"></div></div>
  <div class="row mode-row"><button class="b pri big" data-a="play">Timed puzzle</button><button class="b big" data-a="endless">Endless mode</button><button class="b big" data-a="campaignPlay">Career campaign</button></div>
  <div class="dkt" id="dly"></div>
- <div class="row menu-utility"><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="achievements">Achievements</button><button class="b" data-a="settings">Settings</button></div>
+ <div class="row menu-utility"><button class="b hide" id="y8LeaderboardBtn" data-a="y8Leaderboard">Leaderboard</button><button class="b" data-a="shop">Cosmetics</button><button class="b" data-a="achievements">Achievements</button><button class="b" data-a="settings">Settings</button></div>
  <p class="rec" id="rec"></p>
  
 </section>
@@ -935,6 +936,91 @@ async function encryptLeaderboardScore(score,encryptionKey){
  return btoa(String.fromCharCode(...combined));
 }
 function leaderboardSeasonKey(){const now=new Date();if(now.getUTCDay()===1&&now.getUTCHours()<9)now.setUTCDate(now.getUTCDate()-1);now.setUTCDate(now.getUTCDate()-((now.getUTCDay()+6)%7));return now.toISOString().slice(0,10)}
+
+/* ===== platform: Y8 SDK 2.0 (separate from CrazyGames) ===== */
+const Y8_APP_ID='6ad27ea36da5b1f7cbf0c634';
+const Y8_GAME_ID='288001';
+const Y8_SCORE_TABLE='Score';
+let y8Sdk;
+const Y8={
+ on:false,ready:false,sdk:null,user:null,pendingLeaderboard:false,pendingBestScore:0,initStarted:false,
+ isPlatform(){
+  if(window.CrazyGames&&window.CrazyGames.SDK&&window.CrazyGames.SDK.environment==='crazygames')return false;
+  const hosts=[];
+  try{hosts.push(window.top.location.hostname)}catch(e){}
+  try{if(document.referrer)hosts.push(new URL(document.referrer).hostname)}catch(e){}
+  try{hosts.push(window.location.hostname)}catch(e){}
+  return hosts.some(host=>/(^|\.)y8\.com$/i.test(host)||host==='localhost'||host==='127.0.0.1');
+ },
+ refreshButton(){const button=$('#y8LeaderboardBtn');if(button)button.classList.toggle('hide',!this.on||!this.ready)},
+ init(){
+  if(this.initStarted)return;this.initStarted=true;
+  if(!this.isPlatform())return;
+  const initialize=()=>{
+   if(this.ready)return;
+   try{
+    if(!window.y8||typeof window.y8.sdk!=='function')throw new Error('Y8 SDK is unavailable');
+    y8Sdk=window.y8.sdk();this.sdk=y8Sdk;
+    if(!this.sdk||typeof this.sdk.init!=='function')throw new Error('Y8 SDK initialization is unavailable');
+    const appConfig={appId:Y8_APP_ID,autoLogin:true};
+    const adConfig={gameId:Y8_GAME_ID,preloadAdBreaks:'on',sound:'on',onReady:()=>{}};
+    const initResult=this.sdk.init(appConfig,adConfig);
+    this.on=true;this.ready=true;this.refreshButton();
+    if(typeof this.sdk.onAuth==='function'){
+     this.sdk.onAuth((user,error)=>{
+      if(error){
+       console.warn('Y8 authentication was not completed',error);this.user=null;this.refreshButton();
+       if(this.pendingLeaderboard){this.pendingLeaderboard=false;toast('Y8 sign-in did not finish. You can keep playing.')}
+       return;
+      }
+      this.user=user||null;this.refreshButton();
+      if(this.user&&this.pendingBestScore>0){
+       const score=this.pendingBestScore;this.pendingBestScore=0;
+       this.submitBestScore(score).then(ok=>{if(!ok)this.pendingBestScore=Math.max(this.pendingBestScore,score)});
+      }
+      if(this.user&&this.pendingLeaderboard){this.pendingLeaderboard=false;this.openLeaderboard()}
+     });
+    }
+    if(initResult&&typeof initResult.catch==='function')initResult.catch(error=>{
+     console.warn('Y8 SDK initialization failed',error);this.on=false;this.ready=false;this.refreshButton();
+    });
+    if(typeof this.sdk.getLeaderboards==='function'){
+     Promise.resolve(this.sdk.getLeaderboards()).then(tables=>{
+      if(!Array.isArray(tables)||!tables.includes(Y8_SCORE_TABLE))console.warn('Y8 leaderboard table "Score" was not returned. Check the exact table name in the Y8 Developer Portal.',tables);
+     }).catch(error=>console.warn('Could not verify Y8 leaderboard tables',error));
+    }
+   }catch(error){this.on=false;this.ready=false;this.sdk=null;this.refreshButton();console.warn('Y8 SDK unavailable; Stack Shift will continue without Y8 services.',error)}
+  };
+  window.addEventListener('y8sdk.ready',initialize,{once:true});
+  // The SDK script is async; repeat the ready signal in case it loaded first.
+  if(window.y8&&typeof window.y8.emitReadyEvent==='function')window.y8.emitReadyEvent();
+ },
+ canShowRewardAd(){return !!(this.on&&this.ready&&this.sdk&&typeof this.sdk.showAd==='function')},
+ async submitBestScore(score){
+  const safeScore=Math.max(0,Math.floor(Number(score)||0));
+  if(!safeScore||!this.on||!this.ready)return false;
+  if(!this.user||!this.sdk||typeof this.sdk.saveLeaderboardScore!=='function'){
+   this.pendingBestScore=Math.max(this.pendingBestScore,safeScore);return false;
+  }
+  try{
+   await this.sdk.saveLeaderboardScore({table:Y8_SCORE_TABLE,points:safeScore,allowDuplicates:false,highest:true});
+   return true;
+  }catch(error){console.warn('Y8 leaderboard score submission failed',error);this.pendingBestScore=Math.max(this.pendingBestScore,safeScore);return false}
+ },
+ openLeaderboard(){
+  if(!this.on||!this.ready||!this.sdk){toast('The Y8 leaderboard is available on Y8.');return}
+  if(!this.user){
+   this.pendingLeaderboard=true;
+   if(typeof this.sdk.login==='function'){
+    try{this.sdk.login()}catch(error){this.pendingLeaderboard=false;console.warn('Y8 login failed',error);toast('Y8 sign-in is unavailable right now.')}
+   }else{this.pendingLeaderboard=false;toast('Sign in to Y8 to view the leaderboard.')}
+   return;
+  }
+  if(typeof this.sdk.showLeaderboard!=='function'){toast('Y8 leaderboards are unavailable right now.');return}
+  try{Promise.resolve(this.sdk.showLeaderboard({table:Y8_SCORE_TABLE,mode:'alltime',highest:true})).catch(error=>{console.warn('Could not open Y8 leaderboard',error);toast('Could not open the Y8 leaderboard.')})}
+  catch(error){console.warn('Could not open Y8 leaderboard',error);toast('Could not open the Y8 leaderboard.')}
+ }
+};
 const CAMPAIGN=[
  {id:'route',title:'First route',desc:'Complete 3 deliveries in a timed shift',reward:50,check:(s,g)=>!g.daily&&!g.endless&&g.done>=3},
  {id:'clean',title:'Careful loading',desc:'Make 3 perfect deliveries in one shift',reward:75,check:(s,g)=>g.perf>=3},
@@ -1016,14 +1102,16 @@ let G=null,drag=null,sel=null,U=56,tt,lifeAdBusy=false,lifeAdNextAt=0;
 const LIFE_AD_KEY='stackshift_life_ad_next';
 function lifeAdCooldown(){let stored=0;try{stored=Number(localStorage.getItem(LIFE_AD_KEY))||0}catch(e){}return Math.max(lifeAdNextAt,stored)}
 function lifeAdOffer(context){
- if(!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed)||!SDK.on||!SDK.c||!SDK.c.ad||typeof SDK.c.ad.requestAd!=='function')return'';
+ const crazyAds=!!(SDK.on&&SDK.c&&SDK.c.ad&&typeof SDK.c.ad.requestAd==='function');const y8Ads=Y8.canShowRewardAd();
+ if(!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed)||(!crazyAds&&!y8Ads))return'';
  const left=lifeAdCooldown()-Date.now();
  if(left>0)return'<p class="sub">Extra life ad available in '+Math.ceil(left/1000)+'s.</p>';
  return '<button class="b" data-a="lifeAd" data-context="'+context+'">Watch an ad for +1 life</button>';
 }
 async function requestLifeAd(context){
  if(lifeAdBusy||!G||!G.campaign||((G.lives||0)>1&&!G.campaignFailed))return;
- if(!SDK.on||!SDK.c||!SDK.c.ad||typeof SDK.c.ad.requestAd!=='function'){toast('Rewarded ads are unavailable right now');return}
+ const crazyAds=!!(SDK.on&&SDK.c&&SDK.c.ad&&typeof SDK.c.ad.requestAd==='function');const useY8=!crazyAds&&Y8.canShowRewardAd();
+ if(!crazyAds&&!useY8){toast('Rewarded ads are unavailable right now');return}
  const wait=lifeAdCooldown()-Date.now();if(wait>0){toast('Try again in '+Math.ceil(wait/1000)+' seconds');return}
  lifeAdBusy=true;
  const previousGain=MG?MG.gain.value:null;
@@ -1036,11 +1124,16 @@ async function requestLifeAd(context){
    const finish=error=>{if(settled)return;settled=true;clearTimeout(adTimer);error?reject(error instanceof Error?error:new Error(error&&error.message||'Rewarded ad failed')):resolve()};
    adTimer=setTimeout(()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad timed out'))},120000);
    try{
-    SDK.c.ad.requestAd('rewarded',{
-     adStarted:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},
-     adFinished:()=>{if(!started)setCooldown(180000);finish()},
-     adError:error=>{if(!started)setCooldown(30000);finish(error||new Error('No ad available'))}
-    })
+    if(useY8){
+     const y8Result=Y8.sdk.showAd({type:'reward',name:'campaign-extra-life',beforeAd:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},afterAd:()=>{},beforeReward:showAdFn=>{if(typeof showAdFn==='function')showAdFn();else finish(new Error('Y8 rewarded ad was not ready'))},adViewed:()=>{setCooldown(180000);finish()},adDismissed:()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad dismissed before completion'))},adBreakDone:info=>{if(!info||info.breakStatus!=='viewed'){if(!started)setCooldown(30000);finish(new Error('Y8 rewarded ad unavailable: '+(info&&info.breakStatus||'unknown status')))}});
+     if(y8Result&&typeof y8Result.catch==='function')y8Result.catch(error=>{if(!started)setCooldown(30000);finish(error)});
+    }else{
+     SDK.c.ad.requestAd('rewarded',{
+      adStarted:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},
+      adFinished:()=>{if(!started)setCooldown(180000);finish()},
+      adError:error=>{if(!started)setCooldown(30000);finish(error||new Error('No ad available'))}
+     })
+    }
    }catch(e){if(!started)setCooldown(30000);finish(e)}
   });
   if(!G||!G.campaign)throw new Error('Campaign ended');
@@ -1291,6 +1384,7 @@ function end(){if(!G||!G.run)return;G.run=false;if(drag){drag.p.el.classList.rem
  const rankSeason=leaderboardSeasonKey();const rankCandidate=!G.daily&&!G.endless&&!G.campaign&&G.score>0&&SDK.canSubmitScore()&&(S.leaderboardSeason!==rankSeason||G.score>Number(S.leaderboardBest||0))?{season:rankSeason,score:Math.floor(G.score)}:null;
  S.best=Math.max(prev,G.score);S.shifts++;if(G.done>=5)S.wins++;const campaignReward=0;coins+=campaignReward;S.coins+=coins;S.life+=coins;ach();save();
  if(rankCandidate)SDK.submitBestScore(rankCandidate.score).then(ok=>{if(ok){S.leaderboardSeason=rankCandidate.season;S.leaderboardBest=rankCandidate.score;save()}});
+ if(!G.daily&&!G.endless&&!G.campaign&&G.score>0)Y8.submitBestScore(G.score);
  sfx(pb||G.win?'pb':'end');buzz([20,60,20]);SDK.gx();if(pb||G.win)SDK.ht();if(pb)burst();G.pb=pb;G.coins=coins;G.prev=prev;results()}
 function shareTxt(){const g=G;return`Stack Shift 📦\nScore ${g.score}${g.pb?' (new personal best!)':''}\nOrders ${g.done} · Best streak ${g.bs}`+(g.daily?`\nDaily ${g.date}: ${g.win?'complete ✅':g.done+'/'+DN+' orders'}`:'')}
 function results(){setTimeout(countUp,0);const g=G,acc=g.done?Math.round(g.perf/g.done*100):0,avg=g.done?(g.el/g.done).toFixed(1):'–',d=g.score-g.prev;
@@ -1346,7 +1440,7 @@ function shop(pv){const eq=Object.assign({},S.eq),it=pv&&cat(pv);if(it)eq[it[0]]
  for(const[k,n]of[['van',L('vanPaint')],['pal',L('parcelColors')],['grd',L('cargoFloor')],['dec',L('decal')]])h+=`<h3>${n}</h3><div class="chips">`+C.filter(c=>c[0]===k&&(!c[5]||S.own.includes(c[1]))).map(c=>`<button class="chip${c[1]===eq[k]?' on':''}" data-a="pick" data-id="${c[1]}">${c[2]}<small>${S.own.includes(c[1])?(S.eq[k]===c[1]?L('equipped'):L('owned')):c[3]+' '+L('coins')}</small></button>`).join('')+'</div>';
  if(it){const own=S.own.includes(it[1]);h+=own?`<button class="b pri" data-a="eq" data-id="${it[1]}" ${S.eq[it[0]]===it[1]?'disabled':''}>${S.eq[it[0]]===it[1]?L('equipped'):L('equip')+' '+it[2]}</button>`:`<button class="b pri" data-a="buy" data-id="${it[1]}" ${S.coins<it[3]?'disabled':''}>${L('buy')} ${it[2]} · ${it[3]} ${L('coins')}</button>`}
  ov(h+'<button class="b" data-a="done">'+L('done')+'</button>');$('#ov .card').classList.add('cosmetics-card');applyTheme(eq)}
-const A={play:()=>start(0),hint:hint,account:()=>SDK.signIn(),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
+const A={play:()=>start(0),hint:hint,account:()=>SDK.signIn(),y8Leaderboard:()=>Y8.openLeaderboard(),settings:()=>{settingsBack=!!(G&&G.run&&G.paused);settings()},settingsClose:()=>{cl();applySettings();applyLanguage();if(settingsBack&&G&&G.run&&G.paused){settingsBack=false;pcard()}else{settingsBack=false;menu()}},daily:()=>start(1),endless:()=>start(0,true),again:()=>start(G.daily,G.endless,G.campaign),again0:()=>start(G.daily,G.endless,G.campaign),menu:toMenu,copy:b=>copy(b),campaign:campaign,campaignClose:()=>{cl();menu()},campaignPlay:()=>start(0,false,true),shop:()=>shop(),pick:b=>shop(b.dataset.id),
  buy:b=>{const it=cat(b.dataset.id);if(S.coins>=it[3]&&!S.own.includes(it[1])){S.coins-=it[3];S.own.push(it[1]);S.eq[it[0]]=it[1];save();toast(it[2]+' unlocked');sfx('buy')}shop(it[1])},
  eq:b=>{const it=cat(b.dataset.id);if(S.own.includes(it[1])){S.eq[it[0]]=it[1];save()}shop(it[1])},
  done:()=>{applyTheme(S.eq);cl();menu()},achievements:()=>achievements(),achClose:()=>{cl();menu()},achFilter:b=>achievements(b.dataset.filter),
@@ -1375,6 +1469,6 @@ let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;tra
  if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
 const bootBar=$('#bootBar');let bootP=4;const bootTimer=setInterval(()=>{bootP=Math.min(88,bootP+Math.random()*7+2);bootBar.style.width=bootP+'%'},180);
-(async()=>{await SDK.init();let savedBefore=null;try{savedBefore=st.get(KEY);if(savedBefore==null&&SDK.on&&SDK.dataAvailable){const legacy=localStorage.getItem(KEY);if(legacy!=null){SDK.c.data.setItem(KEY,legacy);savedBefore=legacy}}}catch(e){console.warn('Legacy save migration was not available',e)}S=load();if(!savedBefore||!/\"lang\"\s*:/.test(savedBefore))S.lang=preferredLanguage();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
+(async()=>{await SDK.init();Y8.init();let savedBefore=null;try{savedBefore=st.get(KEY);if(savedBefore==null&&SDK.on&&SDK.dataAvailable){const legacy=localStorage.getItem(KEY);if(legacy!=null){SDK.c.data.setItem(KEY,legacy);savedBefore=legacy}}}catch(e){console.warn('Legacy save migration was not available',e)}S=load();if(!savedBefore||!/\"lang\"\s*:/.test(savedBefore))S.lang=preferredLanguage();save();applyTheme(S.eq);applySettings();size();menu();SDK.loaded();requestAnimationFrame(frame);clearInterval(bootTimer);bootBar.style.width='100%';$('#bootCaption').textContent='Ready to stack';setTimeout(()=>$('#boot').classList.add('done'),420)})();
 
 </script></body></html>
