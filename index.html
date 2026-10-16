@@ -4,7 +4,6 @@
 <title>Stack Shift</title>
 <link rel="icon" type="image/png" href="./favicon.png">
 <meta name="theme-color" content="#14213f">
-<script src="https://cdn.y8.com/minimal-sdk/2-0/y8.min.js" async></script>
 <style>
 :root{--bg:#26395f;--bg2:#1a2748;--navy:#14213f;--cream:#fbf0d4;--paper:#f4e3b8;--ink:#14213f;--or:#f5862a;--ok:#2f8a55;--bad:#c8382b;--gbg:#ead9b5;--gln:#cdb98d;--u:56px;--f:"Arial Rounded MT Bold","Avenir Next Rounded",Nunito,"Trebuchet MS",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1b2845;--bg2:#101a33}}
@@ -938,6 +937,7 @@ async function encryptLeaderboardScore(score,encryptionKey){
 function leaderboardSeasonKey(){const now=new Date();if(now.getUTCDay()===1&&now.getUTCHours()<9)now.setUTCDate(now.getUTCDate()-1);now.setUTCDate(now.getUTCDate()-((now.getUTCDay()+6)%7));return now.toISOString().slice(0,10)}
 
 /* ===== platform: Y8 SDK 2.0 (separate from CrazyGames) ===== */
+const Y8_SDK_URL='https://cdn.y8.com/minimal-sdk/2-0/y8.min.js';
 const Y8_APP_ID='6ad27ea36da5b1f7cbf0c634';
 const Y8_GAME_ID='288001';
 const Y8_SCORE_TABLE='Score';
@@ -995,8 +995,15 @@ const Y8={
    }catch(error){this.on=false;this.ready=false;this.sdk=null;this.refreshButton();console.warn('Y8 SDK unavailable; Stack Shift will continue without Y8 services.',error)}
   };
   window.addEventListener('y8sdk.ready',initialize,{once:true});
-  // The SDK script is async; repeat the ready signal in case it loaded first.
-  if(window.y8&&typeof window.y8.emitReadyEvent==='function')window.y8.emitReadyEvent();
+  // Load Y8 only on Y8 (or an explicitly opted-in local preview), leaving other platforms untouched.
+  if(window.y8&&typeof window.y8.emitReadyEvent==='function'){
+   window.y8.emitReadyEvent();return;
+  }
+  const script=document.createElement('script');
+  script.src=Y8_SDK_URL;script.async=true;
+  script.addEventListener('load',()=>{if(window.y8&&typeof window.y8.emitReadyEvent==='function')window.y8.emitReadyEvent()},{once:true});
+  script.addEventListener('error',()=>console.warn('Y8 SDK script failed to load; Stack Shift will continue without Y8 services.'),{once:true});
+  document.head.appendChild(script);
  },
  canShowRewardAd(){return !!(this.on&&this.ready&&this.sdk&&typeof this.sdk.showAd==='function')},
  async submitBestScore(score){
