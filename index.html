@@ -945,12 +945,16 @@ let y8Sdk;
 const Y8={
  on:false,ready:false,sdk:null,user:null,pendingLeaderboard:false,pendingBestScore:0,initStarted:false,
  isPlatform(){
-  if(window.CrazyGames&&window.CrazyGames.SDK&&window.CrazyGames.SDK.environment==='crazygames')return false;
+  const environment=window.CrazyGames&&window.CrazyGames.SDK&&window.CrazyGames.SDK.environment;
+  // Do not initialize a second platform adapter inside another active SDK.
+  if(environment&&environment!=='disabled'&&environment!=='y8')return false;
+  try{if(new URLSearchParams(window.location.search).get('platform')==='y8')return true}catch(e){}
   const hosts=[];
   try{hosts.push(window.top.location.hostname)}catch(e){}
   try{if(document.referrer)hosts.push(new URL(document.referrer).hostname)}catch(e){}
   try{hosts.push(window.location.hostname)}catch(e){}
-  return hosts.some(host=>/(^|\.)y8\.com$/i.test(host)||host==='localhost'||host==='127.0.0.1');
+  return hosts.some(host=>/(^|\\.)y8\\.com$/i.test(host));
+ }
  },
  refreshButton(){const button=$('#y8LeaderboardBtn');if(button)button.classList.toggle('hide',!this.on||!this.ready)},
  init(){
