@@ -24,7 +24,7 @@ assert.match(source, /saveLeaderboardScore\(\{table:Y8_SCORE_TABLE,points:safeSc
 assert.match(source, /showLeaderboard\(\{table:Y8_SCORE_TABLE,mode:'alltime',highest:true\}\)/, 'the menu leaderboard button should open the Score table');
 assert.match(source, /Y8\.submitBestScore\(G\.score\)/, 'completed standard timed runs should submit a Y8 score');
 assert.match(source, /window\.CrazyGames&&window\.CrazyGames\.SDK&&window\.CrazyGames\.SDK\.environment==='crazygames'\)return false/, 'Y8 services must stay disabled inside CrazyGames');
-assert.match(source, /y8Result=Y8\.sdk\.showAd\(\{type:'reward'/, 'campaign extra-life ads should use the Y8 rewarded-ad API when appropriate');
+assert.match(source, /y8Result=Y8\.sdk\.showAd\(\{\s*type:'reward'/, 'campaign extra-life ads should use the Y8 rewarded-ad API when appropriate');
 assert.match(source, /user-select:\s*none/i);
 assert.match(html, /touch-action:\s*none/i);
 assert.match(html, /orientation:\s*landscape/i);
