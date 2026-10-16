@@ -953,8 +953,7 @@ const Y8={
   try{hosts.push(window.top.location.hostname)}catch(e){}
   try{if(document.referrer)hosts.push(new URL(document.referrer).hostname)}catch(e){}
   try{hosts.push(window.location.hostname)}catch(e){}
-  return hosts.some(host=>/(^|\\.)y8\\.com$/i.test(host));
- }
+  return hosts.some(host=>{const value=String(host).toLowerCase();return value==='y8.com'||value.endsWith('.y8.com')});
  },
  refreshButton(){const button=$('#y8LeaderboardBtn');if(button)button.classList.toggle('hide',!this.on||!this.ready)},
  init(){
