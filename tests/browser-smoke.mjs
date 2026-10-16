@@ -39,7 +39,7 @@ const initScript = () => {
   window.__stackShiftTestUser = null;
   window.__stackShiftSubmittedScores = [];
   window.__stackShiftFullscreenCalls = 0;
-  document.documentElement.requestFullscreen = async () => { window.__stackShiftFullscreenCalls++; };
+  Element.prototype.requestFullscreen = async function () { window.__stackShiftFullscreenCalls++; };
 
   const call = (name) => (...args) => { window.__stackShiftEvents[name]++; return undefined; };
   window.CrazyGames = { SDK: {
