@@ -33,7 +33,7 @@ The client-side SDK submission is appropriate for this static browser game, but 
 - The Y8 leaderboard table name must be exactly `Score`. The menu's **Leaderboard** button opens the all-time table; if the player is not authenticated, the game starts Y8 sign-in first.
 - Only regular **Timed Puzzle** runs submit a score to Y8. Daily Route, Endless, and Campaign runs are excluded. Y8 keeps each player's best score in the table.
 - The Campaign extra-life reward uses Y8's rewarded-ad API when running on Y8. The existing CrazyGames leaderboard, cloud-save and rewarded-ad paths are kept separate and unchanged.
-- Y8 features are enabled on Y8 domains (and localhost for development) and intentionally stay hidden when the CrazyGames SDK identifies the CrazyGames environment.
+- Y8 features are enabled on Y8 domains. For local development, append `?platform=y8` to opt in; the adapter stays off inside another active platform SDK, including CrazyGames.
 
 ## Quality checks
 
