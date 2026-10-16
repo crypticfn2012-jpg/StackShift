@@ -27,6 +27,14 @@ The game includes Timed Puzzle, Endless, a 100-level Career Campaign, a daily ro
 
 The client-side SDK submission is appropriate for this static browser game, but client scores are not tamper-proof; CrazyGames notes that server-side validation is stronger. Do not treat the encryption key as a server secret.
 
+## Y8 SDK, Score leaderboard, and rewarded lives
+
+- Stack Shift loads the official Y8 SDK 2.0 from `https://cdn.y8.com/minimal-sdk/2-0/y8.min.js` and initializes it with App ID `6ad27ea36da5b1f7cbf0c634`, Game ID `288001`, and automatic login.
+- The Y8 leaderboard table name must be exactly `Score`. The menu's **Leaderboard** button opens the all-time table; if the player is not authenticated, the game starts Y8 sign-in first.
+- Only regular **Timed Puzzle** runs submit a score to Y8. Daily Route, Endless, and Campaign runs are excluded. Y8 keeps each player's best score in the table.
+- The Campaign extra-life reward uses Y8's rewarded-ad API when running on Y8. The existing CrazyGames leaderboard, cloud-save and rewarded-ad paths are kept separate and unchanged.
+- Y8 features are enabled on Y8 domains (and localhost for development) and intentionally stay hidden when the CrazyGames SDK identifies the CrazyGames environment.
+
 ## Quality checks
 
 Pushes to `main` run JavaScript syntax checks, seeded puzzle-generation and placement tests, SDK/control/legal-link checks, and target-iframe sizing smoke tests before deploying GitHub Pages. Automated tests do not replace manual checks in CrazyGames Preview at the required iframe sizes and on a physical touch device.
