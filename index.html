@@ -1125,7 +1125,21 @@ async function requestLifeAd(context){
    adTimer=setTimeout(()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad timed out'))},120000);
    try{
     if(useY8){
-     const y8Result=Y8.sdk.showAd({type:'reward',name:'campaign-extra-life',beforeAd:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},afterAd:()=>{},beforeReward:showAdFn=>{if(typeof showAdFn==='function')showAdFn();else finish(new Error('Y8 rewarded ad was not ready'))},adViewed:()=>{setCooldown(180000);finish()},adDismissed:()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad dismissed before completion'))},adBreakDone:info=>{if(!info||info.breakStatus!=='viewed'){if(!started)setCooldown(30000);finish(new Error('Y8 rewarded ad unavailable: '+(info&&info.breakStatus||'unknown status')))}});
+     const y8Result=Y8.sdk.showAd({
+      type:'reward',
+      name:'campaign-extra-life',
+      beforeAd:()=>{started=true;setCooldown(180000);if(MG)MG.gain.value=0},
+      afterAd:()=>{},
+      beforeReward:showAdFn=>{if(typeof showAdFn==='function')showAdFn();else finish(new Error('Y8 rewarded ad was not ready'))},
+      adViewed:()=>{setCooldown(180000);finish()},
+      adDismissed:()=>{if(!started)setCooldown(30000);finish(new Error('Rewarded ad dismissed before completion'))},
+      adBreakDone:info=>{
+       if(!info||info.breakStatus!=='viewed'){
+        if(!started)setCooldown(30000);
+        finish(new Error('Y8 rewarded ad unavailable: '+(info&&info.breakStatus||'unknown status')));
+       }
+      }
+     });
      if(y8Result&&typeof y8Result.catch==='function')y8Result.catch(error=>{if(!started)setCooldown(30000);finish(error)});
     }else{
      SDK.c.ad.requestAd('rewarded',{
