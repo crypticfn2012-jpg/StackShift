@@ -608,6 +608,30 @@ h3{font-size:13px;font-weight:750;letter-spacing:.02em;color:#3e4d63}
  #menu>#rec,#menu>#dly{grid-column:1}
 }
 
+
+/* CrazyGames iframe sizing: keep the full play HUD visible in a short 16:9 embed. */
+@media (min-width:600px) and (max-height:520px){
+  body:has(#game:not(.hide)){height:100dvh;min-height:0;overflow:hidden}
+  body:has(#game:not(.hide)) #app{height:100dvh;min-height:0;max-height:100dvh;width:100%;max-width:100%;padding:5px 9px;overflow:hidden}
+  #game:not(.hide){height:100%;min-height:0;max-height:100%;grid-template-rows:auto minmax(0,1fr) auto auto;row-gap:5px;column-gap:8px}
+  #hud{padding:5px 8px;gap:7px}
+  #sc{font-size:clamp(22px,3.2vh,28px)}
+  #stage{min-height:0;max-height:100%;overflow:hidden}
+  #ord,#contract{margin:0;padding:6px 8px;gap:6px;min-width:0}
+  #ord .van{width:34px}
+  #rl{font-size:11px;line-height:1.2}
+  #on,#contract small{font-size:9px;line-height:1.25}
+  #contract .mark{width:24px;height:24px;font-size:14px}
+  #contract b{font-size:10px}
+  #tut{margin:0;padding:5px 7px;font-size:10px;line-height:1.2}
+  #tut .tutorial-keys{gap:3px}
+  #tut .tutorial-keys span{min-width:25px;height:21px;padding:2px 3px}
+  #tut kbd{font-size:9px}
+  #tut #tutText{font-size:9px;line-height:1.2}
+  #acts{position:relative;bottom:auto;display:flex;flex-direction:row;gap:5px;margin:0;padding:0;background:none;min-width:0}
+  #acts .b{flex:1;min-width:0;min-height:32px;margin:0;padding:5px 4px;font-size:10px}
+}
+
 </style><style id="achievement-polish">
 #ov .card.achievements-card{width:min(650px,calc(100vw - 24px));max-width:650px;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;padding:18px}
 .achievements-card .feature-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 14px}
@@ -1489,6 +1513,12 @@ addEventListener('keydown',e=>{if(!G||!G.run)return;if(e.key==='p'||e.key==='P')
  if(e.key==='r'||e.key==='R'){rotSel();e.preventDefault()}else if(e.key===' '||e.key==='Enter'){e.preventDefault();deliver()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&G.run&&!G.paused)pause(true)});
 addEventListener('resize',size,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',size,{passive:true});
+/* Recalculate the board when the host iframe/container changes dimensions. */
+if(typeof ResizeObserver!=='undefined'){
+ const gameSizeObserver=new ResizeObserver(()=>size());
+ gameSizeObserver.observe(stage);
+ gameSizeObserver.observe(document.documentElement);
+}
 let last=0;function frame(ts){const dt=Math.min(.1,(ts-last)/1e3||0);last=ts;trackPlaytime(dt);
  if(G&&G.run&&!G.paused){if(!G.endless&&!G.campaign)G.t-=dt;G.os+=dt;G.el+=dt;hud();if(!G.endless&&!G.campaign&&G.t<=0){G.t=0;hud();end()}}requestAnimationFrame(frame)}
 /* ===== boot ===== */
