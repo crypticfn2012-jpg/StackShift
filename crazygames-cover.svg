@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs>
+ <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#38527d"/><stop offset="1" stop-color="#111d38"/></linearGradient>
+ <linearGradient id="orange" x2="0" y2="1"><stop stop-color="#ffd18b"/><stop offset=".5" stop-color="#f5862a"/><stop offset="1" stop-color="#bd4c1e"/></linearGradient>
+ <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="2"/></pattern>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="20" stdDeviation="15" flood-color="#071225" flood-opacity=".55"/></filter>
+</defs>
+<rect width="1920" height="1080" fill="url(#bg)"/><rect width="1920" height="1080" fill="url(#grid)"/>
+<circle cx="1430" cy="500" r="540" fill="#f5862a" opacity=".12"/>
+<path d="M0 870 350 740 650 870 930 700 1220 860 1520 690 1920 850V1080H0Z" fill="#0e1b34" opacity=".72"/>
+<g transform="translate(1090 205)" filter="url(#shadow)">
+ <path d="M0 400 260 250 520 400 260 550Z" fill="#d2b184" stroke="#14213f" stroke-width="15"/>
+ <path d="M0 400v-220l260-150v220Z" fill="#e8d4ad" stroke="#14213f" stroke-width="15"/>
+ <path d="M520 400V180L260 30v220Z" fill="#b98e5b" stroke="#14213f" stroke-width="15"/>
+ <path d="M0 180 260 30 520 180 260 330Z" fill="#f5e6c8" stroke="#14213f" stroke-width="15"/>
+ <path d="M95 345 260 250 425 345 260 440Z" fill="#f5862a" stroke="#14213f" stroke-width="10"/>
+ <path d="M95 345v-100l165-95v100Z" fill="#ffb15f" stroke="#14213f" stroke-width="10"/>
+ <path d="M425 345V245L260 150v100Z" fill="#d85e24" stroke="#14213f" stroke-width="10"/>
+ <path d="M150 210 260 145 370 210 260 275Z" fill="#f4e3b8" stroke="#14213f" stroke-width="9"/>
+ <path d="M260 275v120" stroke="#14213f" stroke-width="10"/>
+</g>
+<g transform="translate(1250 710)" filter="url(#shadow)">
+ <path d="M0 70h260l70 75v100H0Z" fill="#f5862a" stroke="#14213f" stroke-width="15" stroke-linejoin="round"/>
+ <path d="M260 70v75h70" fill="#ffc078" stroke="#14213f" stroke-width="12"/>
+ <path d="M28 95h170v95H28Z" fill="#bce9f0" stroke="#14213f" stroke-width="10"/>
+ <circle cx="75" cy="245" r="34" fill="#14213f" stroke="#f4e3b8" stroke-width="12"/>
+ <circle cx="265" cy="245" r="34" fill="#14213f" stroke="#f4e3b8" stroke-width="12"/>
+ <path d="M40 45h120" stroke="#ffd18b" stroke-width="14" stroke-linecap="round"/>
+</g>
+<g transform="translate(150 250)" filter="url(#shadow)">
+ <path d="M80 120 170 25 260 120 170 215Z" fill="#f4e3b8" stroke="#14213f" stroke-width="14"/>
+ <path d="M80 120v190l90 50V215Z" fill="#d3b58a" stroke="#14213f" stroke-width="14"/>
+ <path d="M260 120v190l-90 50V215Z" fill="#a87a4d" stroke="#14213f" stroke-width="14"/>
+ <path d="M105 120 170 82 235 120 170 158Z" fill="#f5862a" stroke="#14213f" stroke-width="8"/>
+</g>
+<g transform="translate(100 760)"><text x="0" y="0" fill="#ffd49b" font-family="Arial,sans-serif" font-size="32" font-weight="900" letter-spacing="12">A QUICK-FIRE PARCEL PUZZLE</text><text x="0" y="138" fill="#fff0d1" stroke="#14213f" stroke-width="7" paint-order="stroke fill" font-family="Arial Rounded MT Bold,Arial,sans-serif" font-size="150" font-weight="900" letter-spacing="-2">STACK SHIFT</text><text x="8" y="202" fill="#d7e6ff" font-family="Arial,sans-serif" font-size="35" font-weight="800" letter-spacing="11">SORT IT. STACK IT. SHIP IT.</text></g>
+</svg>
